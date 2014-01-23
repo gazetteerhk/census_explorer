@@ -5,17 +5,7 @@ import multiprocessing
 import os
 import constituency_areas
 import urllib2
-import logging
-
-logger = logging.getLogger('log')
-logger.setLevel(logging.DEBUG)
-log_formatter = logging.Formatter('%(asctime)s - %(module)s - %(levelname)s - %(message)s',
-                                  datefmt='%Y-%m-%d %H:%M:%S')
-# Log to console
-logstream = logging.StreamHandler()
-logstream.setLevel(logging.INFO)
-logstream.setFormatter(log_formatter)
-logger.addHandler(logstream)
+from log import logger
 
 
 def download_file(remote_local_pair):
@@ -29,11 +19,12 @@ def download_file(remote_local_pair):
 # Path for the Excel Spreadsheets appears to be:
 # http://idds.census2011.gov.hk/Fact_sheets/CA/N06.xlsx
 # Where the file name is the district code
+area_codes = [x.upper() for x in constituency_areas.english['All Districts'].values()]
+all_files = set([x + ".xlsx" for x in area_codes])
+base_path = os.path.abspath("./data")
 
 if __name__ == "__main__":
-    area_codes = [x.upper() for x in constituency_areas.english['All Districts'].values()]
     base_remote_path = "http://idds.census2011.gov.hk/Fact_sheets/CA/"
-    base_path = os.path.abspath("./data")
 
     if not os.path.exists(base_path):
         logger.info("{} does not exist, creating it".format(base_path))
@@ -56,7 +47,6 @@ if __name__ == "__main__":
 
     # Check that all the files were downloaded
     files_in_folder = set(os.listdir(base_path))
-    all_files = set([x + ".xlsx" for x in area_codes])
 
     assert all_files.issubset(files_in_folder), "Some files are missing {}".format(all_files.difference(files_in_folder))
     logger.info("{} files downloaded".format(len(all_files)))
