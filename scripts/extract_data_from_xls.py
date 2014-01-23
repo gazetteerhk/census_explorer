@@ -47,12 +47,17 @@ def check_sheet(wb, tab_name, col, check_col):
         return error_rows
 
 
-def check_row_names():
+def check_for_differences():
     """
     Checks that columns A and H in all of the workbooks match up.
     Just a simple check to see if we need to do more complicated parsing
 
     Really slow, I think because of opening each file.
+
+    Here's the results of this:
+    Counter({0: 1233, 11: 1224, 10: 1200, 9: 1191, 7: 1173, 12: 1023, 13: 1023, 14: 1023, 8: 708})
+    Basically the problem is the ethnicity section, which seems to change sorts for each district.  Not a big problem.
+
     """
     # Make the base versions to compare against
     a01 = xlrd.open_workbook(os.path.join(base_path, 'A01.xlsx'))
