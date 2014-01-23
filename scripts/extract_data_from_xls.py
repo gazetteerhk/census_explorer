@@ -2,7 +2,7 @@ from collections import Counter
 import os
 from log import logger
 from constituency_area_data import all_files, base_path
-import openpyxl
+import xlrd
 
 
 def check_sheet(wb, tab_name, col, check_col):
@@ -24,8 +24,8 @@ def check_sheet(wb, tab_name, col, check_col):
         The workbook to use
     """
     matches = True
-    tmp_sheet = wb.get_sheet_by_name(tab_name)
-    tmp = [x.value for x in tmp_sheet.columns[col]]
+    tmp_sheet = wb.sheet_by_name(tab_name)
+    tmp = [x.value for x in tmp_sheet.col(col)]
     error_rows = []
     if tmp != check_col:
         matches = False
@@ -55,25 +55,25 @@ def check_row_names():
     Really slow, I think because of opening each file.
     """
     # Make the base versions to compare against
-    a01 = openpyxl.load_workbook(os.path.join(base_path, 'A01.xlsx'))
-    tmp_sheet = a01.get_sheet_by_name('A01e')
-    base_english_a = [x.value for x in tmp_sheet.columns[0]]
-    base_english_h = [x.value for x in tmp_sheet.columns[7]]
-    tmp_sheet = a01.get_sheet_by_name('A01t')
-    base_traditional_a = [x.value for x in tmp_sheet.columns[0]]
-    base_traditional_h = [x.value for x in tmp_sheet.columns[7]]
-    tmp_sheet = a01.get_sheet_by_name('A01s')
-    base_simplified_a = [x.value for x in tmp_sheet.columns[0]]
-    base_simplified_h = [x.value for x in tmp_sheet.columns[7]]
+    a01 = xlrd.open_workbook(os.path.join(base_path, 'A01.xlsx'))
+    tmp_sheet = a01.sheet_by_name('A01e')
+    base_english_a = [x.value for x in tmp_sheet.col(0)]
+    base_english_h = [x.value for x in tmp_sheet.col(7)]
+    tmp_sheet = a01.sheet_by_name('A01t')
+    base_traditional_a = [x.value for x in tmp_sheet.col(0)]
+    base_traditional_h = [x.value for x in tmp_sheet.col(7)]
+    tmp_sheet = a01.sheet_by_name('A01s')
+    base_simplified_a = [x.value for x in tmp_sheet.col(0)]
+    base_simplified_h = [x.value for x in tmp_sheet.col(7)]
     counter = 0
     errors = 0
     frequency = Counter()
 
-    for f in list(all_files)[0:1]:
+    for f in all_files:
         base_sheet_name = f[:3]
         filepath = os.path.join(base_path, f)
         logger.info("Checking file {}".format(f))
-        wb = openpyxl.load_workbook(filepath)
+        wb = xlrd.open_workbook(filepath)
 
         # Check the sheets
         results = [
@@ -90,7 +90,7 @@ def check_row_names():
         # so that we can quickly see which rows need extra attention
         [frequency.update(a) for a in results if a is not True]
 
-        if all(results):
+        if all([x is True for x in results]):
             counter += 1
             logger.info(u"No errors in file {}".format(f))
         else:
