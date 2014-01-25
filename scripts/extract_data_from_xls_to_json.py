@@ -83,4 +83,3 @@ if __name__ == '__main__':
                 sh.mkdir('-p', output_dir)
                 output_path = os.path.join(output_dir, tn) + '.json'
                 json.dump(td, open(output_path, 'w'))
-        break
