@@ -171,7 +171,6 @@ def api():
         # When no filter parameters are provided.  Issuing one query with a projection
         # Will return all combinations of the distinct values
         if ca is None:
-            # Not sure if this works
             tmp = [x.constituency_area for x in models.Datapoint.query(filters=query._Query__filters, projection=['constituency_area'], distinct=True).fetch()]
             tmp = models.ConstituencyArea.query(models.ConstituencyArea.key.IN(tmp))
             option_res['ca'] = [x.code for x in tmp]
