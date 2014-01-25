@@ -82,8 +82,8 @@ TABLE_META_DATA = [
 	},
 	{
 	    'name': 'Occupation',
-		'header': ['H82','N82'],
-		'body': ['H83','N91'],
+		'header': ['H81','N81'],
+		'body': ['H82','N91'],
 	},
 	{
 	    'name': 'Industry',
