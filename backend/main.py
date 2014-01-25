@@ -133,8 +133,11 @@ def api():
     query = models.Datapoint.query()
     if ca is not None:
         # constituency_area is a KeyProperty, so we need to retrieve these separately
-        ca_keys = [x.key for x in models.ConstituencyArea.query(models.ConstituencyArea.code.IN(ca)).fetch()]
-        query = query.filter(models.Datapoint.constituency_area.code.IN(ca))
+        # Need to keep these objects later for
+        ca_objs = models.ConstituencyArea.query(models.ConstituencyArea.code.IN(ca)).fetch()
+        ca_obj_cache = dict((x.code, x) for x in ca_objs)
+        ca_keys = [x.key for x in ca_objs]
+        query = query.filter(models.Datapoint.constituency_area.IN(ca_keys))
     if table is not None:
         query = query.filter(models.Datapoint.table.IN(table))
     if row is not None:
@@ -147,7 +150,17 @@ def api():
     # If the query was filtered, then get the data
     no_filters_provided = all([ca is None, table is None, row is None, column is None])
     if not no_filters_provided:
-        res['data'] = [x.to_dict() for x in query.fetch()]
+        data = [x.to_dict() for x in query.fetch()]
+        # Replace each constituency area with the actual entity
+        # If the ca argument was not provided, we need to get a fetch
+        if ca_obj_cache is None:
+            ca = set([x['constituency_area'].id() for x in data])
+            ca_objs = models.ConstituencyArea.query(models.ConstituencyArea.code.IN(list(ca))).fetch()
+            ca_obj_cache = dict((x.code, x) for x in ca_objs)
+        for d in data:
+            ca_code = d['constituency_area'].id()
+            d['constituency_area'] = ca_obj_cache[ca_code].to_dict()
+        res['data'] = data
 
     if options or no_filters_provided:
         option_res = {}
