@@ -8,6 +8,16 @@ import sh
 import itertools
 import pprint
 
+from table_meta_data import TABLE_META_DATA
+#TABLE_META_DATA = [
+#        {
+#        'name': 'household', 
+#        'header': ['A114', 'E114'], 
+#        'body': ['A115', 'E126']
+#        }
+#]
+OUTPUT_PREFIX = 'data-clean'
+
 def conversion(cellPosition):
     row = ord(cellPosition[0]) - ord('A') #convert letter to ASCII, then suyb
     col = int(cellPosition[1:]) - 1 # minus 1
@@ -36,31 +46,16 @@ def extract_table(sheet, name, header, body):
     data = []
     last_primary_cat = None
     for i in range(row1,row2+1):
-        #cat = sheet.cell(i, col1)
-        #if cat.startswith('  '):
-        #cells = [sheet.cell(i, j).value for j in range(col1+1,col2+1)]
         cells = [sheet.cell(i, j).value for j in range(col1,col2+1)]
         data.append(dict(zip(column_names, cells)))
     
-    #print json.dumps(data, indent=2)
     return data
-
-#from table_meta_data import TABLE_META_DATA
-TABLE_META_DATA = [
-        {
-        'name': 'household', 
-        'header': ['A114', 'E114'], 
-        'body': ['A115', 'E126']
-        }
-]
 
 def extract_sheet(book, index):
     st = book.sheet_by_index(index)
     tables = {}
     for (i, md) in enumerate(TABLE_META_DATA):
         data = extract_table(st, **md)
-        #print json.dumps(data, indent=2)
-        #tables[md['name']] = data
         tables['table' + str(i)] = data
     return tables
 
@@ -76,7 +71,6 @@ def extract_book(filename):
     return sheets
 
 if __name__ == '__main__':
-    OUTPUT_PREFIX = 'data-clean'
     sh.rm('-rf', OUTPUT_PREFIX)
     sh.mkdir('-p', OUTPUT_PREFIX)
     for fn in sh.ls('data').split():
@@ -90,10 +84,3 @@ if __name__ == '__main__':
                 output_path = os.path.join(output_dir, tn) + '.json'
                 json.dump(td, open(output_path, 'w'))
         break
-
-    #for f in all_files:
-    #    base_sheet_name = f[:3]
-    #    filepath = os.path.join(base_path, f)
-    #    logger.info("Checking file {}".format(f))
-    #    wb = xlrd.open_workbook(filepath)
-
