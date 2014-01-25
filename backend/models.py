@@ -4,7 +4,9 @@ from google.appengine.ext import ndb
 
 
 class ConstituencyArea(ndb.Model):
-    region = ndb.StringProperty()  # "Hong Kong Island", "Kowloon"
+    region_english = ndb.StringProperty()  # "Hong Kong Island", "Kowloon"
+    region_simplified = ndb.StringProperty()  
+    region_traditional = ndb.StringProperty()  
     district = ndb.StringProperty(required=True)  # "Central & Western", "Wan Chai"
     name_english = ndb.StringProperty(required=True)
     name_simplified = ndb.StringProperty()
