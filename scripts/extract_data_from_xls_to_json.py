@@ -7,6 +7,7 @@ import json
 import sh
 import itertools
 import pprint
+import multiprocessing
 
 from table_meta_data import TABLE_META_DATA
 #TABLE_META_DATA = [
@@ -49,7 +50,12 @@ def extract_table(sheet, name, header, body):
         cells = [sheet.cell(i, j).value for j in range(col1,col2+1)]
         data.append(dict(zip(column_names, cells)))
     
-    return data
+    return {
+            'meta': {
+                'name': name,
+                # other meta data
+                },
+            'data': data}
 
 def extract_sheet(book, index):
     st = book.sheet_by_index(index)
@@ -70,16 +76,47 @@ def extract_book(filename):
         sheets['sheet' + str(i)] = tables
     return sheets
 
+from constituency_areas import english, simplified, traditional
+
+def _to_area_code_mapping(origin):
+    #_tmp = [(v,k) for (k,v) in d.items() for d in origin.values()]
+    _tmp = {}
+    for d in origin.values():
+        for (k, v) in d.items():
+            _tmp[v] = k
+    return _tmp
+
+MAPPING_AREA_CODE_ENGLISH = _to_area_code_mapping(english)
+MAPPING_AREA_CODE_SIMPLIFIED = _to_area_code_mapping(simplified)
+MAPPING_AREA_CODE_TRADITIONAL = _to_area_code_mapping(traditional)
+
+def add_meta_info(table_data, area, sheet_name):
+    mapping = {'sheet0': MAPPING_AREA_CODE_TRADITIONAL,
+            'sheet1': MAPPING_AREA_CODE_SIMPLIFIED,
+            'sheet2': MAPPING_AREA_CODE_ENGLISH}[sheet_name]
+    table_data['meta'].update({'area': mapping[area.lower()]})
+    lang = {'sheet0': 'traditional',
+            'sheet1': 'simplified',
+            'sheet2': 'english'}[sheet_name]
+    table_data['meta'].update({'language': lang})
+    return table_data
+
+def process_one_file(fn):
+    area = fn[:3]
+    fullpath = os.path.join('data', fn)
+    sheets = extract_book(fullpath)
+    for (sn, sd) in sheets.iteritems():
+        for (tn, td) in sd.iteritems():
+            output_dir = os.path.join(OUTPUT_PREFIX, area, sn)
+            sh.mkdir('-p', output_dir)
+            output_path = os.path.join(output_dir, tn) + '.json'
+            add_meta_info(td, area, sn)
+            json.dump(td, open(output_path, 'w'))
+    print 'done:', fn
+
 if __name__ == '__main__':
     sh.rm('-rf', OUTPUT_PREFIX)
     sh.mkdir('-p', OUTPUT_PREFIX)
-    for fn in sh.ls('data').split():
-        area = fn[:3]
-        fullpath = os.path.join('data', fn)
-        sheets = extract_book(fullpath)
-        for (sn, sd) in sheets.iteritems():
-            for (tn, td) in sd.iteritems():
-                output_dir = os.path.join(OUTPUT_PREFIX, area, sn)
-                sh.mkdir('-p', output_dir)
-                output_path = os.path.join(output_dir, tn) + '.json'
-                json.dump(td, open(output_path, 'w'))
+    files = [fn for fn in sh.ls('data').split()] #[:2]
+    pool = multiprocessing.Pool()
+    pool.map(process_one_file, files)
