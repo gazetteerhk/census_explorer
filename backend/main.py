@@ -22,21 +22,27 @@ def upload(constituency_area, sheet_name, table):
         row = d.pop(first_column_name)
         for (k, v) in d.items():
             constituency_area = constituency_area.lower()
-            language = {'sheet0': 'traditional',
-                    'sheet1': 'simplified',
-                    'sheet2': 'english'}[sheet_name]
-            table = table_name
-            column = k
-            row = row
+            language = {'sheet0': u'traditional',
+                    'sheet1': u'simplified',
+                    'sheet2': u'english'}[sheet_name]
+            table = table_name #.decode('utf-8')
+            #logging.warning(k)
+            #logging.warning(type(k))
+            column = k #.decode('utf-8')
+            row = row #.decode('utf-8')
             value = v
             _info = (constituency_area, language, table, row, column, value)
-            if all(_info):
-                _id = hashlib.md5('%s %s %s %s %s %s' % _info).hexdigest()
-                logging.warning(str(_info))
+            logging.warning(str(_info))
+            ok = True
+
+            if value == u'':
+                # missing value
+                ok = False
+
+            if ok:
+                _id = hashlib.md5((u'%s %s %s %s %s %s' % _info).encode('utf-8')).hexdigest()
                 constituency_area_key = list(ConstituencyArea.query(ConstituencyArea.code == constituency_area))[0].key
                 logging.warning(constituency_area_key)
-                if not value:
-                    value = None
                 dp = Datapoint(id=_id, 
                         constituency_area=constituency_area_key,
                         language=language,
