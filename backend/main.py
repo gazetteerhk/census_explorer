@@ -15,9 +15,6 @@ def upload(constituency_area, sheet_name, table):
     import json
     import hashlib
     from models import *
-    #return '%s %s %s' % (constituency_area, language, table)
-    #return request.form['jsondata']
-    #return jsonify(request.form)
     data = json.loads(str(request.form.keys()[0]))
     first_column_name = data['meta']['first_column_name']
     table_name = data['meta']['name']
@@ -29,13 +26,11 @@ def upload(constituency_area, sheet_name, table):
                     'sheet1': u'simplified',
                     'sheet2': u'english'}[sheet_name]
             table = table_name #.decode('utf-8')
-            #logging.warning(k)
-            #logging.warning(type(k))
             column = k.strip() #.decode('utf-8')
             row = row.strip() #.decode('utf-8')
             value = v
             _info = (constituency_area, language, table, row, column, value)
-            logging.warning(str(_info))
+            #logging.warning(str(_info))
             ok = True
 
             if value == u'':
@@ -45,7 +40,7 @@ def upload(constituency_area, sheet_name, table):
             if ok:
                 _id = hashlib.md5((u'%s %s %s %s %s %s' % _info).encode('utf-8')).hexdigest()
                 constituency_area_key = list(ConstituencyArea.query(ConstituencyArea.code == constituency_area))[0].key
-                logging.warning(constituency_area_key)
+                #logging.warning(constituency_area_key)
                 dp = Datapoint(id=_id, 
                         constituency_area=constituency_area_key,
                         language=language,
@@ -53,7 +48,7 @@ def upload(constituency_area, sheet_name, table):
                         column=column,
                         row=row,
                         value=value)
-                logging.warning(dp)
+                #logging.warning(dp)
                 dp.put()
     return "OK"
 
