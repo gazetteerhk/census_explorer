@@ -8,3 +8,4 @@ angular.module('frontendApp')
       'Karma'
     ];
   });
+;

@@ -77,3 +77,19 @@ body {
     border-bottom: 0;
   }
 }
+/*
+rect{
+  -webkit-transition: .3s ease;
+}
+rect:hover{
+  fill: #000;
+  -webkit-transition: .3s ease;
+}*/
+
+/*svg.bar {
+    display: inline-block;
+    width: 20px;
+    height: 75px;    Gets overriden by D3-assigned height below 
+    margin-right: 2px;
+    background-color: teal;
+}*/
