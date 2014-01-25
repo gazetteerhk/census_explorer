@@ -179,8 +179,8 @@
 
   var chart = new dimple.chart(svg, Industrydata);
   console.log(chart);
-  chart.addCategoryAxis("x", ["Industry", "Gender"]);
-  chart.addMeasureAxis("y", "Value");
+  chart.addCategoryAxis("y", ["Industry", "Gender"]);
+  chart.addMeasureAxis("x", "Value");
   chart.addSeries("Gender", dimple.plot.bar);
   chart.draw();
   
