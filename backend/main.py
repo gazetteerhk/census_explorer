@@ -57,6 +57,7 @@ def upload(constituency_area, sheet_name, table):
                 dp.put()
     return "OK"
 
+
 def parse_argument(query_string):
     """
     Takes a raw query_string from the request parameters, and returns a
@@ -126,11 +127,13 @@ def api():
     table = parse_argument(request.args.get('table', None))
     row = parse_argument(request.args.get('row', None))
     column = parse_argument(request.args.get('column', None))
-    options = bool(int(parse_argument(request.args.get('options', 0))))
+    options = bool(int(request.args.get('options', 0)))
 
     # Incrementally build the query
     query = models.Datapoint.query()
     if ca is not None:
+        # constituency_area is a KeyProperty, so we need to retrieve these separately
+        ca_keys = [x.key for x in models.ConstituencyArea.query(models.ConstituencyArea.code.IN(ca)).fetch()]
         query = query.filter(models.Datapoint.constituency_area.code.IN(ca))
     if table is not None:
         query = query.filter(models.Datapoint.table.IN(table))
@@ -158,8 +161,9 @@ def api():
         # Will return all combinations of the distinct values
         if ca is None:
             # Not sure if this works
-            tmp = models.Datapoint.query(filters=query._Query__filters, projection=['constituency_area.code'], distinct=True).fetch()
-            option_res['ca'] = [x.constituency_area.code for x in tmp]
+            tmp = [x.constituency_area for x in models.Datapoint.query(filters=query._Query__filters, projection=['constituency_area'], distinct=True).fetch()]
+            tmp = models.ConstituencyArea.query(models.ConstituencyArea.key.IN(tmp))
+            option_res['ca'] = [x.code for x in tmp]
         if table is None:
             tmp = models.Datapoint.query(filters=query._Query__filters, projection=['table'], distinct=True).fetch()
             option_res['table'] = [x.table for x in tmp]

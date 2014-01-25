@@ -10,7 +10,7 @@ set -xe
 rm -f cmd.sh
 touch cmd.sh
 
-for fn in `find data-clean/ -name '*.json' | cut -c12- | sed 's/.json$//g' | head -n30`
+for fn in `find data-clean/ -name '*.json' | cut -c12- | sed 's/.json$//g' | grep sheet2 | head -n30`
 #for fn in `find data-clean/ -name '*.json' | cut -c12- | sed 's/.json$//g'`
 do
 	#xargs -P 30 -i curl --data @data-clean/{}.json http://localhost:8080/upload/{}/
