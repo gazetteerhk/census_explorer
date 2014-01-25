@@ -6,22 +6,166 @@
   </ul>
   <h3 class="text-muted">Census Explorer</h3>
 </div>
+<script type="text/javascript">
+    var svg = dimple.newSvg(".chart-1", 800, 400);
+  //   var data = [
+  //   {
+  //     "Industry":"Manufacturing",
+  //     "Male":68,
+  //     "Female":35,
+  //     "Value":103
+  //   },
+  //   {
+  //     "Industry":"Construction",
+  //     "Male":272,
+  //     "Female":28,
+  //     "Value":300
+  //   },
+  //   {
+  //     "Industry":"Import/export, wholesale and retail trades",
+  //     "Male":1072,
+  //     "Female":854,
+  //     "Value":1926
+  //   },
+  //   {
+  //     "Industry":"Transportation, storage, postal and courier services",
+  //     "Male":484,
+  //     "Female":109,
+  //     "Value":593
+  //   },
+  //   {
+  //     "Industry":"Accommodation and food services",
+  //     "Male":483,
+  //     "Female":280,
+  //     "Value":763
+  //   },
 
+  var data = 
+[
+  {
+    "Industry": "Public administration",
+    "Gender": "Male",
+    "Value": 390
+  },
+  {
+    "Industry": "Public administration",
+    "Gender": "Female",
+    "Value": 524
+  },
+  {
+    "Industry": "Public administration",
+    "Gender": "Both",
+    "Value": 914
+  },
+  {
+    "Industry":"Others",
+    "Gender": "Male",
+    "Value": 0
+  },
+  {
+    "Industry":"Others",
+    "Gender": "Female",
+    "Value":17
+  },
+  {
+    "Industry":"Others",
+    "Gender": "Both",
+    "Value":17
+  },
+  {
+    "Industry":"Miscellaneous social and personal services",
+    "Gender": "Male",
+    "Value": 129
+  },
+  {
+    "Industry":"Miscellaneous social and personal services",
+    "Gender": "Female",
+    "Value":545
+  },
+  {
+    "Industry":"Miscellaneous social and personal services",
+    "Gender": "Both",
+    "Value":674
+  },
+  {
+    "Industry":"Real estate, professional and business services",
+    "Gender": "Male",
+    "Value":690
+  },
+  {
+    "Industry":"Real estate, professional and business services",
+    "Gender": "Female",
+    "Value":575
+  },
+  {
+    "Industry":"Real estate, professional and business services",
+    "Gender": "Both",
+    "Value":1265
+  },
+  {
+    "Industry":"Financing and insurance",
+    "Gender": "Male",
+    "Value": 308
+  },
+  {
+    "Industry":"Financing and insurance",
+    "Gender": "Female",
+    "Value":350,
+  },
+  {
+    "Industry":"Financing and insurance",
+    "Gender": "Both",
+    "Value":658
+  },
+  {
+    "Industry":"Information and communications",
+    "Gender": "Male",
+    "Value": 118
+  },
+  {
+    "Industry":"Information and communications",
+    "Gender": "Female",
+    "Value": 24
+  },
+  {
+    "Industry":"Information and communications",
+    "Gender": "Both",
+    "Value": 142
+  },
+  {
+    "Industry":"Accommodation and food services",
+    "Gender": "Male",
+    "Value": 483
+  },
+  {
+    "Industry":"Accommodation and food services",
+    "Gender": "Female",
+    "Value": 280
+  },
+  {
+    "Industry":"Accommodation and food services",
+    "Gender": "Both",
+    "Value": 763
+  }
+]
+
+  var chart = new dimple.chart(svg, data);
+  console.log(chart);
+  chart.addCategoryAxis("x", ["Gender", "Industry"]);
+  chart.addMeasureAxis("y", "Value");
+  chart.addSeries("Gender", dimple.plot.bar);
+  // chart.addOrderRule("Gender", true);
+  // chart.assignColor("")
+  chart.draw();
+
+  </script>
 
 <script type="text/javascript">
-var dataset = [5, 15, 10, 25, 20];
-d3.select(".chart-1")
-  .selectAll("div")
-    .data(dataset)
-  .enter().append("div")
-    .attr("class", "bar")
-    .style("height", function (d) {
-        var barHeight = d * 5;
-        return barHeight + "px";
-    });
+
 </script>
 
 <section class="chart-1"></section>
+<section class="chart-2"></section>
 
 <!-- <div class="jumbotron">
   <h1>'Allo, 'Allo!</h1>

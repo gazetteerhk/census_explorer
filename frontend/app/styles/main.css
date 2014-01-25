@@ -78,7 +78,7 @@ body {
   }
 }
 
-div.bar {
+svg.bar {
     display: inline-block;
     width: 20px;
     height: 75px;   /* Gets overriden by D3-assigned height below */
