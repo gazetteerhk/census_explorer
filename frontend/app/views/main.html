@@ -4,10 +4,24 @@
     <li><a ng-href="#">About</a></li>
     <li><a ng-href="#">Contact</a></li>
   </ul>
-  <h3 class="text-muted">frontend</h3>
+  <h3 class="text-muted">Census Explorer</h3>
 </div>
 
 
+<script type="text/javascript">
+var dataset = [5, 15, 10, 25, 20];
+d3.select(".chart-1")
+  .selectAll("div")
+    .data(dataset)
+  .enter().append("div")
+    .attr("class", "bar")
+    .style("height", function (d) {
+        var barHeight = d * 5;
+        return barHeight + "px";
+    });
+</script>
+
+<section class="chart-1"></section>
 
 <!-- <div class="jumbotron">
   <h1>'Allo, 'Allo!</h1>
