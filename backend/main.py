@@ -10,8 +10,10 @@ import logging
 def hello_world():
     return 'Census Explorer'
 
+'''
 @app.route('/upload/<constituency_area>/<sheet_name>/<table>/', methods = ['POST'])
 def upload(constituency_area, sheet_name, table):
+    return "NOT OK"
     import json
     import hashlib
     from models import *
@@ -51,6 +53,7 @@ def upload(constituency_area, sheet_name, table):
                 #logging.warning(dp)
                 dp.put()
     return "OK"
+'''
 
 
 def parse_argument(query_string):
