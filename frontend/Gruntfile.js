@@ -330,6 +330,7 @@ module.exports = function (grunt) {
       return grunt.task.run(['build', 'connect:dist:keepalive']);
     }
 
+    // TODO: Something wrong with this task -- it's removing references to dimple and changing paths
     grunt.task.run([
       'clean:server',
       'bower-install',
