@@ -31,8 +31,8 @@ def upload(constituency_area, sheet_name, table):
             table = table_name #.decode('utf-8')
             #logging.warning(k)
             #logging.warning(type(k))
-            column = k #.decode('utf-8')
-            row = row #.decode('utf-8')
+            column = k.strip() #.decode('utf-8')
+            row = row.strip() #.decode('utf-8')
             value = v
             _info = (constituency_area, language, table, row, column, value)
             logging.warning(str(_info))
