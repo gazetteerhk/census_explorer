@@ -53,6 +53,7 @@ def extract_table(sheet, name, header, body):
     return {
             'meta': {
                 'name': name,
+                'first_column_name': column_names[0]
                 # other meta data
                 },
             'data': data}

@@ -14,7 +14,9 @@ class ConstituencyArea(ndb.Model):
 
 class Datapoint(ndb.Model):
     constituency_area = ndb.KeyProperty(kind=ConstituencyArea, required=True)
+    language = ndb.StringProperty(required=True) # 'english', 'simplified', 'traditional'
     table = ndb.StringProperty(required=True)  # "Household income", etc -- corresponds to table
     row = ndb.StringProperty(required=True)  # "2000 - 3999", "4000 - 5000"
     column = ndb.StringProperty(required=True)  # "Male", "Female", "Both sexes"
-    value = ndb.FloatProperty(required=True)
+    #value = ndb.FloatProperty(required=True)
+    value = ndb.FloatProperty()
