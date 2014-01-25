@@ -1,3 +1,4 @@
+import collections
 from flask import Flask, jsonify, request
 import models
 import urllib
@@ -140,10 +141,38 @@ def api():
 
     res = {}
 
-    if options or all([ca is None, table is None, row is None, column is None]):
+    # If the query was filtered, then get the data
+    no_filters_provided = all([ca is None, table is None, row is None, column is None])
+    if not no_filters_provided:
+        res['data'] = [x.to_dict() for x in query.fetch()]
+
+    if options or no_filters_provided:
         option_res = {}
 
-    return jsonify(ca=ca, table=table, row=row, column=column)
+        # Incrementally build the available options for other columns
+        # We need to do this after building the initial query, since we
+        # only want the options for columns that we didn't filter on
+
+        # This method issues four queries, but will return fewer results in cases
+        # When no filter parameters are provided.  Issuing one query with a projection
+        # Will return all combinations of the distinct values
+        if ca is None:
+            # Not sure if this works
+            tmp = models.Datapoint.query(filters=query._Query__filters, projection=['constituency_area.code'], distinct=True).fetch()
+            option_res['ca'] = [x.constituency_area.code for x in tmp]
+        if table is None:
+            tmp = models.Datapoint.query(filters=query._Query__filters, projection=['table'], distinct=True).fetch()
+            option_res['table'] = [x.table for x in tmp]
+        if row is None:
+            tmp = models.Datapoint.query(filters=query._Query__filters, projection=['row'], distinct=True).fetch()
+            option_res['row'] = [x.row for x in tmp]
+        if column is None:
+            tmp = models.Datapoint.query(filters=query._Query__filters, projection=['column'], distinct=True).fetch()
+            option_res['column'] = [x.column for x in tmp]
+
+        res['options'] = option_res
+
+    return jsonify(**res)
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0")
