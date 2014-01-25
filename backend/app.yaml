@@ -39,5 +39,8 @@ handlers:
 - url: /static
   static_dir: static
 
+- url: /tasks/populate_constituency_areas
+  script: tasks.populate_constituency_areas
+
 - url: .*
   script: main.app
