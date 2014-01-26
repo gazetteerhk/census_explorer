@@ -6,12 +6,34 @@ app = Flask(__name__)
 
 import logging
 
+from models import Admin
+
 @app.route('/')
 def hello_world():
     return 'Census Explorer'
 
-#@app.route('/upload/<constituency_area>/<sheet_name>/<table>/', methods = ['POST'])
-@app.route('/upload/<constituency_area>/<sheet_name>/<table>/', methods = ['PUT'])
+def require_admin(func):
+    def decorated(*args, **kwargs):
+        r = list(Admin.query(Admin.name=='admin'))
+        if len(r) == 0 or r[0].token == request.args.get('token', None):
+            # len(r) == 0: init admin
+            return func(*args, **kwargs)
+        else:
+            return "404"
+    return decorated
+
+@app.route('/_admin/init/')
+@require_admin
+def admin_init():
+    import hashlib
+    import random
+    admin = Admin(id="0", enabled=True, name='admin',
+            token=hashlib.md5(str(random.random()).encode('utf-8')).hexdigest()[:16])
+    admin.put()
+    return 'OK'
+
+@app.route('/upload/<constituency_area>/<sheet_name>/<table>/', methods = ['POST'])
+#@require_admin():
 def upload(constituency_area, sheet_name, table):
     import json
     import hashlib

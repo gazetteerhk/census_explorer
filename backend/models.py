@@ -22,3 +22,8 @@ class Datapoint(ndb.Model):
     column = ndb.StringProperty(required=True)  # "Male", "Female", "Both sexes"
     #value = ndb.FloatProperty(required=True)
     value = ndb.FloatProperty()
+
+class Admin(ndb.Model):
+    name = ndb.StringProperty()
+    enabled = ndb.BooleanProperty()
+    token = ndb.StringProperty()
