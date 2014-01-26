@@ -16,6 +16,14 @@ angular.module('frontendApp', [
         templateUrl: 'views/about.html',
         controller: 'AboutCtrl'
       })
+      .when('/discover', {
+        templateUrl: 'views/discover.html',
+        controller: 'DiscoverCtrl',
+      })
+      .when('/explore', {
+        templateUrl: 'views/explore.html',
+        controller: 'ExploreCtrl',
+      })
       .otherwise({
         redirectTo: '/'
       });
