@@ -91,10 +91,15 @@ angular.module('frontendApp').factory('CensusAPI', ['$log', '$http', function($l
   Query.prototype.fetch = function() {
     /*
      * Sends the request to the API with the provided filters
+     *
+     * Returns:
+     * --------
+     * Promise object encapsulating
      */
 
-    var resp = $http.get(svc.endpointURL, {params: this._filters})
-    return resp;
+    var promise = $http.get(svc.endpointURL, {params: this._filters});
+
+    return promise;
   };
 
   svc.Query = Query;
