@@ -10,6 +10,7 @@ set -xe
 rm -f cmd.sh
 touch cmd.sh
 
+TOKEN="711b5d660d92"
 PREFIX=http://localhost:8080
 #PREFIX="http://golden-shine-471.appspot.com"
 
@@ -21,7 +22,7 @@ for fn in `cat list.failed | sed 's/.json$//g' | head -n1`
 do
 	#xargs -P 30 -i curl --data @data-clean/{}.json upload/{}/
 	echo $fn
-	echo "curl -XPOST -H 'Content-Type:application/json' --data @data-clean/$fn.json $PREFIX/upload/$fn/" >> cmd.sh
+	echo "curl -XPOST -H 'Content-Type:application/json' --data @data-clean/$fn.json $PREFIX/upload/$fn/?token=$TOKEN" >> cmd.sh
 done 
 
 time cat cmd.sh | xargs -i -P 30 bash -c '{}'

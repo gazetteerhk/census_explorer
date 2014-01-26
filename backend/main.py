@@ -15,11 +15,14 @@ def hello_world():
 def require_admin(func):
     def decorated(*args, **kwargs):
         r = list(Admin.query(Admin.name=='admin'))
-        if len(r) == 0 or r[0].token == request.args.get('token', None):
+        if len(r) == 0 or (r[0].enabled == True and r[0].token == request.args.get('token', None)):
             # len(r) == 0: init admin
             return func(*args, **kwargs)
         else:
             return "404"
+    # Without the following line, you will see the error:
+    #   "View function mapping is overwriting an existing endpoint"
+    decorated.__name__ = func.__name__
     return decorated
 
 @app.route('/_admin/init/')
@@ -33,7 +36,7 @@ def admin_init():
     return 'OK'
 
 @app.route('/upload/<constituency_area>/<sheet_name>/<table>/', methods = ['POST'])
-#@require_admin():
+@require_admin
 def upload(constituency_area, sheet_name, table):
     import json
     import hashlib
