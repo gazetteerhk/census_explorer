@@ -1,13 +1,13 @@
 'use strict';
 
 angular.module('frontendApp', [
-    'ngCookies',
-    'ngResource',
-    'ngSanitize',
-    'ngRoute',
-    'ngAnimate'
-  ])
-  .config(function($routeProvider) {
+  'ngCookies',
+  'ngResource',
+  'ngSanitize',
+  'ngRoute',
+  'ngAnimate','leaflet-directive'
+])
+  .config(function ($routeProvider) {
     $routeProvider
       .when('/', {
         templateUrl: 'views/main.html',
@@ -29,13 +29,17 @@ angular.module('frontendApp', [
         templateUrl: 'views/explore.html',
         controller: 'ExploreCtrl'
       })
+      .when('/map', {
+        templateUrl: 'views/map.html',
+        controller: 'MapCtrl'
+      })
       .when('/query', {
         templateUrl: 'views/query.html',
         controller: 'QueryCtrl'
       })
       .otherwise({
         redirectTo: '/'
-      });
+      })
   });
 
 angular.module('frontendApp').factory('CensusAPI', ['$log', '$http', function($log, $http) {
