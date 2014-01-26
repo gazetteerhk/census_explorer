@@ -2,6 +2,7 @@ import models
 from google.appengine.ext import ndb
 import logging
 
+from main import require_admin
 
 def populate_constituency_areas(*args, **kwargs):
     """
