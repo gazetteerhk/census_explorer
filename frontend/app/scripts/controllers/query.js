@@ -453,6 +453,10 @@ angular.module('frontendApp')
     };
 
     $scope.renderCharts = function(data) {
+      // Ensure that the elements are gone
+      d3.select("#chart-male svg").remove();
+      d3.select("#chart-female svg").remove();
+
       var svg_male = dimple.newSvg("#chart-male", 500, 400);
       var svg_female = dimple.newSvg("#chart-female", 500, 400);
       var data_male = _.where(data, {column: "Male"});
@@ -464,9 +468,9 @@ angular.module('frontendApp')
 
     var drawChart = function(svg, data) {
       var chart = new dimple.chart(svg, data);
-      chart.setBounds(60, 30, 410, 305)
-      chart.addCategoryAxis("x", "row");
-      chart.addMeasureAxis("y", "value");
+      chart.setBounds(120, 30, 380, 305)
+      chart.addCategoryAxis("y", "row");
+      chart.addMeasureAxis("x", "value");
       chart.addSeries(null, dimple.plot.bar);
       chart.draw();
     };
