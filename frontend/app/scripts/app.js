@@ -36,28 +36,29 @@ angular.module('frontendApp', [
       .otherwise({
         redirectTo: '/'
       });
-  })
-  .config(function($httpProvider) {
-    $httpProvider.defaults.useXDomain = true;
-    delete $httpProvider.defaults.headers.common['X-Requested-With'];
   });
-
 
 angular.module('frontendApp').factory('CensusAPI', ['$log', '$http', function($log, $http) {
   var svc = {};
   svc.endpointURL = 'http://192.168.222.3:8080/api';
 
-  var Query = function() {
+  var Query = function(filters) {
     /*
      * Object for handling queries to the Census API
      * Filters are added with methods on the object
+     *
+     * If constructor is passed an object, then that becomes the filters
      */
-    this._filters = {
-      ca: [],
-      table: [],
-      column: [],
-      row: []
-    };
+    if (_.isObject(filters)) {
+      this._filters = _.clone(filters);
+    } else {
+      this._filters = {
+        ca: [],
+        table: [],
+        column: [],
+        row: []
+      };
+    }
   };
 
   Query.prototype.addFilter = function(field, values) {
