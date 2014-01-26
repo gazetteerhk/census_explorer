@@ -2,22 +2,63 @@ import collections
 from flask import Flask, jsonify, request
 import models
 import urllib
+from google.appengine.api import memcache
+import hashlib
+
 app = Flask(__name__)
 
 import logging
+
+from models import Admin
 
 @app.route('/')
 def hello_world():
     return 'Census Explorer'
 
-'''
+def require_admin(func):
+    def decorated(*args, **kwargs):
+        r = list(Admin.query(Admin.name=='admin'))
+        if len(r) == 0 or (r[0].enabled == True and r[0].token == request.args.get('token', None)):
+            # len(r) == 0: init admin
+            return func(*args, **kwargs)
+        else:
+            return "404"
+    # Without the following line, you will see the error:
+    #   "View function mapping is overwriting an existing endpoint"
+    decorated.__name__ = func.__name__
+    return decorated
+
+def cache_it(func):
+    def decorated(*args, **kwargs):
+        #logging.warning((request.query_string))
+        key = hashlib.md5((request.path + request.query_string).encode('utf-8')).hexdigest()
+        logging.warning('key: %s', key)
+        res = memcache.get(key)
+        if not res:
+            cache_time = 300
+            res = func(*args, **kwargs)
+            memcache.add(key, res, cache_time)
+        return res
+    decorated.__name__ = func.__name__
+    return decorated
+
+@app.route('/_admin/init/')
+@require_admin
+def admin_init():
+    import random
+    admin = Admin(id="0", enabled=True, name='admin',
+            token=hashlib.md5(str(random.random()).encode('utf-8')).hexdigest()[:16])
+    admin.put()
+    return 'OK'
+
 @app.route('/upload/<constituency_area>/<sheet_name>/<table>/', methods = ['POST'])
+@require_admin
 def upload(constituency_area, sheet_name, table):
-    return "NOT OK"
     import json
-    import hashlib
     from models import *
-    data = json.loads(str(request.form.keys()[0]))
+    #logging.warning(str(request.data))
+    # request.data contains the raw HTTP request body IFF Flask does not know the type...
+    data = json.loads(str(request.data))
     first_column_name = data['meta']['first_column_name']
     table_name = data['meta']['name']
     for d in data['data']:
@@ -53,7 +94,6 @@ def upload(constituency_area, sheet_name, table):
                 #logging.warning(dp)
                 dp.put()
     return "OK"
-'''
 
 
 def parse_argument(query_string):
@@ -63,13 +103,15 @@ def parse_argument(query_string):
 
     If query_string is None, then returns None
     """
-    if query_string is None:
+    if query_string is None or len(query_string) == 0:
         return None
-    res = urllib.unquote_plus(query_string).split(',')
+    # res = urllib.unquote_plus(query_string).split(',')
+    res = map(urllib.unquote_plus, query_string)
     return res
 
 
 @app.route('/api')
+@cache_it
 def api():
     """
     API Endpoint for accessing the data
@@ -120,12 +162,18 @@ def api():
 
 
     """
+    import time
+    _time_start = time.time()
+
+
     # Parse the arguments
-    ca = parse_argument(request.args.get('ca', None))
-    table = parse_argument(request.args.get('table', None))
-    row = parse_argument(request.args.get('row', None))
-    column = parse_argument(request.args.get('column', None))
+    ca = parse_argument(request.args.getlist('ca', None))
+    table = parse_argument(request.args.getlist('table', None))
+    row = parse_argument(request.args.getlist('row', None))
+    column = parse_argument(request.args.getlist('column', None))
     options = bool(int(request.args.get('options', 0)))
+
+    ca_obj_cache = None
 
     # Incrementally build the query
     query = models.Datapoint.query()
@@ -186,7 +234,14 @@ def api():
 
         res['options'] = option_res
 
-    return jsonify(**res)
+    res['meta'] = {}
+    res['meta']['execution_time'] = time.time() - _time_start
+
+    response = jsonify(**res)
+    # Add the cross site request header
+    response.headers["Access-Control-Allow-Origin"] = "*"
+
+    return response
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0")

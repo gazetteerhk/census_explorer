@@ -42,12 +42,9 @@
       <!-- Add your site or application content here -->
       <div class="container view-animate" ng-view=""></div>
 
-
-      <div class="footer">
-        <div class="container">
-          Foo footer
-
-        </div>
+    <div class="footer">
+      <div class="container">
+        (c) HK Census Data Explorer Team, 2014.
       </div>
       <!-- Google Analytics: change UA-XXXXX-X to be your site's ID -->
       <script>
@@ -67,8 +64,7 @@
 
     <!-- build:js scripts/vendor.js -->
     <!-- bower:js -->
-      <script type="text/javascript"  src="//maps.googleapis.com/maps/api/js?key=AIzaSyAD0DuFfwB-m7JYCejyWCwkVFrRIvyH3RE&sensor=false&libraries=places&region=HK"></script>
-      
+    <script src="bower_components/lodash/dist/lodash.js"></script>
     <script src="bower_components/jquery/jquery.js"></script>
     <script src="bower_components/angular/angular.js"></script>
     <script src="bower_components/angular-resource/angular-resource.js"></script>
@@ -84,6 +80,7 @@
 
         <script src="scripts/angular-leaflet-directive.js"></script>
 
+    <link rel="stylesheet" type="text/css" href="bower_components/font-awesome/css/font-awesome.css">
     <!-- endbower -->
     <!-- endbuild -->
 
@@ -91,10 +88,11 @@
     <script src="scripts/app.js"></script>
     <script src="scripts/controllers/main.js"></script>
     <script src="scripts/controllers/about.js"></script>
+    <script src="scripts/controllers/getdata.js"></script>
     <script src="scripts/controllers/discover.js"></script>
     <script src="scripts/controllers/explore.js"></script>
         <script src="scripts/controllers/map.js"></script> 
-
+    <script src="scripts/controllers/query.js"></script>
     <!-- endbuild -->
   </body>
   </html>
