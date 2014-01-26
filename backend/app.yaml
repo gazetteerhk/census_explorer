@@ -45,7 +45,6 @@ handlers:
 
 - url: /tasks/populate_constituency_areas
   script: tasks.populate_constituency_areas
-  login: admin
 
 - url: .*
   script: main.app

@@ -171,6 +171,8 @@ def api():
     column = parse_argument(request.args.get('column', None))
     options = bool(int(request.args.get('options', 0)))
 
+    ca_obj_cache = None
+
     # Incrementally build the query
     query = models.Datapoint.query()
     if ca is not None:
