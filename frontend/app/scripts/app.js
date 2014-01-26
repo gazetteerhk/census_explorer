@@ -40,7 +40,7 @@ angular.module('frontendApp', [
 
 angular.module('frontendApp').factory('CensusAPI', ['$log', '$http', function($log, $http) {
   var svc = {};
-  svc.endpointURL = 'http://192.168.222.3:8080/api';
+  svc.endpointURL = 'http://golden-shine-471.appspot.com/api';
 
   var Query = function(filters) {
     /*

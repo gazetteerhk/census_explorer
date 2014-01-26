@@ -447,6 +447,7 @@ angular.module('frontendApp')
         var promise = resp.fetch();
         promise.success(function(data) {
           $scope._rawData = data;
+          $scope.cas = _.uniq(_.pluck(_.pluck(data.data, 'constituency_area'), 'name_english')).join(', ');
           $scope.renderCharts(data.data);
         });
       }
