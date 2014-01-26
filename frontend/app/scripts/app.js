@@ -5,7 +5,7 @@ angular.module('frontendApp', [
   'ngResource',
   'ngSanitize',
   'ngRoute',
-  'ngAnimate'
+  'ngAnimate','leaflet-directive'
 ])
   .config(function ($routeProvider) {
     $routeProvider
@@ -24,6 +24,10 @@ angular.module('frontendApp', [
       .when('/explore', {
         templateUrl: 'views/explore.html',
         controller: 'ExploreCtrl'
+      })
+      .when('/map', {
+        templateUrl: 'views/map.html',
+        controller: 'MapCtrl'
       })
       .otherwise({
         redirectTo: '/'

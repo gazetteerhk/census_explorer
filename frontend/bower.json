@@ -12,7 +12,10 @@
     "bootstrap": "~3.0.0",
     "d3": "3",
     "dimple": "~1.1.3",
-    "angular-animate": "~1.2.10"
+    "angular-animate": "~1.2.10",
+    "leaflet":"*",
+    "ng-i18next":"0.2.8",
+    "leaflet.markerclusterer":"*"
   },
   "devDependencies": {
     "angular-mocks": "1.2.6",
