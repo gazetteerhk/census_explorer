@@ -1,7 +1,54 @@
-/* Space out content a bit */
 body {
-  padding-top: 20px;
-  padding-bottom: 20px;
+  overflow: -moz-scrollbars-vertical;
+  overflow-y: scroll;
+}
+
+/* Non-responsive overrides */
+.container {
+  max-width: none !important;
+  width: 1170px;
+}
+
+
+/* Always float the navbar header */
+.navbar-header {
+  float: left;
+}
+
+/* Undo the collapsing navbar */
+.navbar-collapse {
+  display: block !important;
+  height: auto !important;
+  padding-bottom: 0;
+  overflow: visible !important;
+}
+
+.navbar-toggle {
+  display: none;
+}
+.navbar-collapse {
+  border-top: 0;
+}
+
+.navbar-brand {
+  margin-left: -15px;
+}
+
+/* Always apply the floated nav */
+.navbar-nav {
+  float: left;
+  margin: 0;
+}
+.navbar-nav > li {
+  float: left;
+}
+.navbar-nav > li > a {
+  padding: 15px;
+}
+
+/* Redeclare since we override the float above */
+.navbar-nav.navbar-right {
+  float: right;
 }
 
 /* Everything but the jumbotron gets side spacing for mobile first views */
@@ -14,9 +61,11 @@ body {
 
 /* Custom page header */
 .header {
+  margin-bottom: 30px;
   border-bottom: 1px solid #e5e5e5;
 }
 /* Make the masthead heading the same height as the navigation */
+/* Currently unused -- I ended up using nav-brand.  Maybe will bring this back later, since brand is a bit small --Han */
 .header h3 {
   margin-top: 0;
   margin-bottom: 0;
@@ -24,19 +73,33 @@ body {
   padding-bottom: 19px;
 }
 
+/* Animations for ng-view */
+
+.view-animate {
+
+}
+
+.view-animate.ng-enter {
+  -webkit-transition: 0.5s linear all;
+  -moz-transition: 0.5s linear all;
+  -o-transition: 0.5s linear all;
+  transition: 0.5s linear all;
+  opacity: 0;
+}
+
+.view-animate.ng-enter.ng-enter-active {
+  opacity:1;
+}
+
 /* Custom page footer */
 .footer {
   padding-top: 19px;
+  padding-bottom: 30px;
   color: #777;
+  background-color: #333;
   border-top: 1px solid #e5e5e5;
 }
 
-/* Customize container */
-@media (min-width: 768px) {
-  .container {
-    max-width: 730px;
-  }
-}
 .container-narrow > hr {
   margin: 30px 0;
 }
@@ -57,23 +120,4 @@ body {
 }
 .marketing p + h4 {
   margin-top: 28px;
-}
-
-/* Responsive: Portrait tablets and up */
-@media screen and (min-width: 768px) {
-  /* Remove the padding we set earlier */
-  .header,
-  .marketing,
-  .footer {
-    padding-left: 0;
-    padding-right: 0;
-  }
-  /* Space out the masthead */
-  .header {
-    margin-bottom: 30px;
-  }
-  /* Remove the bottom border on the jumbotron for visual effect */
-  .jumbotron {
-    border-bottom: 0;
-  }
 }
