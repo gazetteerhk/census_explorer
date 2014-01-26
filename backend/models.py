@@ -4,7 +4,9 @@ from google.appengine.ext import ndb
 
 
 class ConstituencyArea(ndb.Model):
-    region = ndb.StringProperty()  # "Hong Kong Island", "Kowloon"
+    region_english = ndb.StringProperty()  # "Hong Kong Island", "Kowloon"
+    region_simplified = ndb.StringProperty()  
+    region_traditional = ndb.StringProperty()  
     district = ndb.StringProperty(required=True)  # "Central & Western", "Wan Chai"
     name_english = ndb.StringProperty(required=True)
     name_simplified = ndb.StringProperty()
@@ -20,3 +22,8 @@ class Datapoint(ndb.Model):
     column = ndb.StringProperty(required=True)  # "Male", "Female", "Both sexes"
     #value = ndb.FloatProperty(required=True)
     value = ndb.FloatProperty()
+
+class Admin(ndb.Model):
+    name = ndb.StringProperty()
+    enabled = ndb.BooleanProperty()
+    token = ndb.StringProperty()

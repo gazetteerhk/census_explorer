@@ -6,19 +6,44 @@ app = Flask(__name__)
 
 import logging
 
+from models import Admin
+
 @app.route('/')
 def hello_world():
     return 'Census Explorer'
 
+def require_admin(func):
+    def decorated(*args, **kwargs):
+        r = list(Admin.query(Admin.name=='admin'))
+        if len(r) == 0 or (r[0].enabled == True and r[0].token == request.args.get('token', None)):
+            # len(r) == 0: init admin
+            return func(*args, **kwargs)
+        else:
+            return "404"
+    # Without the following line, you will see the error:
+    #   "View function mapping is overwriting an existing endpoint"
+    decorated.__name__ = func.__name__
+    return decorated
+
+@app.route('/_admin/init/')
+@require_admin
+def admin_init():
+    import hashlib
+    import random
+    admin = Admin(id="0", enabled=True, name='admin',
+            token=hashlib.md5(str(random.random()).encode('utf-8')).hexdigest()[:16])
+    admin.put()
+    return 'OK'
+
 @app.route('/upload/<constituency_area>/<sheet_name>/<table>/', methods = ['POST'])
+@require_admin
 def upload(constituency_area, sheet_name, table):
     import json
     import hashlib
     from models import *
-    #return '%s %s %s' % (constituency_area, language, table)
-    #return request.form['jsondata']
-    #return jsonify(request.form)
-    data = json.loads(str(request.form.keys()[0]))
+    #logging.warning(str(request.data))
+    # request.data contains the raw HTTP request body IFF Flask does not know the type...
+    data = json.loads(str(request.data))
     first_column_name = data['meta']['first_column_name']
     table_name = data['meta']['name']
     for d in data['data']:
@@ -29,13 +54,11 @@ def upload(constituency_area, sheet_name, table):
                     'sheet1': u'simplified',
                     'sheet2': u'english'}[sheet_name]
             table = table_name #.decode('utf-8')
-            #logging.warning(k)
-            #logging.warning(type(k))
-            column = k #.decode('utf-8')
-            row = row #.decode('utf-8')
+            column = k.strip() #.decode('utf-8')
+            row = row.strip() #.decode('utf-8')
             value = v
             _info = (constituency_area, language, table, row, column, value)
-            logging.warning(str(_info))
+            #logging.warning(str(_info))
             ok = True
 
             if value == u'':
@@ -45,7 +68,7 @@ def upload(constituency_area, sheet_name, table):
             if ok:
                 _id = hashlib.md5((u'%s %s %s %s %s %s' % _info).encode('utf-8')).hexdigest()
                 constituency_area_key = list(ConstituencyArea.query(ConstituencyArea.code == constituency_area))[0].key
-                logging.warning(constituency_area_key)
+                #logging.warning(constituency_area_key)
                 dp = Datapoint(id=_id, 
                         constituency_area=constituency_area_key,
                         language=language,
@@ -53,7 +76,7 @@ def upload(constituency_area, sheet_name, table):
                         column=column,
                         row=row,
                         value=value)
-                logging.warning(dp)
+                #logging.warning(dp)
                 dp.put()
     return "OK"
 
@@ -133,8 +156,11 @@ def api():
     query = models.Datapoint.query()
     if ca is not None:
         # constituency_area is a KeyProperty, so we need to retrieve these separately
-        ca_keys = [x.key for x in models.ConstituencyArea.query(models.ConstituencyArea.code.IN(ca)).fetch()]
-        query = query.filter(models.Datapoint.constituency_area.code.IN(ca))
+        # Need to keep these objects later for
+        ca_objs = models.ConstituencyArea.query(models.ConstituencyArea.code.IN(ca)).fetch()
+        ca_obj_cache = dict((x.code, x) for x in ca_objs)
+        ca_keys = [x.key for x in ca_objs]
+        query = query.filter(models.Datapoint.constituency_area.IN(ca_keys))
     if table is not None:
         query = query.filter(models.Datapoint.table.IN(table))
     if row is not None:
@@ -147,7 +173,17 @@ def api():
     # If the query was filtered, then get the data
     no_filters_provided = all([ca is None, table is None, row is None, column is None])
     if not no_filters_provided:
-        res['data'] = [x.to_dict() for x in query.fetch()]
+        data = [x.to_dict() for x in query.fetch()]
+        # Replace each constituency area with the actual entity
+        # If the ca argument was not provided, we need to get a fetch
+        if ca_obj_cache is None:
+            ca = set([x['constituency_area'].id() for x in data])
+            ca_objs = models.ConstituencyArea.query(models.ConstituencyArea.code.IN(list(ca))).fetch()
+            ca_obj_cache = dict((x.code, x) for x in ca_objs)
+        for d in data:
+            ca_code = d['constituency_area'].id()
+            d['constituency_area'] = ca_obj_cache[ca_code].to_dict()
+        res['data'] = data
 
     if options or no_filters_provided:
         option_res = {}
@@ -160,7 +196,6 @@ def api():
         # When no filter parameters are provided.  Issuing one query with a projection
         # Will return all combinations of the distinct values
         if ca is None:
-            # Not sure if this works
             tmp = [x.constituency_area for x in models.Datapoint.query(filters=query._Query__filters, projection=['constituency_area'], distinct=True).fetch()]
             tmp = models.ConstituencyArea.query(models.ConstituencyArea.key.IN(tmp))
             option_res['ca'] = [x.code for x in tmp]

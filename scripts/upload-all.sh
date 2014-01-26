@@ -10,12 +10,19 @@ set -xe
 rm -f cmd.sh
 touch cmd.sh
 
-for fn in `find data-clean/ -name '*.json' | cut -c12- | sed 's/.json$//g' | grep sheet2 | head -n30`
+TOKEN="711b5d660d92"
+PREFIX=http://localhost:8080
+#PREFIX="http://golden-shine-471.appspot.com"
+
+#for fn in `cat list.failed | sed 's/.json$//g'`
+for fn in `cat list.failed | sed 's/.json$//g' | head -n1`
+#for fn in `find data-clean/ -name '*.json' | cut -c12- | sed 's/.json$//g' | grep sheet2`
+#for fn in `find data-clean/ -name '*.json' | cut -c12- | sed 's/.json$//g' | grep sheet2 | head -n300`
 #for fn in `find data-clean/ -name '*.json' | cut -c12- | sed 's/.json$//g'`
 do
-	#xargs -P 30 -i curl --data @data-clean/{}.json http://localhost:8080/upload/{}/
+	#xargs -P 30 -i curl --data @data-clean/{}.json upload/{}/
 	echo $fn
-	echo curl --data @data-clean/$fn.json http://localhost:8080/upload/$fn/ >> cmd.sh
+	echo "curl -XPOST -H 'Content-Type:application/json' --data @data-clean/$fn.json $PREFIX/upload/$fn/?token=$TOKEN" >> cmd.sh
 done 
 
-time cat cmd.sh | xargs -i -P 30 sh -c '{}'
+time cat cmd.sh | xargs -i -P 30 bash -c '{}'

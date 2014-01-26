@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 #>>> d = dict(zip(english.keys(), ['R'] * 22))
 #>>> pprint.pprint(d)
 #{u'All Districts': 'R',
