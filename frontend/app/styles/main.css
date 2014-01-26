@@ -1,5 +1,6 @@
-/* Space out content a bit */
 body {
+  overflow: -moz-scrollbars-vertical;
+  overflow-y: scroll;
 }
 
 /* Non-responsive overrides */
@@ -64,11 +65,30 @@ body {
   border-bottom: 1px solid #e5e5e5;
 }
 /* Make the masthead heading the same height as the navigation */
+/* Currently unused -- I ended up using nav-brand.  Maybe will bring this back later, since brand is a bit small --Han */
 .header h3 {
   margin-top: 0;
   margin-bottom: 0;
   line-height: 40px;
   padding-bottom: 19px;
+}
+
+/* Animations for ng-view */
+
+.view-animate {
+
+}
+
+.view-animate.ng-enter {
+  -webkit-transition: 0.5s linear all;
+  -moz-transition: 0.5s linear all;
+  -o-transition: 0.5s linear all;
+  transition: 0.5s linear all;
+  opacity: 0;
+}
+
+.view-animate.ng-enter.ng-enter-active {
+  opacity:1;
 }
 
 /* Custom page footer */
@@ -80,12 +100,6 @@ body {
   border-top: 1px solid #e5e5e5;
 }
 
-/* Customize container */
-@media (min-width: 768px) {
-  .container {
-    max-width: 730px;
-  }
-}
 .container-narrow > hr {
   margin: 30px 0;
 }
@@ -107,38 +121,3 @@ body {
 .marketing p + h4 {
   margin-top: 28px;
 }
-
-/* Responsive: Portrait tablets and up */
-@media screen and (min-width: 768px) {
-  /* Remove the padding we set earlier */
-  .header,
-  .marketing,
-  .footer {
-    padding-left: 0;
-    padding-right: 0;
-  }
-  /* Space out the masthead */
-  .header {
-    margin-bottom: 30px;
-  }
-  /* Remove the bottom border on the jumbotron for visual effect */
-  .jumbotron {
-    border-bottom: 0;
-  }
-}
-/*
-rect{
-  -webkit-transition: .3s ease;
-}
-rect:hover{
-  fill: #000;
-  -webkit-transition: .3s ease;
-}*/
-
-/*svg.bar {
-    display: inline-block;
-    width: 20px;
-    height: 75px;    Gets overriden by D3-assigned height below 
-    margin-right: 2px;
-    background-color: teal;
-}*/

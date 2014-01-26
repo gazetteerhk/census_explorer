@@ -4,7 +4,8 @@ angular.module('frontendApp', [
   'ngCookies',
   'ngResource',
   'ngSanitize',
-  'ngRoute'
+  'ngRoute',
+  'ngAnimate'
 ])
   .config(function ($routeProvider) {
     $routeProvider
@@ -18,11 +19,11 @@ angular.module('frontendApp', [
       })
       .when('/discover', {
         templateUrl: 'views/discover.html',
-        controller: 'DiscoverCtrl',
+        controller: 'DiscoverCtrl'
       })
       .when('/explore', {
         templateUrl: 'views/explore.html',
-        controller: 'ExploreCtrl',
+        controller: 'ExploreCtrl'
       })
       .otherwise({
         redirectTo: '/'
