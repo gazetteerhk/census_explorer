@@ -235,7 +235,11 @@ def api():
     res['meta'] = {}
     res['meta']['execution_time'] = time.time() - _time_start
 
-    return jsonify(**res)
+    response = jsonify(**res)
+    # Add the cross site request header
+    response.headers["Access-Control-Allow-Origin"] = "*"
+
+    return response
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0")
