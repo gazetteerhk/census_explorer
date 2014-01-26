@@ -18,24 +18,11 @@ from table_meta_data import TABLE_META_DATA
 #        'body': ['A115', 'E126']
 #        }
 #]
-OUTPUT_PREFIX = 'data-clean'
 
 def conversion(cellPosition):
     row = ord(cellPosition[0]) - ord('A') #convert letter to ASCII, then suyb
     col = int(cellPosition[1:]) - 1 # minus 1
     return col, row
-
-def extract(fn):
-    wb = xlrd.open_workbook(fn)
-    st = wb.sheet_by_index(2)
-    column_names = [st.cell(5, j).value for j in range(0,5)]
-    data = []
-    for i in range(6,13):
-        cells = [st.cell(i, j).value for j in range(0,5)]
-        data.append(dict(zip(column_names, cells)))
-    print data
-    print json.dumps(data, indent=2)
-
 
 def translate_sheet(book):
     sheetNum = [0, 1, 2] #0 - Traditional, 1 - Simplifed, 2 - English    
@@ -63,9 +50,9 @@ def translate_sheet(book):
 
             #get the name and remove empty string
             #get the col name
-            column_names[i] = [x for x in [sheet.cell(row1, j).value for j in range(col1,col2+1)] if x] 
+            column_names[i] = [x.strip() for x in [sheet.cell(row1, j).value for j in range(col1,col2+1)] if x] 
             #get the row name
-            column_names[i] = column_names[i] + [x for x in [sheet.cell(j, body_col1).value for j in range(body_row1, body_row2+1)] if x] 
+            column_names[i] = column_names[i] + [x.strip() for x in [sheet.cell(j, body_col1).value for j in range(body_row1, body_row2+1)] if x] 
             
         #for each column_name, find out T, S, E and then store them
         
@@ -122,12 +109,12 @@ def process_one_file(fn):
     #print len(translate_dict)
     #print translate_dict
     with open('translate.json', 'w') as outfile:
-        result = json.dumps(translate_dict, indent=2, ensure_ascii=False).encode('utf-8')
-
-    outfile.close()
+        #result = json.dumps(translate_dict, indent=2, ensure_ascii=False).encode('utf-8')
+        #json.dump(translate_dict, outfile, indent=2)
+        json.dump(translate_dict, outfile)
     print 'done'
 
 if __name__ == '__main__':
     #read the file
-    process_one_file('C:/[DATA]/census_explorer/translate.xlsx')
+    process_one_file('data/A01.xlsx')
     
