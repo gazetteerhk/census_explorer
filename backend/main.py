@@ -10,14 +10,15 @@ import logging
 def hello_world():
     return 'Census Explorer'
 
-'''
-@app.route('/upload/<constituency_area>/<sheet_name>/<table>/', methods = ['POST'])
+#@app.route('/upload/<constituency_area>/<sheet_name>/<table>/', methods = ['POST'])
+@app.route('/upload/<constituency_area>/<sheet_name>/<table>/', methods = ['PUT'])
 def upload(constituency_area, sheet_name, table):
-    return "NOT OK"
     import json
     import hashlib
     from models import *
-    data = json.loads(str(request.form.keys()[0]))
+    #logging.warning(str(request.data))
+    # request.data contains the raw HTTP request body IFF Flask does not know the type...
+    data = json.loads(str(request.data))
     first_column_name = data['meta']['first_column_name']
     table_name = data['meta']['name']
     for d in data['data']:
@@ -53,7 +54,6 @@ def upload(constituency_area, sheet_name, table):
                 #logging.warning(dp)
                 dp.put()
     return "OK"
-'''
 
 
 def parse_argument(query_string):
