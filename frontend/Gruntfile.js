@@ -147,10 +147,6 @@ module.exports = function (grunt) {
       }
     },
 
-
-
-
-
     // Renames files for browser caching purposes
     rev: {
       dist: {
@@ -255,7 +251,6 @@ module.exports = function (grunt) {
             '.htaccess',
             '*.html',
             'views/{,*/}*.html',
-            'bower_components/**/*',
             'images/{,*/}*.{webp}',
             'fonts/*'
           ]
@@ -290,9 +285,9 @@ module.exports = function (grunt) {
         'copy:styles'
       ],
       dist: [
-        'copy:styles',
-        'imagemin',
-        'svgmin'
+        'copy:styles',  // Copy app/styles to .tmp/styles
+        'imagemin',  // copy app/images to dist/images
+        'svgmin'  // copy svgs from app/images to dist/images
       ]
     },
 
@@ -362,24 +357,24 @@ module.exports = function (grunt) {
   ]);
 
   grunt.registerTask('build', [
-    'clean:dist',
-    'useminPrepare',
-    'concurrent:dist',
-    'autoprefixer',
-    'concat',
-    'ngmin',
-    'copy:dist',
-    'cdnify',
-    'cssmin',
-    'uglify',
-    'rev',
-    'usemin',
-    'htmlmin'
+    'clean:dist',  // Clears the distribution folders
+    'useminPrepare',  // Dynamically reads <!-- build --> tags in index.html and generates grunt config for those tags
+    'concurrent:dist',  // Copies images to dist folder, copies styles to .tmp
+    'autoprefixer',  // Prefix CSS with vendor prefixes
+    'concat',  // Concat using the useminPrepare configuration - js and css blocks -- puts result js and css files in .tmp
+    'ngmin',  // Makes angular scripts minsafe
+    'copy:dist',  // copies everything into dist
+    'cdnify',  // replaces angular and jquery references to CDN version
+    'cssmin',  // Minify css
+    'uglify',  // Minify JS
+    'rev',  // Cachebusting
+    'usemin',  // Replace references with cachebusted versions
+    'htmlmin', // Minify html
   ]);
 
   grunt.registerTask('default', [
-    'newer:jshint',
-    'test',
-    'build'
+//    'newer:jshint',
+//    'test',
+//    'build'
   ]);
 };
