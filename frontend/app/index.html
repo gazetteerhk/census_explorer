@@ -12,9 +12,8 @@
   <!-- build:css styles/vendor.css -->
   <!-- bower:css -->
   <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" />
-
+  <link rel="stylesheet" type="text/css" href="bower_components/font-awesome/css/font-awesome.css">
   <link rel="stylesheet" href="//cdn.leafletjs.com/leaflet-0.7.2/leaflet.css" />
-
   <!-- endbower -->
   <!-- endbuild -->
   <!-- build:css({.tmp,app}) styles/main.css -->
@@ -62,6 +61,13 @@
     <script src="bower_components/json3/lib/json3.min.js"></script>
     <![endif]-->
 
+    <!-- The following three can not be injected by bower, separate them here.
+    Or, grunt build will change this index.html
+    -->
+    <script src="//leafletjs.com/dist/leaflet.js"></script>
+    <script src="scripts/angular-leaflet-directive.js"></script>
+    <script src="bower_components/dimple/dist/dimple.v1.1.3.js"></script>
+    
 
     <!-- build:js scripts/vendor.js -->
     <!-- bower:js -->
@@ -75,10 +81,7 @@
     <script src="bower_components/d3/d3.js"></script>
     <script src="bower_components/angular-animate/angular-animate.js"></script>
     <script src="bower_components/lodash/dist/lodash.compat.js"></script>
-    <script src="bower_components/dimple/dist/dimple.v1.1.3.js"></script>
-      <script src="//leafletjs.com/dist/leaflet.js"></script>
-      <script src="scripts/angular-leaflet-directive.js"></script>
-    <link rel="stylesheet" type="text/css" href="bower_components/font-awesome/css/font-awesome.css">
+    
     <!-- endbower -->
     <!-- endbuild -->
 
