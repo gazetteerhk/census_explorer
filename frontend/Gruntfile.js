@@ -122,6 +122,7 @@ module.exports = function (grunt) {
           ]
         }]
       },
+      deploy: '.grunt/grunt-gh-pages/',
       server: '.tmp'
     },
 
@@ -382,6 +383,7 @@ module.exports = function (grunt) {
   ]);
 
   grunt.registerTask('deploy', [
+    'clean:deploy',
     'build',
     'gh-pages'
   ]);
