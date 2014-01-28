@@ -2,7 +2,6 @@
 from collections import Counter
 import os
 from log import logger
-from constituency_area_data import all_files, base_path
 import xlrd
 import json
 #import sh
@@ -72,9 +71,6 @@ def translate_sheet(book):
         #print len(translateDict)
     return translateDict
        
-    
-from constituency_areas import english, simplified, traditional
-
 def _to_area_code_mapping(origin):
     #_tmp = [(v,k) for (k,v) in d.items() for d in origin.values()]
     _tmp = {}
@@ -83,20 +79,9 @@ def _to_area_code_mapping(origin):
             _tmp[v] = k
     return _tmp
 
-MAPPING_AREA_CODE_ENGLISH = _to_area_code_mapping(english)
-MAPPING_AREA_CODE_SIMPLIFIED = _to_area_code_mapping(simplified)
-MAPPING_AREA_CODE_TRADITIONAL = _to_area_code_mapping(traditional)
-
-def add_meta_info(table_data, area, sheet_name):
-    mapping = {'sheet0': MAPPING_AREA_CODE_TRADITIONAL,
-            'sheet1': MAPPING_AREA_CODE_SIMPLIFIED,
-            'sheet2': MAPPING_AREA_CODE_ENGLISH}[sheet_name]
-    table_data['meta'].update({'area': mapping[area.lower()]})
-    lang = {'sheet0': 'traditional',
-            'sheet1': 'simplified',
-            'sheet2': 'english'}[sheet_name]
-    table_data['meta'].update({'language': lang})
-    return table_data
+from constituency_areas import MAPPING_AREA_CODE_TO_ENGLISH 
+from constituency_areas import MAPPING_AREA_CODE_TO_SIMPLIFIED
+from constituency_areas import MAPPING_AREA_CODE_TO_TRADITIONAL
 
 def process_one_file(fn):
     area = fn[:3]
