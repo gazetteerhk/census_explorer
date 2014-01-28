@@ -17,3 +17,5 @@ backend/lib/*
 !backend/lib/README.md
 
 backend/index.yaml
+
+.grunt
