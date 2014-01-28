@@ -11,6 +11,7 @@ module.exports = function (grunt) {
 
   // Load grunt tasks automatically
   require('load-grunt-tasks')(grunt);
+  grunt.loadNpmTasks('grunt-gh-pages');
 
   // Time how long tasks take. Can help when optimizing build times
   require('time-grunt')(grunt);
@@ -317,6 +318,14 @@ module.exports = function (grunt) {
     //   dist: {}
     // },
 
+    'gh-pages': {
+      options: {
+        base: '<%= yeoman.dist %>',
+        message: 'Deploy'
+      },
+      src: ['**']
+    },
+
     // Test settings
     karma: {
       unit: {
@@ -370,6 +379,11 @@ module.exports = function (grunt) {
     'rev',  // Cachebusting
     'usemin',  // Replace references with cachebusted versions
     'htmlmin', // Minify html
+  ]);
+
+  grunt.registerTask('deploy', [
+    'build',
+    'gh-pages'
   ]);
 
   grunt.registerTask('default', [
