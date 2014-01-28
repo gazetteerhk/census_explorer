@@ -207,12 +207,12 @@ def process_one_file(fn):
     logger.info('process one xls done:' + fn)
 
 import re
-_IDENTIFIER_CLEANER = re.compile(r'\(\)\$#&,/')
+_IDENTIFIER_CLEANER = re.compile(ur'[\(\)\$#&,/]')
 #_IDENTIFIER_BLANKS = re.compile(r'\s')
 def get_identifier(sheet, table, row, col):
     value = unicode(sheet.cell(row, col).value)
     # clean and shorten human readable strings
-    value = _IDENTIFIER_CLEANER.sub(' ', value)
+    value = _IDENTIFIER_CLEANER.sub('', value)
     terms = value.strip().split()
     if terms:
         leading_term = terms[0]
