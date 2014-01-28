@@ -3874,3 +3874,10 @@ def _to_area_code_mapping(origin):
 MAPPING_AREA_CODE_TO_ENGLISH = _to_area_code_mapping(AREA_CODE_ENGLISH)
 MAPPING_AREA_CODE_TO_SIMPLIFIED = _to_area_code_mapping(AREA_CODE_SIMPLIFIED)
 MAPPING_AREA_CODE_TO_TRADITIONAL = _to_area_code_mapping(AREA_CODE_TRADITIONAL)
+
+# Path for the Excel Spreadsheets appears to be:
+# http://idds.census2011.gov.hk/Fact_sheets/CA/N06.xlsx
+# Where the file name is the district code
+ALL_AREA_CODES = [x.upper() for x in AREA_CODE_ENGLISH['All Districts'].values()]
+ALL_FILES = set([x + ".xlsx" for x in ALL_AREA_CODES])
+

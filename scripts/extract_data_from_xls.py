@@ -1,9 +1,12 @@
 from collections import Counter
 import os
-from log import logger
-from constituency_area_data import all_files, base_path
 import xlrd
 
+from log import logger
+import config
+from constituency_areas import ALL_FILES
+
+base_path = os.path.abspath(config.DIR_DATA_DOWNLOAD)
 
 def check_sheet(wb, tab_name, col, check_col):
     """
@@ -74,7 +77,7 @@ def check_for_differences():
     errors = 0
     frequency = Counter()
 
-    for f in all_files:
+    for f in ALL_FILES:
         base_sheet_name = f[:3]
         filepath = os.path.join(base_path, f)
         logger.info("Checking file {}".format(f))

@@ -3,10 +3,14 @@ Script for downloading the raw census data for each CA
 """
 import multiprocessing
 import os
-import constituency_areas
 import urllib2
+
+import constituency_areas
+from constituency_areas import ALL_AREA_CODES, ALL_FILES
 from log import logger
 import config
+
+base_path = os.path.abspath(config.DIR_DATA_DOWNLOAD)
 
 def download_file(remote_local_pair):
     url = remote_local_pair[0]
@@ -15,13 +19,6 @@ def download_file(remote_local_pair):
     with open(local_file_path, 'wb') as f:
         remote = urllib2.urlopen(url)
         f.write(remote.read())
-
-# Path for the Excel Spreadsheets appears to be:
-# http://idds.census2011.gov.hk/Fact_sheets/CA/N06.xlsx
-# Where the file name is the district code
-area_codes = [x.upper() for x in constituency_areas.AREA_CODE_ENGLISH['All Districts'].values()]
-all_files = set([x + ".xlsx" for x in area_codes])
-base_path = os.path.abspath(config.DIR_DATA_DOWNLOAD)
 
 def main():
     base_remote_path = "http://idds.census2011.gov.hk/Fact_sheets/CA/"
@@ -36,7 +33,7 @@ def main():
     files_to_download = []
     # A list of tuples, first element is remote url, second element is local file
 
-    for code in area_codes:
+    for code in ALL_AREA_CODES:
         filename = code + ".xlsx"
         url = base_remote_path + filename
         local_file_path = os.path.join(base_path, filename)
@@ -48,8 +45,8 @@ def main():
     # Check that all the files were downloaded
     files_in_folder = set(os.listdir(base_path))
 
-    assert all_files.issubset(files_in_folder), "Some files are missing {}".format(all_files.difference(files_in_folder))
-    logger.info("{} files downloaded".format(len(all_files)))
+    assert ALL_FILES.issubset(files_in_folder), "Some files are missing {}".format(ALL_FILES.difference(files_in_folder))
+    logger.info("{} files downloaded".format(len(ALL_FILES)))
 
 if __name__ == "__main__":
     main()
