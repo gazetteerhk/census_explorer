@@ -17,7 +17,7 @@
     "ng-i18next":"0.2.8",
     "leaflet.markerclusterer":"*",
     "lodash": "~2.4.1",
-    "font-awesome": "*"
+    "components-font-awesome": "*"
   },
   "devDependencies": {
     "angular-mocks": "1.2.6",

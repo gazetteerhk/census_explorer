@@ -5,13 +5,18 @@ angular.module('frontendApp', [
   'ngResource',
   'ngSanitize',
   'ngRoute',
-  'ngAnimate','leaflet-directive'
+  'ngAnimate',
+  //'leaflet-directive'
 ])
   .config(function ($routeProvider) {
     $routeProvider
+      // .when('/', {
+      //   templateUrl: 'views/main.html',
+      //   controller: 'MainCtrl'
+      // })
       .when('/', {
-        templateUrl: 'views/main.html',
-        controller: 'MainCtrl'
+        templateUrl: 'views/query.html',
+        controller: 'QueryCtrl'
       })
       .when('/about', {
         templateUrl: 'views/about.html',
