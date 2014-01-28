@@ -126,31 +126,27 @@ from table_meta_data import TABLE_META_DATA
 OUTPUT_PREFIX = config.DIR_DATA_CLEAN_JSON
 INPUT_PREFIX = config.DIR_DATA_DOWNLOAD
 
-def conversion(cellPosition):
-    row = ord(cellPosition[0]) - ord('A') #convert letter to ASCII, then suyb
-    col = int(cellPosition[1:]) - 1 # minus 1
-    return col, row
+def cell_name_to_pos(cellPosition):
+    #NOTE:
+    #    only works for single letter column
+    col = ord(cellPosition[0]) - ord('A') #convert letter to ASCII, then suyb
+    row = int(cellPosition[1:]) - 1 # minus 1
+    return row, col
 
-def extract(fn):
-    wb = xlrd.open_workbook(fn)
-    st = wb.sheet_by_index(2)
-    column_names = [st.cell(5, j).value for j in range(0,5)]
-    data = []
-    for i in range(6,13):
-        cells = [st.cell(i, j).value for j in range(0,5)]
-        data.append(dict(zip(column_names, cells)))
-    print data
-    print json.dumps(data, indent=2)
+def pos_to_cell_name(row, col):
+    #NOTE:
+    #    only works for single letter column
+    return '%s%d' % (chr(col + ord('A')), row + 1)
 
 def extract_table(sheet, name, header, body):
     # header: (A6, E6)
     # body: (A7, E13)
-    row1, col1 = conversion(header[0])
-    row2, col2 = conversion(header[1])
+    row1, col1 = cell_name_to_pos(header[0])
+    row2, col2 = cell_name_to_pos(header[1])
     column_names = [sheet.cell(row1, j).value for j in range(col1,col2+1)]
 
-    row1, col1 = conversion(body[0])
-    row2, col2 = conversion(body[1])
+    row1, col1 = cell_name_to_pos(body[0])
+    row2, col2 = cell_name_to_pos(body[1])
     data = []
     last_primary_cat = None
     for i in range(row1,row2+1):
@@ -210,6 +206,21 @@ def process_one_file(fn):
             json.dump(td, open(output_path, 'w'))
     logger.info('process one xls done:' + fn)
 
+import re
+_IDENTIFIER_CLEANER = re.compile(r'\(\)\$#&')
+#_IDENTIFIER_BLANKS = re.compile(r'\s')
+def get_identifier(sheet, row, col):
+    value = unicode(sheet.cell(row, col).value)
+    cell_name = pos_to_cell_name(row, col)
+    # clean and shorten human readable strings
+    value = _IDENTIFIER_CLEANER.sub(' ', value)
+    terms = value.strip().split()
+    if terms:
+        leading_term = terms[0]
+    else:
+        leading_term = None
+    return ('%s_%s' % (cell_name, leading_term)).lower()
+
 def translate_sheet(book):
     sheetNum = [0, 1, 2] #0 - Traditional, 1 - Simplifed, 2 - English    
     tables = {}
@@ -222,54 +233,54 @@ def translate_sheet(book):
         header = md['header'] #['H41', 'N41']
         body = md['body'] #['A7', 'E13']        
         name = md['name'] # 'Place of Study'
-        
-        column_names = {}
+
+        row1, col1 = cell_name_to_pos(header[0])
+        row2, col2 = cell_name_to_pos(header[1])
+        body_row1, body_col1 = cell_name_to_pos(body[0])
+        body_row2, body_col2 = cell_name_to_pos(body[1])
+
+        column_positions = [(row1, j) for j in range(col1, col2 + 1)]
+        row_positions = [(j, body_col1) for j in range(body_row1, body_row2 + 1)]
+        #TODO:
+        #    rows and columns may be handled differently.
+        #    e.g. rows like "1 - 1000" do carry some special information
+        all_positions = column_positions + row_positions
+
+        names = {}
         #get different language sheet in excel
         for i in sheetNum:
             sheet = book.sheet_by_index(i)
-            row1, col1 = conversion(header[0])
-            row2, col2 = conversion(header[1])
-            body_row1, body_col1 = conversion(body[0])
-            body_row2, body_col2 = conversion(body[1])
-            #actually we only need to extract the row name in the body            
-            #print row1, col1
+            names[i] = [unicode(sheet.cell(*pos).value).strip() for pos in all_positions]
+        ids = [get_identifier(sheet, *pos) for pos in all_positions]
 
-            #get the name and remove empty string
-            #get the col name
-            column_names[i] = [x.strip() for x in [sheet.cell(row1, j).value for j in range(col1,col2+1)] if x] 
-            #get the row name
-            column_names[i] = column_names[i] + [x.strip() for x in [sheet.cell(j, body_col1).value for j in range(body_row1, body_row2+1)] if x] 
-            
-        #for each column_name, find out T, S, E and then store them
-        
-        for c in range(len(column_names[0])):            
-            traditional_col = column_names[0][c]
-            simplified_col = column_names[1][c]
-            english_col = column_names[2][c]            
-            translateDict[english_col] = {'T':traditional_col, 'S':simplified_col,'E':english_col}
+        for c in range(len(all_positions)):
+            traditional_col = names[0][c]
+            simplified_col = names[1][c]
+            english_col = names[2][c]
+            identifier = ids[c]
+            translateDict[identifier] = {'T':traditional_col, 'S':simplified_col,'E':english_col}
 
     return translateDict
 
 def gen_translation():
-    fn = 'data/A01.xlsx'
-    area = fn[:3]
-    fullpath = fn #toby     
+    fullpath = os.path.join(config.DIR_DATA_DOWNLOAD, 'A01.xlsx')
     wb = xlrd.open_workbook(fullpath)
     translate_dict = translate_sheet(wb)
     with open('translate.json', 'w') as outfile:
         json.dump(translate_dict, outfile)
-    print 'done'
 
 def main():
+    logger.info('Start to generate translation dicts')
+    gen_translation()
+
+    return 
+
     logger.info('Start to parse individual xls files')
     sh.rm('-rf', OUTPUT_PREFIX)
     sh.mkdir('-p', OUTPUT_PREFIX)
-    files = [fn for fn in sh.ls(INPUT_PREFIX).split()] #[:2]
+    files = [fn for fn in sh.ls(INPUT_PREFIX).split()]
     pool = multiprocessing.Pool()
     pool.map(process_one_file, files)
-
-    logger.info('Start to generate translation dicts')
-    gen_translation()
 
 if __name__ == '__main__':
     main()
