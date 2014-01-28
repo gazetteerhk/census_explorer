@@ -1,5 +1,8 @@
 #!/bin/bash
 
+echo clean dist dir
+rm -rf dist
+
 echo usual build
 grunt build
 

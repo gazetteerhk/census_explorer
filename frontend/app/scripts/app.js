@@ -10,9 +10,13 @@ angular.module('frontendApp', [
 ])
   .config(function ($routeProvider) {
     $routeProvider
+      // .when('/', {
+      //   templateUrl: 'views/main.html',
+      //   controller: 'MainCtrl'
+      // })
       .when('/', {
-        templateUrl: 'views/main.html',
-        controller: 'MainCtrl'
+        templateUrl: 'views/query.html',
+        controller: 'QueryCtrl'
       })
       .when('/about', {
         templateUrl: 'views/about.html',
