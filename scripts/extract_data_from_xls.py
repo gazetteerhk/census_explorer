@@ -208,15 +208,68 @@ def process_one_file(fn):
             output_path = os.path.join(output_dir, tn) + '.json'
             add_meta_info(td, area, sn)
             json.dump(td, open(output_path, 'w'))
-    print 'done:', fn
+    logger.info('process one xls done:' + fn)
+
+def translate_sheet(book):
+    sheetNum = [0, 1, 2] #0 - Traditional, 1 - Simplifed, 2 - English    
+    tables = {}
+    translateDict = {}
+    count = 0
+    for (i, md) in enumerate(TABLE_META_DATA):       
+        #heck the header
+        #extract the field on different sheets
+
+        header = md['header'] #['H41', 'N41']
+        body = md['body'] #['A7', 'E13']        
+        name = md['name'] # 'Place of Study'
+        
+        column_names = {}
+        #get different language sheet in excel
+        for i in sheetNum:
+            sheet = book.sheet_by_index(i)
+            row1, col1 = conversion(header[0])
+            row2, col2 = conversion(header[1])
+            body_row1, body_col1 = conversion(body[0])
+            body_row2, body_col2 = conversion(body[1])
+            #actually we only need to extract the row name in the body            
+            #print row1, col1
+
+            #get the name and remove empty string
+            #get the col name
+            column_names[i] = [x.strip() for x in [sheet.cell(row1, j).value for j in range(col1,col2+1)] if x] 
+            #get the row name
+            column_names[i] = column_names[i] + [x.strip() for x in [sheet.cell(j, body_col1).value for j in range(body_row1, body_row2+1)] if x] 
+            
+        #for each column_name, find out T, S, E and then store them
+        
+        for c in range(len(column_names[0])):            
+            traditional_col = column_names[0][c]
+            simplified_col = column_names[1][c]
+            english_col = column_names[2][c]            
+            translateDict[english_col] = {'T':traditional_col, 'S':simplified_col,'E':english_col}
+
+    return translateDict
+
+def gen_translation():
+    fn = 'data/A01.xlsx'
+    area = fn[:3]
+    fullpath = fn #toby     
+    wb = xlrd.open_workbook(fullpath)
+    translate_dict = translate_sheet(wb)
+    with open('translate.json', 'w') as outfile:
+        json.dump(translate_dict, outfile)
+    print 'done'
 
 def main():
+    logger.info('Start to parse individual xls files')
     sh.rm('-rf', OUTPUT_PREFIX)
     sh.mkdir('-p', OUTPUT_PREFIX)
     files = [fn for fn in sh.ls(INPUT_PREFIX).split()] #[:2]
     pool = multiprocessing.Pool()
     pool.map(process_one_file, files)
 
+    logger.info('Start to generate translation dicts')
+    gen_translation()
+
 if __name__ == '__main__':
     main()
-
