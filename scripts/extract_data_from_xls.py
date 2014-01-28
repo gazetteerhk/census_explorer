@@ -138,16 +138,18 @@ def pos_to_cell_name(row, col):
     #    only works for single letter column
     return '%s%d' % (chr(col + ord('A')), row + 1)
 
-def extract_table(sheet, name, header, body):
+def extract_table(sheet, table, name, header, body):
     # header: (A6, E6)
     # body: (A7, E13)
     row1, col1 = cell_name_to_pos(header[0])
     row2, col2 = cell_name_to_pos(header[1])
-    column_names = [sheet.cell(row1, j).value for j in range(col1,col2+1)]
+    #column_names = [sheet.cell(row1, j).value for j in range(col1,col2+1)]
+    column_names = [get_identifier(sheet, table, row1, j) for j in range(col1,col2+1)]
 
     row1, col1 = cell_name_to_pos(body[0])
     row2, col2 = cell_name_to_pos(body[1])
-    row_names = [sheet.cell(i, col1).value for i in range(row1,row2+1)]
+    #row_names = [sheet.cell(i, col1).value for i in range(row1,row2+1)]
+    row_names = [get_identifier(sheet, table, i, col1) for i in range(row1,row2+1)]
 
     data = []
     for i in range(row1, row2 + 1):
@@ -159,7 +161,8 @@ def extract_table(sheet, name, header, body):
     
     return {
             'meta': {
-                'name': name,
+                'table_id': table,
+                'table_name': name,
                 #'first_column_name': column_names[0]
                 # other meta data
                 },
@@ -171,7 +174,7 @@ def extract_sheet(book, index):
     st = book.sheet_by_index(index)
     tables = {}
     for (i, md) in enumerate(TABLE_META_DATA):
-        data = extract_table(st, **md)
+        data = extract_table(st, i, **md)
         tables['table' + str(i)] = data
     return tables
 
@@ -179,38 +182,42 @@ def extract_book(filename):
     # 0: CH T
     # 1: CH S
     # 2: EN
+    #NOTE:
+    #    Only sheet English sheet is concerned.
+    #    Other sheets can be easily reconstructed with identifier and translation.
     wb = xlrd.open_workbook(filename)
-    sheets = {}
-    #for i in [0, 1, 2]:
-    for i in [2]:
-        tables = extract_sheet(wb, i)
-        sheets['sheet' + str(i)] = tables
-    return sheets
+    return extract_sheet(wb, 2)
+    #sheets = {}
+    ##for i in [0, 1, 2]:
+    #for i in [2]:
+    #    tables = extract_sheet(wb, i)
+    #    sheets['sheet' + str(i)] = tables
+    #return sheets
 
 from constituency_areas import MAPPING_AREA_CODE_TO_ENGLISH, MAPPING_AREA_CODE_TO_SIMPLIFIED, MAPPING_AREA_CODE_TO_TRADITIONAL
 
-def add_meta_info(table_data, area, sheet_name):
-    mapping = {'sheet0': MAPPING_AREA_CODE_TO_TRADITIONAL,
-            'sheet1': MAPPING_AREA_CODE_TO_SIMPLIFIED,
-            'sheet2': MAPPING_AREA_CODE_TO_ENGLISH}[sheet_name]
-    table_data['meta'].update({'area': mapping[area.lower()]})
-    lang = {'sheet0': 'traditional',
-            'sheet1': 'simplified',
-            'sheet2': 'english'}[sheet_name]
-    table_data['meta'].update({'language': lang})
-    return table_data
+#def add_meta_info(table_data, area, sheet_name):
+#    mapping = {'sheet0': MAPPING_AREA_CODE_TO_TRADITIONAL,
+#            'sheet1': MAPPING_AREA_CODE_TO_SIMPLIFIED,
+#            'sheet2': MAPPING_AREA_CODE_TO_ENGLISH}[sheet_name]
+#    table_data['meta'].update({'area': mapping[area.lower()]})
+#    lang = {'sheet0': 'traditional',
+#            'sheet1': 'simplified',
+#            'sheet2': 'english'}[sheet_name]
+#    table_data['meta'].update({'language': lang})
+#    return table_data
 
 def process_one_file(fn):
     area = fn[:3]
     fullpath = os.path.join('data', fn)
-    sheets = extract_book(fullpath)
-    for (sn, sd) in sheets.iteritems():
-        for (tn, td) in sd.iteritems():
-            output_dir = os.path.join(OUTPUT_PREFIX, area, sn)
-            sh.mkdir('-p', output_dir)
-            output_path = os.path.join(output_dir, tn) + '.json'
-            add_meta_info(td, area, sn)
-            json.dump(td, open(output_path, 'w'))
+    tables = extract_book(fullpath)
+    for (tn, td) in tables.iteritems():
+        output_dir = os.path.join(OUTPUT_PREFIX, 'areas', area)
+        sh.mkdir('-p', output_dir)
+        output_path = os.path.join(output_dir, tn) + '.json'
+        #add_meta_info(td, area)
+        td['meta']['area'] = area
+        json.dump(td, open(output_path, 'w'))
     logger.info('process one xls done:' + fn)
 
 import re
@@ -281,19 +288,20 @@ def gen_translation():
     fullpath = os.path.join(config.DIR_DATA_DOWNLOAD, 'A01.xlsx')
     wb = xlrd.open_workbook(fullpath)
     translate_dict = translate_sheet(wb)
-    with open('translate.json', 'w') as outfile:
+    with open(os.path.join(config.DIR_DATA_CLEAN_JSON, 'translate.json'), 'w') as outfile:
         json.dump(translate_dict, outfile)
 
 def main():
-    logger.info('Start to generate translation dicts')
-    gen_translation()
-
     logger.info('Start to parse individual xls files')
     sh.rm('-rf', OUTPUT_PREFIX)
     sh.mkdir('-p', OUTPUT_PREFIX)
     files = [fn for fn in sh.ls(INPUT_PREFIX).split()]
     pool = multiprocessing.Pool()
     pool.map(process_one_file, files)
+
+    logger.info('Start to generate translation dicts')
+    gen_translation()
+
 
 if __name__ == '__main__':
     main()
