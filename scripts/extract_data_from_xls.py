@@ -147,18 +147,24 @@ def extract_table(sheet, name, header, body):
 
     row1, col1 = cell_name_to_pos(body[0])
     row2, col2 = cell_name_to_pos(body[1])
+    row_names = [sheet.cell(i, col1).value for i in range(row1,row2+1)]
+
     data = []
-    last_primary_cat = None
-    for i in range(row1,row2+1):
-        cells = [sheet.cell(i, j).value for j in range(col1,col2+1)]
-        data.append(dict(zip(column_names, cells)))
+    for i in range(row1, row2 + 1):
+        data.append([sheet.cell(i, j).value for j in range(col1 + 1, col2 + 1)])
+    #last_primary_cat = None
+    #for i in range(row1,row2+1):
+    #    cells = [sheet.cell(i, j).value for j in range(col1,col2+1)]
+    #    data.append(dict(zip(column_names, cells)))
     
     return {
             'meta': {
                 'name': name,
-                'first_column_name': column_names[0]
+                #'first_column_name': column_names[0]
                 # other meta data
                 },
+            'row_names': row_names,
+            'column_names': column_names,
             'data': data}
 
 def extract_sheet(book, index):
@@ -175,7 +181,8 @@ def extract_book(filename):
     # 2: EN
     wb = xlrd.open_workbook(filename)
     sheets = {}
-    for i in [0, 1, 2]:
+    #for i in [0, 1, 2]:
+    for i in [2]:
         tables = extract_sheet(wb, i)
         sheets['sheet' + str(i)] = tables
     return sheets
@@ -280,8 +287,6 @@ def gen_translation():
 def main():
     logger.info('Start to generate translation dicts')
     gen_translation()
-
-    return 
 
     logger.info('Start to parse individual xls files')
     sh.rm('-rf', OUTPUT_PREFIX)
