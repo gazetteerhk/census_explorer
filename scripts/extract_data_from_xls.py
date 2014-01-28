@@ -207,11 +207,10 @@ def process_one_file(fn):
     logger.info('process one xls done:' + fn)
 
 import re
-_IDENTIFIER_CLEANER = re.compile(r'\(\)\$#&')
+_IDENTIFIER_CLEANER = re.compile(r'\(\)\$#&,/')
 #_IDENTIFIER_BLANKS = re.compile(r'\s')
-def get_identifier(sheet, row, col):
+def get_identifier(sheet, table, row, col):
     value = unicode(sheet.cell(row, col).value)
-    cell_name = pos_to_cell_name(row, col)
     # clean and shorten human readable strings
     value = _IDENTIFIER_CLEANER.sub(' ', value)
     terms = value.strip().split()
@@ -219,7 +218,16 @@ def get_identifier(sheet, row, col):
         leading_term = terms[0]
     else:
         leading_term = None
-    return ('%s_%s' % (cell_name, leading_term)).lower()
+
+    if table in [0]:
+        # NOTE:
+        #     Use table as prefix. 
+        #     This is to solve problems in table1, 
+        #     where the order can be different across areas.
+        return ('tab%s_%s' % (table, leading_term)).lower()
+    else:
+        cell_name = pos_to_cell_name(row, col)
+        return ('%s_%s' % (cell_name, leading_term)).lower()
 
 def translate_sheet(book):
     sheetNum = [0, 1, 2] #0 - Traditional, 1 - Simplifed, 2 - English    
@@ -251,7 +259,7 @@ def translate_sheet(book):
         for i in sheetNum:
             sheet = book.sheet_by_index(i)
             names[i] = [unicode(sheet.cell(*pos).value).strip() for pos in all_positions]
-        ids = [get_identifier(sheet, *pos) for pos in all_positions]
+        ids = [get_identifier(sheet, i, *pos) for pos in all_positions]
 
         for c in range(len(all_positions)):
             traditional_col = names[0][c]
