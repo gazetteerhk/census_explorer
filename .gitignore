@@ -12,3 +12,8 @@ bower_components
 build
 # grunt build
 dist
+
+backend/lib/*
+!backend/lib/README.md
+
+backend/index.yaml
