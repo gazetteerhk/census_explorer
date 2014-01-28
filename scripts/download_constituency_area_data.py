@@ -6,7 +6,7 @@ import os
 import constituency_areas
 import urllib2
 from log import logger
-
+import config
 
 def download_file(remote_local_pair):
     url = remote_local_pair[0]
@@ -19,11 +19,11 @@ def download_file(remote_local_pair):
 # Path for the Excel Spreadsheets appears to be:
 # http://idds.census2011.gov.hk/Fact_sheets/CA/N06.xlsx
 # Where the file name is the district code
-area_codes = [x.upper() for x in constituency_areas.english['All Districts'].values()]
+area_codes = [x.upper() for x in constituency_areas.AREA_CODE_ENGLISH['All Districts'].values()]
 all_files = set([x + ".xlsx" for x in area_codes])
-base_path = os.path.abspath("./data")
+base_path = os.path.abspath(config.DIR_DATA_DOWNLOAD)
 
-if __name__ == "__main__":
+def main():
     base_remote_path = "http://idds.census2011.gov.hk/Fact_sheets/CA/"
 
     if not os.path.exists(base_path):
@@ -50,3 +50,6 @@ if __name__ == "__main__":
 
     assert all_files.issubset(files_in_folder), "Some files are missing {}".format(all_files.difference(files_in_folder))
     logger.info("{} files downloaded".format(len(all_files)))
+
+if __name__ == "__main__":
+    main()

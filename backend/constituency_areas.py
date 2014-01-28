@@ -3,8 +3,6 @@
 """
 Script for parsing the list of CAs
 """
-
-
 ## List of consitutency areas
 
 # Taken from the javascript of the Census page
@@ -13,7 +11,7 @@ Script for parsing the list of CAs
 
 # English
 
-english = {
+AREA_CODE_ENGLISH = {
     u"Hong Kong Island": {
         u"Chung Wan": u"a01",
         u"Mid Levels East": u"a02",
@@ -1297,7 +1295,7 @@ english = {
 }
 
 # Simplified
-simplified = {
+AREA_CODE_SIMPLIFIED = {
     u"香港岛": {
         u"中环": u"a01",
         u"半山东": u"a02",
@@ -2582,7 +2580,7 @@ simplified = {
 
 # Traditional
 
-traditional = {
+AREA_CODE_TRADITIONAL = {
     u"香港島": {
         u"中環": u"a01",
         u"半山東": u"a02",
@@ -3865,3 +3863,14 @@ traditional = {
     }
 }
 
+
+def _to_area_code_mapping(origin):
+    _tmp = {}
+    for d in origin.values():
+        for (k, v) in d.items():
+            _tmp[v] = k
+    return _tmp
+
+MAPPING_AREA_CODE_TO_ENGLISH = _to_area_code_mapping(AREA_CODE_ENGLISH)
+MAPPING_AREA_CODE_TO_SIMPLIFIED = _to_area_code_mapping(AREA_CODE_SIMPLIFIED)
+MAPPING_AREA_CODE_TO_TRADITIONAL = _to_area_code_mapping(AREA_CODE_TRADITIONAL)

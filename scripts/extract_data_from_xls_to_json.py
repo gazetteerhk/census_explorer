@@ -1,15 +1,16 @@
 from collections import Counter
 import os
 from log import logger
-from constituency_area_data import all_files, base_path
 import xlrd
 import json
 import sh
 import itertools
 import pprint
 import multiprocessing
+import config
 
 from table_meta_data import TABLE_META_DATA
+# Sample:
 #TABLE_META_DATA = [
 #        {
 #        'name': 'household', 
@@ -17,7 +18,8 @@ from table_meta_data import TABLE_META_DATA
 #        'body': ['A115', 'E126']
 #        }
 #]
-OUTPUT_PREFIX = 'data-clean'
+OUTPUT_PREFIX = config.DIR_DATA_CLEAN_JSON
+INPUT_PREFIX = config.DIR_DATA_DOWNLOAD
 
 def conversion(cellPosition):
     row = ord(cellPosition[0]) - ord('A') #convert letter to ASCII, then suyb
@@ -77,24 +79,12 @@ def extract_book(filename):
         sheets['sheet' + str(i)] = tables
     return sheets
 
-from constituency_areas import english, simplified, traditional
-
-def _to_area_code_mapping(origin):
-    #_tmp = [(v,k) for (k,v) in d.items() for d in origin.values()]
-    _tmp = {}
-    for d in origin.values():
-        for (k, v) in d.items():
-            _tmp[v] = k
-    return _tmp
-
-MAPPING_AREA_CODE_ENGLISH = _to_area_code_mapping(english)
-MAPPING_AREA_CODE_SIMPLIFIED = _to_area_code_mapping(simplified)
-MAPPING_AREA_CODE_TRADITIONAL = _to_area_code_mapping(traditional)
+from constituency_areas import MAPPING_AREA_CODE_TO_ENGLISH, MAPPING_AREA_CODE_TO_SIMPLIFIED, MAPPING_AREA_CODE_TO_TRADITIONAL
 
 def add_meta_info(table_data, area, sheet_name):
-    mapping = {'sheet0': MAPPING_AREA_CODE_TRADITIONAL,
-            'sheet1': MAPPING_AREA_CODE_SIMPLIFIED,
-            'sheet2': MAPPING_AREA_CODE_ENGLISH}[sheet_name]
+    mapping = {'sheet0': MAPPING_AREA_CODE_TO_TRADITIONAL,
+            'sheet1': MAPPING_AREA_CODE_TO_SIMPLIFIED,
+            'sheet2': MAPPING_AREA_CODE_TO_ENGLISH}[sheet_name]
     table_data['meta'].update({'area': mapping[area.lower()]})
     lang = {'sheet0': 'traditional',
             'sheet1': 'simplified',
@@ -115,9 +105,12 @@ def process_one_file(fn):
             json.dump(td, open(output_path, 'w'))
     print 'done:', fn
 
-if __name__ == '__main__':
+def main():
     sh.rm('-rf', OUTPUT_PREFIX)
     sh.mkdir('-p', OUTPUT_PREFIX)
-    files = [fn for fn in sh.ls('data').split()] #[:2]
+    files = [fn for fn in sh.ls(INPUT_PREFIX).split()] #[:2]
     pool = multiprocessing.Pool()
     pool.map(process_one_file, files)
+
+if __name__ == '__main__':
+    main()
