@@ -203,7 +203,7 @@ from constituency_areas import MAPPING_AREA_CODE_TO_ENGLISH, MAPPING_AREA_CODE_T
 
 def process_one_file(fn):
     area = fn[:3]
-    fullpath = os.path.join('data', fn)
+    fullpath = os.path.join(config.DIR_DATA_DOWNLOAD, fn)
     tables = extract_book(fullpath)
     for (tn, td) in tables.iteritems():
         output_dir = os.path.join(OUTPUT_PREFIX, 'areas', area)

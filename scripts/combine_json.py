@@ -93,14 +93,20 @@ def translate_datapoints(df, language):
             dataframe_column, on='column'
             )
 
-datapoints = get_all_data_points()
-print len(datapoints)
-df = pd.DataFrame(datapoints, columns = 'region district area table row column value'.split())
+def main():
+    datapoints = get_all_data_points()
+    logger.info('Total %d data points', len(datapoints))
+    df = pd.DataFrame(datapoints, columns = 'region district area table row column value'.split())
 
-sh.mkdir('-p', config.DIR_DATA_COMBINED)
-df.to_csv(path.join(config.DIR_DATA_COMBINED, 'census.csv'), encoding='utf-8')
-#print translate_datapoints(df, 'E')[:10]
-translate_datapoints(df, 'E').to_csv(path.join(config.DIR_DATA_COMBINED, 'census-e.csv'), encoding='utf-8')
-translate_datapoints(df, 'S').to_csv(path.join(config.DIR_DATA_COMBINED, 'census-s.csv'), encoding='utf-8')
-translate_datapoints(df, 'T').to_csv(path.join(config.DIR_DATA_COMBINED, 'census-t.csv'), encoding='utf-8')
+    sh.mkdir('-p', config.DIR_DATA_COMBINED)
+    logger.info('Write datapoints to CSV')
+    df.to_csv(path.join(config.DIR_DATA_COMBINED, 'census.csv'), encoding='utf-8')
+    logger.info('Write english datapoints to CSV')
+    translate_datapoints(df, 'E').to_csv(path.join(config.DIR_DATA_COMBINED, 'census-e.csv'), encoding='utf-8')
+    logger.info('Write simplified datapoints to CSV')
+    translate_datapoints(df, 'S').to_csv(path.join(config.DIR_DATA_COMBINED, 'census-s.csv'), encoding='utf-8')
+    logger.info('Write traditional datapoints to CSV')
+    translate_datapoints(df, 'T').to_csv(path.join(config.DIR_DATA_COMBINED, 'census-t.csv'), encoding='utf-8')
 
+if __name__ == '__main__':
+    main()
