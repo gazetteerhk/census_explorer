@@ -288,7 +288,10 @@ def gen_translation():
     fullpath = os.path.join(config.DIR_DATA_DOWNLOAD, 'A01.xlsx')
     wb = xlrd.open_workbook(fullpath)
     translate_dict = translate_sheet(wb)
-    with open(os.path.join(config.DIR_DATA_CLEAN_JSON, 'translate.json'), 'w') as outfile:
+    from translation_fix import ERRATA
+    for identifier, trans in ERRATA.iteritems():
+        translate_dict[identifier].update(trans)
+    with open(os.path.join(config.DIR_DATA_CLEAN_JSON, 'translation.json'), 'w') as outfile:
         json.dump(translate_dict, outfile)
 
 def main():
