@@ -2,6 +2,9 @@ import collections
 from flask import Flask, jsonify, request
 import models
 import urllib
+from google.appengine.api import memcache
+import hashlib
+
 app = Flask(__name__)
 
 import logging
@@ -25,10 +28,23 @@ def require_admin(func):
     decorated.__name__ = func.__name__
     return decorated
 
+def cache_it(func):
+    def decorated(*args, **kwargs):
+        #logging.warning((request.query_string))
+        key = hashlib.md5((request.path + request.query_string).encode('utf-8')).hexdigest()
+        logging.warning('key: %s', key)
+        res = memcache.get(key)
+        if not res:
+            cache_time = 300
+            res = func(*args, **kwargs)
+            memcache.add(key, res, cache_time)
+        return res
+    decorated.__name__ = func.__name__
+    return decorated
+
 @app.route('/_admin/init/')
 @require_admin
 def admin_init():
-    import hashlib
     import random
     admin = Admin(id="0", enabled=True, name='admin',
             token=hashlib.md5(str(random.random()).encode('utf-8')).hexdigest()[:16])
@@ -39,7 +55,6 @@ def admin_init():
 @require_admin
 def upload(constituency_area, sheet_name, table):
     import json
-    import hashlib
     from models import *
     #logging.warning(str(request.data))
     # request.data contains the raw HTTP request body IFF Flask does not know the type...
@@ -95,6 +110,7 @@ def parse_argument(query_string):
 
 
 @app.route('/api')
+@cache_it
 def api():
     """
     API Endpoint for accessing the data
@@ -145,12 +161,17 @@ def api():
 
 
     """
+    import time
+    _time_start = time.time()
+
     # Parse the arguments
     ca = parse_argument(request.args.get('ca', None))
     table = parse_argument(request.args.get('table', None))
     row = parse_argument(request.args.get('row', None))
     column = parse_argument(request.args.get('column', None))
     options = bool(int(request.args.get('options', 0)))
+
+    ca_obj_cache = None
 
     # Incrementally build the query
     query = models.Datapoint.query()
@@ -211,7 +232,14 @@ def api():
 
         res['options'] = option_res
 
-    return jsonify(**res)
+    res['meta'] = {}
+    res['meta']['execution_time'] = time.time() - _time_start
+
+    response = jsonify(**res)
+    # Add the cross site request header
+    response.headers["Access-Control-Allow-Origin"] = "*"
+
+    return response
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0")
