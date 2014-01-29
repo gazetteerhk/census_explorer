@@ -6,7 +6,7 @@ angular.module('frontendApp', [
   'ngSanitize',
   'ngRoute',
   'ngAnimate',
-  //'leaflet-directive'
+  'leaflet-directive'
 ])
   .config(function ($routeProvider) {
     $routeProvider
