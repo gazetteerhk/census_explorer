@@ -12,3 +12,4 @@ openpyxl==1.8.2
 sh==1.09
 wsgiref==0.1.2
 xlrd==0.9.2
+pandas==0.13.0

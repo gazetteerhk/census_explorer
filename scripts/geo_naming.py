@@ -25,7 +25,7 @@ import copy
 # set to unique; list to make it JSON serializable
 ALL_AREA_CODES = list(set([c.lower() for c in constituency_areas.ALL_AREA_CODES]))
 ALL_DISTRICT_CODES = list(set(map(lambda c: c[0], ALL_AREA_CODES)))
-ALL_REGION_CODES = ['hk', 'kl', 'nt']
+ALL_REGION_CODES = [u'hk', u'kl', u'nt']
 
 # Manual code, the only information missing constituency_areas.py
 _TRANSLATION_ALL_DISTRICT = {

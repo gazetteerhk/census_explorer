@@ -230,7 +230,7 @@ def get_identifier(sheet, table, row, col):
     if table in [0]:
         # NOTE:
         #     Use table as prefix. 
-        #     This is to solve problems in table1, 
+        #     This is to solve problems in table0, 
         #     where the order can be different across areas.
         return ('tab%s_%s' % (table, leading_term)).lower()
     else:
