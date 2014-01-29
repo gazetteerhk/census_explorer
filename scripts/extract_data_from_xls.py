@@ -294,6 +294,13 @@ def gen_translation_for_one_group(wb, names_from, output_fn):
     with open(os.path.join(config.DIR_DATA_CLEAN_JSON, output_fn), 'w') as outfile:
         json.dump(translate_dict, outfile)
 
+def gen_translation_for_table():
+    translate_dict = {}
+    for (i, table) in enumerate(TABLE_META_DATA):
+        translate_dict[i] = table['names']
+    with open(os.path.join(config.DIR_DATA_CLEAN_JSON, 'translation-table.json'), 'w') as outfile:
+        json.dump(translate_dict, outfile)
+
 def gen_translation():
     fullpath = os.path.join(config.DIR_DATA_DOWNLOAD, 'A01.xlsx')
     wb = xlrd.open_workbook(fullpath)
@@ -301,13 +308,15 @@ def gen_translation():
     gen_translation_for_one_group(wb, 'row', 'translation-row.json')
     gen_translation_for_one_group(wb, 'column', 'translation-column.json')
 
+    gen_translation_for_table()
+
 def main():
-    #logger.info('Start to parse individual xls files')
-    #sh.rm('-rf', OUTPUT_PREFIX)
-    #sh.mkdir('-p', OUTPUT_PREFIX)
-    #files = [fn for fn in sh.ls(INPUT_PREFIX).split()]
-    #pool = multiprocessing.Pool()
-    #pool.map(process_one_file, files)
+    logger.info('Start to parse individual xls files')
+    sh.rm('-rf', OUTPUT_PREFIX)
+    sh.mkdir('-p', OUTPUT_PREFIX)
+    files = [fn for fn in sh.ls(INPUT_PREFIX).split()]
+    pool = multiprocessing.Pool()
+    pool.map(process_one_file, files)
 
     logger.info('Start to generate translation dicts')
     gen_translation()
