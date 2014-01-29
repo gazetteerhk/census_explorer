@@ -99,17 +99,18 @@ for region in ALL_REGION_CODES:
                     tmp.append(area)
             GEO_TREE[region][district] = tmp
 
-
 def output(obj, filename):
     json.dump(obj, open(path.join(config.DIR_DATA_GEO_NAME, filename), 'w'))
 
+def main():
+    sh.mkdir('-p', config.DIR_DATA_GEO_NAME)
+    output(TRANSLATION_AREAS, 'translation-areas.json')
+    output(TRANSLATION_DISTRICTS, 'translation-districts.json')
+    output(TRANSLATION_REGIONS, 'translation-regions.json')
+    output(MAP_AREA_TO_REGION, 'map-area-to-region.json')
+    output(MAP_AREA_TO_DISTRICT, 'map-area-to-district.json')
+    output(MAP_DISTRICT_TO_REGION, 'map-district-to-region.json')
+    output(GEO_TREE, 'geo-tree.json')
 
-sh.mkdir('-p', config.DIR_DATA_GEO_NAME)
-output(TRANSLATION_AREAS, 'translation-areas.json')
-output(TRANSLATION_DISTRICTS, 'translation-districts.json')
-output(TRANSLATION_REGIONS, 'translation-regions.json')
-output(MAP_AREA_TO_REGION, 'map-area-to-region.json')
-output(MAP_AREA_TO_DISTRICT, 'map-area-to-district.json')
-output(MAP_DISTRICT_TO_REGION, 'map-district-to-region.json')
-output(GEO_TREE, 'geo-tree.json')
-
+if __name__ == "__main__":
+    main()
