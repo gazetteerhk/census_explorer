@@ -103,9 +103,10 @@ def parse_argument(query_string):
 
     If query_string is None, then returns None
     """
-    if query_string is None:
+    if query_string is None or len(query_string) == 0:
         return None
-    res = urllib.unquote_plus(query_string).split(',')
+    # res = urllib.unquote_plus(query_string).split(',')
+    res = map(urllib.unquote_plus, query_string)
     return res
 
 
@@ -164,11 +165,12 @@ def api():
     import time
     _time_start = time.time()
 
+
     # Parse the arguments
-    ca = parse_argument(request.args.get('ca', None))
-    table = parse_argument(request.args.get('table', None))
-    row = parse_argument(request.args.get('row', None))
-    column = parse_argument(request.args.get('column', None))
+    ca = parse_argument(request.args.getlist('ca', None))
+    table = parse_argument(request.args.getlist('table', None))
+    row = parse_argument(request.args.getlist('row', None))
+    column = parse_argument(request.args.getlist('column', None))
     options = bool(int(request.args.get('options', 0)))
 
     ca_obj_cache = None

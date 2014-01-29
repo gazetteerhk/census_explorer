@@ -11,6 +11,7 @@ module.exports = function (grunt) {
 
   // Load grunt tasks automatically
   require('load-grunt-tasks')(grunt);
+  grunt.loadNpmTasks('grunt-gh-pages');
 
   // Time how long tasks take. Can help when optimizing build times
   require('time-grunt')(grunt);
@@ -121,6 +122,7 @@ module.exports = function (grunt) {
           ]
         }]
       },
+      deploy: '.grunt/grunt-gh-pages/',
       server: '.tmp'
     },
 
@@ -146,10 +148,6 @@ module.exports = function (grunt) {
         ignorePath: '<%= yeoman.app %>/'
       }
     },
-
-
-
-
 
     // Renames files for browser caching purposes
     rev: {
@@ -255,7 +253,6 @@ module.exports = function (grunt) {
             '.htaccess',
             '*.html',
             'views/{,*/}*.html',
-            'bower_components/**/*',
             'images/{,*/}*.{webp}',
             'fonts/*'
           ]
@@ -264,6 +261,11 @@ module.exports = function (grunt) {
           cwd: '.tmp/images',
           dest: '<%= yeoman.dist %>/images',
           src: ['generated/*']
+        }, {
+          expand: true,
+          cwd: '<%= yeoman.app %>/bower_components/font-awesome/',
+          src: 'fonts/*',
+          dest: '<%= yeoman.dist %>'
         }]
       },
       styles: {
@@ -271,7 +273,9 @@ module.exports = function (grunt) {
         cwd: '<%= yeoman.app %>/styles',
         dest: '.tmp/styles/',
         src: '{,*/}*.css'
-      }
+      },
+
+      
     },
 
     // Run some tasks in parallel to speed up the build process
@@ -283,9 +287,9 @@ module.exports = function (grunt) {
         'copy:styles'
       ],
       dist: [
-        'copy:styles',
-        'imagemin',
-        'svgmin'
+        'copy:styles',  // Copy app/styles to .tmp/styles
+        'imagemin',  // copy app/images to dist/images
+        'svgmin'  // copy svgs from app/images to dist/images
       ]
     },
 
@@ -314,6 +318,14 @@ module.exports = function (grunt) {
     // concat: {
     //   dist: {}
     // },
+
+    'gh-pages': {
+      options: {
+        base: '<%= yeoman.dist %>',
+        message: 'Deploy'
+      },
+      src: ['**']
+    },
 
     // Test settings
     karma: {
@@ -355,25 +367,30 @@ module.exports = function (grunt) {
   ]);
 
   grunt.registerTask('build', [
-    'clean:dist',
-    'bower-install',
-    'useminPrepare',
-    'concurrent:dist',
-    'autoprefixer',
-    'concat',
-    'ngmin',
-    'copy:dist',
-    'cdnify',
-    'cssmin',
-    'uglify',
-    'rev',
-    'usemin',
-    'htmlmin'
+    'clean:dist',  // Clears the distribution folders
+    'useminPrepare',  // Dynamically reads <!-- build --> tags in index.html and generates grunt config for those tags
+    'concurrent:dist',  // Copies images to dist folder, copies styles to .tmp
+    'autoprefixer',  // Prefix CSS with vendor prefixes
+    'concat',  // Concat using the useminPrepare configuration - js and css blocks -- puts result js and css files in .tmp
+    'ngmin',  // Makes angular scripts minsafe
+    'copy:dist',  // copies everything into dist
+    'cdnify',  // replaces angular and jquery references to CDN version
+    'cssmin',  // Minify css
+    'uglify',  // Minify JS
+    'rev',  // Cachebusting
+    'usemin',  // Replace references with cachebusted versions
+    'htmlmin', // Minify html
+  ]);
+
+  grunt.registerTask('deploy', [
+    'clean:deploy',
+    'build',
+    'gh-pages'
   ]);
 
   grunt.registerTask('default', [
-    'newer:jshint',
-    'test',
-    'build'
+//    'newer:jshint',
+//    'test',
+//    'build'
   ]);
 };
