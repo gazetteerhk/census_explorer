@@ -237,7 +237,7 @@ def get_identifier(sheet, table, row, col):
         cell_name = pos_to_cell_name(row, col)
         return ('%s_%s' % (cell_name, leading_term)).lower()
 
-def translate_sheet(book):
+def translate_sheet(book, names_from='all'):
     sheetNum = [0, 1, 2] #0 - Traditional, 1 - Simplifed, 2 - English    
     tables = {}
     translateDict = {}
@@ -260,7 +260,14 @@ def translate_sheet(book):
         #TODO:
         #    rows and columns may be handled differently.
         #    e.g. rows like "1 - 1000" do carry some special information
-        all_positions = column_positions + row_positions
+        if names_from == 'all':
+            all_positions = column_positions + row_positions
+        elif names_from == 'column':
+            all_positions = column_positions
+        elif names_from == 'row':
+            all_positions = row_positions
+        else:
+            raise 'unknow names_from'
 
         names = {}
         #get different language sheet in excel
@@ -278,23 +285,29 @@ def translate_sheet(book):
 
     return translateDict
 
+def gen_translation_for_one_group(wb, names_from, output_fn):
+    translate_dict = translate_sheet(wb, names_from)
+    from translation_fix import ERRATA
+    for identifier, trans in ERRATA.iteritems():
+        if identifier in translate_dict:
+            translate_dict[identifier].update(trans)
+    with open(os.path.join(config.DIR_DATA_CLEAN_JSON, output_fn), 'w') as outfile:
+        json.dump(translate_dict, outfile)
+
 def gen_translation():
     fullpath = os.path.join(config.DIR_DATA_DOWNLOAD, 'A01.xlsx')
     wb = xlrd.open_workbook(fullpath)
-    translate_dict = translate_sheet(wb)
-    from translation_fix import ERRATA
-    for identifier, trans in ERRATA.iteritems():
-        translate_dict[identifier].update(trans)
-    with open(os.path.join(config.DIR_DATA_CLEAN_JSON, 'translation.json'), 'w') as outfile:
-        json.dump(translate_dict, outfile)
+    gen_translation_for_one_group(wb, 'all', 'translation.json')
+    gen_translation_for_one_group(wb, 'row', 'translation-row.json')
+    gen_translation_for_one_group(wb, 'column', 'translation-column.json')
 
 def main():
-    logger.info('Start to parse individual xls files')
-    sh.rm('-rf', OUTPUT_PREFIX)
-    sh.mkdir('-p', OUTPUT_PREFIX)
-    files = [fn for fn in sh.ls(INPUT_PREFIX).split()]
-    pool = multiprocessing.Pool()
-    pool.map(process_one_file, files)
+    #logger.info('Start to parse individual xls files')
+    #sh.rm('-rf', OUTPUT_PREFIX)
+    #sh.mkdir('-p', OUTPUT_PREFIX)
+    #files = [fn for fn in sh.ls(INPUT_PREFIX).split()]
+    #pool = multiprocessing.Pool()
+    #pool.map(process_one_file, files)
 
     logger.info('Start to generate translation dicts')
     gen_translation()
