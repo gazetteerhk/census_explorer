@@ -138,32 +138,26 @@ def pos_to_cell_name(row, col):
     #    only works for single letter column
     return '%s%d' % (chr(col + ord('A')), row + 1)
 
-def extract_table(sheet, table, name, header, body):
+def extract_table(sheet, table, name, names, header, body, **kwargs):
     # header: (A6, E6)
     # body: (A7, E13)
     row1, col1 = cell_name_to_pos(header[0])
     row2, col2 = cell_name_to_pos(header[1])
-    #column_names = [sheet.cell(row1, j).value for j in range(col1,col2+1)]
     column_names = [get_identifier(sheet, table, row1, j) for j in range(col1,col2+1)]
 
     row1, col1 = cell_name_to_pos(body[0])
     row2, col2 = cell_name_to_pos(body[1])
-    #row_names = [sheet.cell(i, col1).value for i in range(row1,row2+1)]
     row_names = [get_identifier(sheet, table, i, col1) for i in range(row1,row2+1)]
 
     data = []
     for i in range(row1, row2 + 1):
         data.append([sheet.cell(i, j).value for j in range(col1 + 1, col2 + 1)])
-    #last_primary_cat = None
-    #for i in range(row1,row2+1):
-    #    cells = [sheet.cell(i, j).value for j in range(col1,col2+1)]
-    #    data.append(dict(zip(column_names, cells)))
     
     return {
             'meta': {
                 'table_id': table,
-                'table_name': name['E'],
-                #'first_column_name': column_names[0]
+                'table_name': name,
+                'table_names': names,
                 # other meta data
                 },
             'row_names': row_names,
