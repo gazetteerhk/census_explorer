@@ -162,7 +162,7 @@ def extract_table(sheet, table, name, header, body):
     return {
             'meta': {
                 'table_id': table,
-                'table_name': name,
+                'table_name': name['E'],
                 #'first_column_name': column_names[0]
                 # other meta data
                 },
