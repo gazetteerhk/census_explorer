@@ -308,3 +308,14 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+    # NOTE:
+    # Following is to show that merged cells (C76-E76) only have data in the first one.
+    # This excludes the possibility of automatic column extension for name fix.
+    # We need to use errata.
+    #fullpath = os.path.join(config.DIR_DATA_DOWNLOAD, 'A01.xlsx')
+    #wb = xlrd.open_workbook(fullpath)
+    #sheet = wb.sheet_by_index(2)
+    #print sheet.cell(*cell_name_to_pos('C76'))
+    #print sheet.cell(*cell_name_to_pos('D76'))
+    #print sheet.cell(*cell_name_to_pos('E76'))
