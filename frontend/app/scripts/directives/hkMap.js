@@ -18,6 +18,9 @@ angular.module('frontendApp').directive('hkMap', function() {
       var leafletNode = angular.element(elem.children()[0]);
       // If height is specified, then move it to the template, otherwise use default
       leafletNode.css('height', attrs.height || "300px");
+
+      // Need relative positioning for overlay
+      elem.css('position', 'relative');
     },
     controller: ['$scope', 'GeoFiles', function($scope, GeoFiles) {
       // Default initializations
@@ -46,16 +49,20 @@ angular.module('frontendApp').directive('hkMap', function() {
 
       var mouseoverHandler = function(e) {
         var layer = e.target;
+        console.log(e.target);
         layer.setStyle(highlightedStyle);
         if (!L.Browser.ie && !L.Browser.opera) {
           layer.bringToFront();
         }
+
+        $scope.highlightedFeature = e.target.feature.properties.DCCODE;
       };
 
       var resetStyle = function(e) {
         // Can't use resetStyle because we don't have access to the GeoJSON object
         var layer = e.target;
         layer.setStyle(defaultStyle);
+        delete $scope.highlightedFeature;
       };
 
       var clickHandler = function(e) {
@@ -86,6 +93,6 @@ angular.module('frontendApp').directive('hkMap', function() {
         };
       });
     }],
-    template: '<leaflet center="center" defaults="defaults" geojson="districts"></leaflet>'
+    template: '<leaflet center="center" defaults="defaults" geojson="districts"></leaflet><div class="map-overlay" ng-show="highlightedFeature">{{ highlightedFeature }}</div>'
   }
 });
