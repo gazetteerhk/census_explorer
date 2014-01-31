@@ -47,6 +47,7 @@ angular.module('frontendApp').directive('hkMap', function() {
         weight: 6
       };
 
+      // Handlers for interaction
       var mouseoverHandler = function(e) {
         var layer = e.target;
         console.log(e.target);
@@ -55,18 +56,17 @@ angular.module('frontendApp').directive('hkMap', function() {
           layer.bringToFront();
         }
 
-        $scope.highlightedFeature = e.target.feature.properties.DCCODE;
+        $scope.highlightedFeature = e.target.feature.properties.DCCODE || e.target.feature.properties.CACODE;
       };
 
       var resetStyle = function(e) {
         // Can't use resetStyle because we don't have access to the GeoJSON object
         var layer = e.target;
         layer.setStyle(defaultStyle);
-        delete $scope.highlightedFeature;
+        $scope.highlightedFeature = undefined;
       };
 
       var clickHandler = function(e) {
-
       };
 
       var onEachFeature = function(feature, layer) {
@@ -84,15 +84,27 @@ angular.module('frontendApp').directive('hkMap', function() {
           style: defaultStyle,
           onEachFeature: onEachFeature // Need handlers here
         };
+        $scope.geojson = $scope.districts;
       });
 
       GeoFiles.getAreas().then(function(data) {
         $scope.areas = {
           data: data,
-          style: undefined // need a function here for each district
+          style: defaultStyle,
+          onEachFeature: onEachFeature
         };
       });
+
+      // If we zoom in further than >= 14, then switch over to the constituency areas layer
+      $scope.$watch('center.zoom', function(newVal, oldVal) {
+        if (newVal >= 14) {
+          $scope.geojson = $scope.areas;
+        } else {
+          $scope.geojson = $scope.districts;
+        }
+      });
     }],
-    template: '<leaflet center="center" defaults="defaults" geojson="districts"></leaflet><div class="map-overlay" ng-show="highlightedFeature">{{ highlightedFeature }}</div>'
+    template: '<leaflet center="center" defaults="defaults" geojson="geojson"></leaflet>' +
+      '<div class="map-overlay" ng-show="highlightedFeature">{{ highlightedFeature }}</div><span>{{ center }}</span>'
   }
 });
