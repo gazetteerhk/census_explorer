@@ -58,7 +58,7 @@ var MapCtrl = function($scope, $http) {
         };
     }
 
-    $http.get("data/geojson/dc_polygon.geojson").success(function(data, status) {
+    $http.get("scripts/geo/dc_polygon.geo.json").success(function(data, status) {
         console.log('got polygon'+status);
         console.log(data);
         angular.extend($scope, {
