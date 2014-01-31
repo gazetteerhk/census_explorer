@@ -12,7 +12,6 @@
 angular.module('frontendApp').directive('hkMap', function() {
 
   return {
-    priority: '100',
     scope: true,
     restrict: 'AE',
     link: function(scope, elem, attrs) {
@@ -21,6 +20,7 @@ angular.module('frontendApp').directive('hkMap', function() {
       leafletNode.css('height', attrs.height || "300px");
     },
     controller: ['$scope', 'GeoFiles', function($scope, GeoFiles) {
+      // Default initializations
       $scope.defaults =  {
         scrollWheelZoom: false,
         maxZoom: 18
@@ -32,8 +32,60 @@ angular.module('frontendApp').directive('hkMap', function() {
         zoom: 12
       };
 
-      GeoFiles.getDistricts().then(function(data) {$scope.geojson = {data: data};});
+      var defaultStyle = {
+        color: "#2b8cbe",
+        fillOpacity: 0.2,
+        weight: 3
+      };
+
+      var highlightedStyle = {
+        color: "#000",
+        fillOpacity: 0,
+        weight: 6
+      };
+
+      var mouseoverHandler = function(e) {
+        var layer = e.target;
+        layer.setStyle(highlightedStyle);
+        if (!L.Browser.ie && !L.Browser.opera) {
+          layer.bringToFront();
+        }
+      };
+
+      var resetStyle = function(e) {
+        // Can't use resetStyle because we don't have access to the GeoJSON object
+        var layer = e.target;
+        layer.setStyle(defaultStyle);
+      };
+
+      var clickHandler = function(e) {
+
+      };
+
+      var onEachFeature = function(feature, layer) {
+        layer.on({
+          mouseover: mouseoverHandler,
+          mouseout: resetStyle
+        });
+
+      };
+
+      // Loading the map layers
+      GeoFiles.getDistricts().then(function(data) {
+        $scope.districts = {
+          data: data,
+          style: defaultStyle,
+          onEachFeature: onEachFeature // Need handlers here
+        };
+      });
+
+      GeoFiles.getAreas().then(function(data) {
+        $scope.areas = {
+          data: data,
+          style: undefined // need a function here for each district
+        };
+      });
     }],
-    template: '<leaflet center="center" defaults="defaults" geojson="geojson"></leaflet>'
+    template: '<leaflet center="center" defaults="defaults" geojson="districts"></leaflet>'
   }
 });
