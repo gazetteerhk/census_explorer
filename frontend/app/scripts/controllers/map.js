@@ -56,23 +56,37 @@ var MapCtrl = function($scope, $http) {
             dashArray: '3',
             fillOpacity: 0.7
         };
-    }
+    };
 
-    $http.get("scripts/geo/dc_polygon.geo.json").success(function(data, status) {
-        console.log('got polygon'+status);
-        console.log(data);
-        angular.extend($scope, {
-            geojson: {
-                data: data,
-                // style: style,
-                resetStyleOnMouseout: true
-            }
-        });
-        console.log('updated scope')
-        console.log($scope);
-
-
+  $http.get("scripts/geo/dc_polygon.topo.json").success(function(data, status) {
+    console.log('got polygon'+status);
+    console.log(data);
+    var geo_data = topojson.feature(data, data.objects['dc_polygon.geo']);
+    angular.extend($scope, {
+      geojson: {
+        data: geo_data,
+        // style: style,
+        resetStyleOnMouseout: true
+      }
     });
+    console.log('updated scope')
+    console.log($scope);
+  });
+
+  $http.get("scripts/geo/dc_polygon.geo.json").success(function(data, status) {
+    console.log('got polygon'+status);
+    console.log(data);
+    angular.extend($scope, {
+      geojson_orig: {
+        data: data,
+        // style: style,
+        resetStyleOnMouseout: true
+      }
+    });
+    console.log('updated scope')
+    console.log($scope);
+  });
+
 
     // $scope.$watch('spots', function(spots) {
 
