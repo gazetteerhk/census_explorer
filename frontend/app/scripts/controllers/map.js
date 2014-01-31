@@ -1,6 +1,6 @@
 'use strict'
 
-var MapCtrl = function($scope, $http) {
+var MapCtrl = function($scope, $http, GeoFiles) {
 
     //only when DOM ready? or 
     angular.extend($scope, {
@@ -47,45 +47,27 @@ var MapCtrl = function($scope, $http) {
         // }
     });
 
-     var style = function(feature) {
-        return {
-            fillColor: '#CC0066',
-            weight: 2,
-            opacity: 1,
-            color: 'white',
-            dashArray: '3',
-            fillOpacity: 0.7
-        };
+  var style = function(feature) {
+    return {
+      fillColor: '#CC0066',
+      weight: 2,
+      opacity: 1,
+      color: 'white',
+      dashArray: '3',
+      fillOpacity: 0.7
     };
+  };
 
-  $http.get("scripts/geo/dc_polygon.topo.json").success(function(data, status) {
-    console.log('got polygon'+status);
-    console.log(data);
-    var geo_data = topojson.feature(data, data.objects['dc_polygon.geo']);
+  GeoFiles.getDistricts().then(function(data) {
     angular.extend($scope, {
       geojson: {
-        data: geo_data,
-        // style: style,
-        resetStyleOnMouseout: true
-      }
-    });
-    console.log('updated scope')
-    console.log($scope);
-  });
-
-  $http.get("scripts/geo/dc_polygon.geo.json").success(function(data, status) {
-    console.log('got polygon'+status);
-    console.log(data);
-    angular.extend($scope, {
-      geojson_orig: {
         data: data,
         // style: style,
         resetStyleOnMouseout: true
       }
     });
-    console.log('updated scope')
-    console.log($scope);
   });
+
 
 
     // $scope.$watch('spots', function(spots) {

@@ -42,7 +42,7 @@
     "karma": "~0.10.9",
     "karma-ng-html2js-preprocessor": "~0.1.0",
     "grunt-gh-pages": "~0.9.0",
-    "topojson": "~1.4.6",
+    "topojson": "~1.4.6"
   },
   "engines": {
     "node": ">=0.8.0"
