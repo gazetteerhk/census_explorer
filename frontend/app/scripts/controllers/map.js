@@ -58,15 +58,15 @@ var MapCtrl = function($scope, $http, GeoFiles) {
     };
   };
 
-  GeoFiles.getDistricts().then(function(data) {
-    angular.extend($scope, {
-      geojson: {
-        data: data,
-        // style: style,
-        resetStyleOnMouseout: true
-      }
-    });
-  });
+//  GeoFiles.getAreas().then(function(data) {
+//    angular.extend($scope, {
+//      geojson: {
+//        data: data,
+//        style: style,
+//        resetStyleOnMouseout: true
+//      }
+//    });
+//  });
 
 
 
