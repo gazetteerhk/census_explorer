@@ -8,26 +8,26 @@ def populate_constituency_areas(*args, **kwargs):
     """
     Loads all of the constituency areas into the database
     """
-    from constituency_areas import english, traditional, simplified
+    from constituency_areas import AREA_CODE_ENGLISH, AREA_CODE_SIMPLIFIED, AREA_CODE_TRADITIONAL
     from district_to_regions import DISTRICT_TO_REGION_ENGLISH, DISTRICT_TO_REGION_SIMPLIFIED, DISTRICT_TO_REGION_TRADITIONAL
 
     objs_to_commit = {}
 
-    for district, cas in english.items():
+    for district, cas in AREA_CODE_ENGLISH.items():
         for ca, code in cas.items():
             logging.info("Adding CA {} {}".format(code, ca))
             obj = models.ConstituencyArea(id=code, district=district, name_english=ca, code=code)
             obj.region_english = DISTRICT_TO_REGION_ENGLISH[district]
             objs_to_commit[code] = obj
 
-    for district, cas in simplified.items():
+    for district, cas in AREA_CODE_SIMPLIFIED.items():
         for ca, code in cas.items():
             logging.info("Adding CA {} {}".format(code, ca.encode('utf-8')))
             obj = objs_to_commit[code]
             obj.region_simplified = DISTRICT_TO_REGION_SIMPLIFIED[district]
             obj.name_simplified = ca
 
-    for district, cas in traditional.items():
+    for district, cas in AREA_CODE_TRADITIONAL.items():
         for ca, code in cas.items():
             logging.info("Adding CA {} {}".format(code, ca.encode('utf-8')))
             obj = objs_to_commit[code]
