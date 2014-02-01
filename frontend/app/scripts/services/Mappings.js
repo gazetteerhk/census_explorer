@@ -85,14 +85,25 @@ angular.module('frontendApp').factory('Mappings', ['$http', '$q', function($http
 
   };
 
-  // Districts to Areas
+  // Areas from District
   var _getAreasFromDistrict = function(district) {
     district = district.toLowerCase();
-//    if (_.isUndefined(svc._data.geoTree))
+    var region = _getRegionFromDistrict(district);
+
+    return svc._data.geoTree[region][district];
   };
 
   svc.getAreasFromDistrict = function(district) {
+    var deferred = $q.defer();
+    if (_.isUndefined(svc._data.geoTree)) {
+      loadGeoTree().then(function() {
+        deferred.resolve(_getAreasFromDistrict(district));
+      });
+    } else {
+      deferred.resolve(_getAreasFromDistrict(district));
+    }
 
+    return deferred.promise;
   };
 
   return svc;
