@@ -319,7 +319,7 @@ def gen_translation_for_one_group(wb, names_from):
     from translation_fix import ERRATA
     #print translate_dict
     #print _merge_translation_dict(translate_dict, ERRATA)
-    return _merge_translation_dict(translate_dict, ERRATA)
+    return _merge_translation_dict(translate_dict, ERRATA, False)
 
 def gen_translation_for_table():
     translate_dict = {}
@@ -327,18 +327,28 @@ def gen_translation_for_table():
         translate_dict[i] = table['names']
     return translate_dict
 
-def gen_translation():
+def gen_translation_for_one_area(args):
+    fn, names_from = args
+    fullpath = os.path.join(config.DIR_DATA_DOWNLOAD, fn)
+    wb = xlrd.open_workbook(fullpath)
+    logger.info('translation %s, %s', fn, names_from)
+    return gen_translation_for_one_group(wb, names_from)
+
+def gen_translation(files):
     translate_dict_all = defaultdict(dict)
     translate_dict_row = defaultdict(dict)
     translate_dict_column = defaultdict(dict)
 
-    fullpath = os.path.join(config.DIR_DATA_DOWNLOAD, 'A01.xlsx')
-    wb = xlrd.open_workbook(fullpath)
-    _merge_translation_dict(translate_dict_all, gen_translation_for_one_group(wb, 'all'))
-    #print translate_dict_all
-
-    _merge_translation_dict(translate_dict_row, gen_translation_for_one_group(wb, 'row'))
-    _merge_translation_dict(translate_dict_column, gen_translation_for_one_group(wb, 'column'))
+    pool = multiprocessing.Pool()
+    translate_dict_all = reduce(_merge_translation_dict, 
+            pool.map(gen_translation_for_one_area, zip(files, ['all'] * len(files))), 
+            defaultdict(dict))
+    translate_dict_row = reduce(_merge_translation_dict, 
+            pool.map(gen_translation_for_one_area, zip(files, ['row'] * len(files))), 
+            defaultdict(dict))
+    translate_dict_column = reduce(_merge_translation_dict, 
+            pool.map(gen_translation_for_one_area, zip(files, ['column'] * len(files))), 
+            defaultdict(dict))
 
     with open(os.path.join(config.DIR_DATA_CLEAN_JSON, 'translation.json'), 'w') as outfile:
         json.dump(translate_dict_all, outfile)
@@ -347,6 +357,7 @@ def gen_translation():
     with open(os.path.join(config.DIR_DATA_CLEAN_JSON, 'translation-column.json'), 'w') as outfile:
         json.dump(translate_dict_column, outfile)
 
+    # table translations from table_meta_data.py
     with open(os.path.join(config.DIR_DATA_CLEAN_JSON, 'translation-table.json'), 'w') as outfile:
         json.dump(gen_translation_for_table(), outfile)
 
@@ -355,11 +366,14 @@ def main():
     sh.rm('-rf', OUTPUT_PREFIX)
     sh.mkdir('-p', OUTPUT_PREFIX)
     files = [fn for fn in sh.ls(INPUT_PREFIX).split()]
+
+    # Extract xls to JSON
     pool = multiprocessing.Pool()
     pool.map(process_one_file, files)
 
+    # Translation
     logger.info('Start to generate translation dicts')
-    gen_translation()
+    gen_translation(files)
 
 
 if __name__ == '__main__':
