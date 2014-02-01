@@ -86,7 +86,11 @@ for region in ALL_REGION_CODES:
         MAP_AREA_TO_REGION[ac] = region
 MAP_AREA_TO_DISTRICT = dict([(c, c[0]) for c in ALL_AREA_CODES])
 
-MAP_DISTRICT_TO_REGION = dict(zip(MAP_AREA_TO_DISTRICT.values(), MAP_AREA_TO_REGION.values()))
+# Only .keys() and .values() from the same dict are guranteed to be in the same order.
+#MAP_DISTRICT_TO_REGION = dict(zip(MAP_AREA_TO_DISTRICT.values(), MAP_AREA_TO_REGION.values()))
+MAP_DISTRICT_TO_REGION = {}
+for area, district in MAP_AREA_TO_DISTRICT.iteritems():
+    MAP_DISTRICT_TO_REGION[district] = MAP_AREA_TO_REGION[area]
 
 GEO_TREE = {}
 for region in ALL_REGION_CODES:
