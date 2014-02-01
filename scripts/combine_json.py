@@ -100,13 +100,13 @@ def main():
 
     sh.mkdir('-p', config.DIR_DATA_COMBINED)
     logger.info('Write datapoints to CSV')
-    df.to_csv(path.join(config.DIR_DATA_COMBINED, 'census.csv'), encoding='utf-8')
+    df.to_csv(path.join(config.DIR_DATA_COMBINED, 'census.csv'), encoding='utf-8', index=False)
     logger.info('Write english datapoints to CSV')
-    translate_datapoints(df, 'E').to_csv(path.join(config.DIR_DATA_COMBINED, 'census-e.csv'), encoding='utf-8')
+    translate_datapoints(df, 'E').to_csv(path.join(config.DIR_DATA_COMBINED, 'census-e.csv'), encoding='utf-8', index=False)
     logger.info('Write simplified datapoints to CSV')
-    translate_datapoints(df, 'S').to_csv(path.join(config.DIR_DATA_COMBINED, 'census-s.csv'), encoding='utf-8')
+    translate_datapoints(df, 'S').to_csv(path.join(config.DIR_DATA_COMBINED, 'census-s.csv'), encoding='utf-8', index=False)
     logger.info('Write traditional datapoints to CSV')
-    translate_datapoints(df, 'T').to_csv(path.join(config.DIR_DATA_COMBINED, 'census-t.csv'), encoding='utf-8')
+    translate_datapoints(df, 'T').to_csv(path.join(config.DIR_DATA_COMBINED, 'census-t.csv'), encoding='utf-8', index=False)
 
 if __name__ == '__main__':
     main()
