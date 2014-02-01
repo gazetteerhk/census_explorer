@@ -180,39 +180,47 @@ describe('Services: AreaSelection', function() {
 
   it('removeArea removes single area', function() {
     mdl._selected = {a01: true, b01: true};
-    mdl.removeArea('a01')
+    mdl.removeArea('a01');
     expect(mdl._selected).toEqual({b01: true});
   });
 
   it('removeArea removes multiple areas', function() {
     mdl._selected = {a01: true, b01: true, c01: true};
-    mdl.removeArea(['a01', 'c01'])
+    mdl.removeArea(['a01', 'c01']);
     expect(mdl._selected).toEqual({b01: true});
   });
 
   it('removeArea removes districts', function() {
     mdl._selected = {a01: true, b01: true, c01: true};
-    mdl.removeArea(['a01', 'c01'])
+    mdl.removeArea(['a', 'c']);
+    $httpBackend.flush();
+    $rootScope.$apply();
     expect(mdl._selected).toEqual({b01: true});
   });
 
   it('removeArea removes regions', function() {
     mdl._selected = {a01: true, b01: true, c01: true, t01: true};
-    mdl.removeArea(['hk'])
+    mdl.removeArea(['hk']);
+    $httpBackend.flush();
+    $rootScope.$apply();
     expect(mdl._selected).toEqual({t01: true});
   });
 
   it('removesArea removes mixed types', function() {
     mdl._selected = {a01: true, b01: true, c01: true};
-    mdl.removeArea(['a01', 'b'])
+    mdl.removeArea(['a01', 'b']);
+    $httpBackend.flush();
+    $rootScope.$apply();
     expect(mdl._selected).toEqual({c01: true});
   });
 
   it('removeArea does not throw', function() {
     mdl._selected = {a01: true, b01: true, c01: true};
     var nonexistant = function() {
-      mdl.removeArea(['a01', 'c01', 'xx'])
+      mdl.removeArea(['a01', 'c01', 'xx']);
       mdl.removeArea('xx')
+      $httpBackend.flush();
+      $rootScope.$apply();
     };
     expect(nonexistant).not.toThrow();
     expect(mdl._selected).toEqual({b01: true});

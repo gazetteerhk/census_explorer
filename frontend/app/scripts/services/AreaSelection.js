@@ -25,7 +25,6 @@ angular.module('frontendApp').factory('AreaSelection', ['Mappings', function(Map
   var _getType = function(area) {
     // Determines whether the area is a region, district, or area
     // Actually not a guarantee that it is an area -- could possible not be a valid area
-
     area = area.toLowerCase();
     if (_.contains(Mappings._data.regions, area)) {
       return REGION;
@@ -36,6 +35,7 @@ angular.module('frontendApp').factory('AreaSelection', ['Mappings', function(Map
     }
   };
 
+  // Adding areas
   var _addArea = function(self, area) {
     area = area.toLowerCase();
     var areaType = _getType(area);
@@ -70,9 +70,6 @@ angular.module('frontendApp').factory('AreaSelection', ['Mappings', function(Map
     region = region.toLowerCase();
     Mappings.getDistrictsFromRegion(region)
       .then(function(districts) {
-        return districts
-      })
-      .then(function(districts) {
         _.forEach(districts, _.partial(_addDistrict, self))
       });
   };
@@ -83,6 +80,48 @@ angular.module('frontendApp').factory('AreaSelection', ['Mappings', function(Map
     } else {
       _addArea(this, area);
     }
+  };
+
+  // Clearing the selection
+  AreaModel.prototype.clearSelected = function() {
+    var self = this;
+    _.forOwn(this._selected, function(val, key) {delete self._selected[key];});
+  };
+
+  // Removing areas
+  var _removeArea = function(self, area) {
+    area = area.toLowerCase();
+    var areaType = _getType(area);
+    if (areaType === REGION) {
+      _removeRegion(self, area);
+    } else if (areaType === DISTRICT) {
+      _removeDistrict(self, area);
+    } else {
+      delete self._selected[area];
+    }
+  };
+
+  var _removeRegion = function(self, region) {
+    region = region.toLowerCase();
+    Mappings.getDistrictsFromRegion(region).then(function(districts) {
+      _.forEach(districts, _.partial(_removeDistrict, self));
+    });
+  };
+
+  var _removeDistrict = function(self, district) {
+    district = district.toLowerCase();
+    Mappings.getAreasFromDistrict(district).then(function(areas) {
+      _.forEach(areas, function(area) {delete self._selected[area];})
+    });
+  };
+
+  AreaModel.prototype.removeArea = function(area) {
+    if (_.isArray(area)) {
+      _.forEach(area, _.partial(_removeArea, this));
+    } else {
+      _removeArea(this, area);
+    }
+
   };
 
   svc.AreaModel = AreaModel;
