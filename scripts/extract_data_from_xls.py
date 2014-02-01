@@ -269,12 +269,17 @@ def translate_sheet(book, names_from='all'):
         else:
             raise 'unknow names_from'
 
+        # Get identifier from sheet2 (English)
+        sheet_english = book.sheet_by_index(2)
+        ids = [get_identifier(sheet_english, i, *pos) for pos in all_positions]
         names = {}
-        #get different language sheet in excel
-        for i in sheetNum:
-            sheet = book.sheet_by_index(i)
-            names[i] = [unicode(sheet.cell(*pos).value).strip() for pos in all_positions]
-        ids = [get_identifier(sheet, i, *pos) for pos in all_positions]
+        # Get names in different language sheet
+        for j in sheetNum:
+            sheet = book.sheet_by_index(j)
+            names[j] = [unicode(sheet.cell(*pos).value).strip() for pos in all_positions]
+
+        #print len(ids), ids
+        #print len(names[0]), names
 
         for c in range(len(all_positions)):
             traditional_col = names[0][c]
@@ -283,6 +288,7 @@ def translate_sheet(book, names_from='all'):
             identifier = ids[c]
             translateDict[identifier] = {'T':traditional_col, 'S':simplified_col,'E':english_col}
 
+    #print translateDict
     return translateDict
 
 def _merge_translation_dict(dest, src, new_keys=True):
@@ -311,6 +317,8 @@ def _merge_translation_dict(dest, src, new_keys=True):
 def gen_translation_for_one_group(wb, names_from):
     translate_dict = translate_sheet(wb, names_from)
     from translation_fix import ERRATA
+    #print translate_dict
+    #print _merge_translation_dict(translate_dict, ERRATA)
     return _merge_translation_dict(translate_dict, ERRATA)
 
 def gen_translation_for_table():
@@ -327,6 +335,8 @@ def gen_translation():
     fullpath = os.path.join(config.DIR_DATA_DOWNLOAD, 'A01.xlsx')
     wb = xlrd.open_workbook(fullpath)
     _merge_translation_dict(translate_dict_all, gen_translation_for_one_group(wb, 'all'))
+    #print translate_dict_all
+
     _merge_translation_dict(translate_dict_row, gen_translation_for_one_group(wb, 'row'))
     _merge_translation_dict(translate_dict_column, gen_translation_for_one_group(wb, 'column'))
 
@@ -337,7 +347,8 @@ def gen_translation():
     with open(os.path.join(config.DIR_DATA_CLEAN_JSON, 'translation-column.json'), 'w') as outfile:
         json.dump(translate_dict_column, outfile)
 
-    gen_translation_for_table()
+    with open(os.path.join(config.DIR_DATA_CLEAN_JSON, 'translation-table.json'), 'w') as outfile:
+        json.dump(gen_translation_for_table(), outfile)
 
 def main():
     logger.info('Start to parse individual xls files')
@@ -352,8 +363,7 @@ def main():
 
 
 if __name__ == '__main__':
-    gen_translation()
-    #main()
+    main()
 
     # NOTE:
     # Following is to show that merged cells (C76-E76) only have data in the first one.
