@@ -1,16 +1,18 @@
 'use strict';
 
 /*
- * @name hkMap
  * @ngdoc directive
- * @description Directive for a map of Hong Kong with GeoJSON layers for district councils and constituency areas
- * @scope
+ * @name hkMap
+ * @description
+ * Directive for a map of Hong Kong with GeoJSON layers for district councils and constituency areas
  *
+ * @param {string} [height="300px"] Height of the map.
+ * @param {class} class Use the class declaration to set width in Bootstrap column system.
+ * @param {object} selectedItems Object that stores which elements in the map are selected
  *
  */
 
 angular.module('frontendApp').directive('hkMap', function() {
-
   return {
     scope: true,
     restrict: 'AE',
@@ -41,9 +43,15 @@ angular.module('frontendApp').directive('hkMap', function() {
         weight: 3
       };
 
-      var highlightedStyle = {
+      var hoverStyle = {
         color: "#000",
         fillOpacity: 0,
+        weight: 6
+      };
+
+      var selectedStyle = {
+        color: "#ff0",
+        fillOpacity: 0.2,
         weight: 6
       };
 
@@ -51,22 +59,25 @@ angular.module('frontendApp').directive('hkMap', function() {
       var mouseoverHandler = function(e) {
         var layer = e.target;
         console.log(e.target);
-        layer.setStyle(highlightedStyle);
+        layer.setStyle(hoverStyle);
         if (!L.Browser.ie && !L.Browser.opera) {
           layer.bringToFront();
         }
 
-        $scope.highlightedFeature = e.target.feature.properties.DCCODE || e.target.feature.properties.CACODE;
+        $scope.hoveredFeature = e.target.feature.properties.DCCODE || e.target.feature.properties.CACODE;
       };
 
       var resetStyle = function(e) {
         // Can't use resetStyle because we don't have access to the GeoJSON object
         var layer = e.target;
         layer.setStyle(defaultStyle);
-        $scope.highlightedFeature = undefined;
+        $scope.hoveredFeature = undefined;
       };
 
       var clickHandler = function(e) {
+        // When clicked, check if the object is already in the selectedItems hash
+        // If it is, apply the defaultStyle and remove it from the hash
+        // If it isn't, apply the selectedStyle and add it to the hash
       };
 
       var onEachFeature = function(feature, layer) {
@@ -105,6 +116,6 @@ angular.module('frontendApp').directive('hkMap', function() {
       });
     }],
     template: '<leaflet center="center" defaults="defaults" geojson="geojson"></leaflet>' +
-      '<div class="map-overlay" ng-show="highlightedFeature">{{ highlightedFeature }}</div><span>{{ center }}</span>'
+      '<div class="map-overlay" ng-show="hoveredFeature">{{ hoveredFeature }}</div><span>{{ center }}</span>'
   }
 });

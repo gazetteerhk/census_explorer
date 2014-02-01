@@ -38,7 +38,10 @@ This will download all of the dependencies necessary to run the frontend locally
 `grunt serve` will start the local http server at port 9000 in `app`.  Note that by default the host is 0.0.0.0 to allow connections
 from outside the server, if you use a VM or a remote server.
 
+`grunt test` will run frontend tests.
+
 `grunt build` will execute the build process.  Running `grunt serve:dist` will run the build process and start the server
 within `dist`.  If you are deploying, it is not necessary to run this as the deploy process will build as well.
 
 `grunt deploy` will build and deploy the site to Github pages.
+
