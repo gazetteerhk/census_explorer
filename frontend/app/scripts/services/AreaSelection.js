@@ -22,7 +22,7 @@ angular.module('frontendApp').factory('AreaSelection', ['Mappings', function(Map
     return _.sortBy(_.keys(this._selected));
   };
 
-  var getType = function(area) {
+  var _getType = function(area) {
     // Determines whether the area is a region, district, or area
     // Actually not a guarantee that it is an area -- could possible not be a valid area
 
@@ -38,7 +38,7 @@ angular.module('frontendApp').factory('AreaSelection', ['Mappings', function(Map
 
   var _addArea = function(self, area) {
     area = area.toLowerCase();
-    var areaType = getType(area);
+    var areaType = _getType(area);
     if (areaType === REGION) {
       _addRegion(self, area);
     } else if (areaType === DISTRICT) {
