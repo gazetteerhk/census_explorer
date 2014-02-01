@@ -1,4 +1,4 @@
-from collections import Counter
+from collections import Counter, defaultdict
 import os
 import xlrd
 import json
@@ -285,28 +285,57 @@ def translate_sheet(book, names_from='all'):
 
     return translateDict
 
-def gen_translation_for_one_group(wb, names_from, output_fn):
+def _merge_translation_dict(dest, src, new_keys=True):
+    '''
+    Merge translation dict. In case of discrepancies, use values from src.
+    In-place operation.
+
+    :new_keys:
+        If True, keys exist in src but non-exist in dest will also be added.
+        Use to False to perform a translation 'fixing' operation.
+    
+    The format of translation dict:
+    {
+      'identifier': {
+        'E': 'English name',
+        'S': 'Simplified Chinese name',
+        'T': 'Traditional Chinese name',
+      }
+    }
+    '''
+    for identifier, trans in src.iteritems():
+        if new_keys or identifier in dest:
+            dest.setdefault(identifier, {}).update(trans)
+    return dest
+
+def gen_translation_for_one_group(wb, names_from):
     translate_dict = translate_sheet(wb, names_from)
     from translation_fix import ERRATA
-    for identifier, trans in ERRATA.iteritems():
-        if identifier in translate_dict:
-            translate_dict[identifier].update(trans)
-    with open(os.path.join(config.DIR_DATA_CLEAN_JSON, output_fn), 'w') as outfile:
-        json.dump(translate_dict, outfile)
+    return _merge_translation_dict(translate_dict, ERRATA)
 
 def gen_translation_for_table():
     translate_dict = {}
     for (i, table) in enumerate(TABLE_META_DATA):
         translate_dict[i] = table['names']
-    with open(os.path.join(config.DIR_DATA_CLEAN_JSON, 'translation-table.json'), 'w') as outfile:
-        json.dump(translate_dict, outfile)
+    return translate_dict
 
 def gen_translation():
+    translate_dict_all = defaultdict(dict)
+    translate_dict_row = defaultdict(dict)
+    translate_dict_column = defaultdict(dict)
+
     fullpath = os.path.join(config.DIR_DATA_DOWNLOAD, 'A01.xlsx')
     wb = xlrd.open_workbook(fullpath)
-    gen_translation_for_one_group(wb, 'all', 'translation.json')
-    gen_translation_for_one_group(wb, 'row', 'translation-row.json')
-    gen_translation_for_one_group(wb, 'column', 'translation-column.json')
+    _merge_translation_dict(translate_dict_all, gen_translation_for_one_group(wb, 'all'))
+    _merge_translation_dict(translate_dict_row, gen_translation_for_one_group(wb, 'row'))
+    _merge_translation_dict(translate_dict_column, gen_translation_for_one_group(wb, 'column'))
+
+    with open(os.path.join(config.DIR_DATA_CLEAN_JSON, 'translation.json'), 'w') as outfile:
+        json.dump(translate_dict_all, outfile)
+    with open(os.path.join(config.DIR_DATA_CLEAN_JSON, 'translation-row.json'), 'w') as outfile:
+        json.dump(translate_dict_row, outfile)
+    with open(os.path.join(config.DIR_DATA_CLEAN_JSON, 'translation-column.json'), 'w') as outfile:
+        json.dump(translate_dict_column, outfile)
 
     gen_translation_for_table()
 
@@ -323,7 +352,8 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    gen_translation()
+    #main()
 
     # NOTE:
     # Following is to show that merged cells (C76-E76) only have data in the first one.
