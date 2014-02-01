@@ -16,6 +16,7 @@ angular.module('frontendApp').factory('Mappings', ['$http', '$q', function($http
   var loadGeoTree = function() {
     var promise = $http.get('scripts/mappings/geo-tree.json', {cache: true}).success(function(data) {
       svc._data.geoTree = data;
+      svc._data.areas = _.sortBy(_.flatten(_.map(_.values(data), _.values)));
     });
     return promise;
   };
@@ -105,6 +106,19 @@ angular.module('frontendApp').factory('Mappings', ['$http', '$q', function($http
 
     return deferred.promise;
   };
+
+  svc.getAllAreas = function() {
+    var deferred = $q.defer();
+    if (_.isUndefined(svc._data.geoTree)) {
+      loadGeoTree().then(function() {
+        deferred.resolve(svc._data.areas);
+      });
+    } else {
+      deferred.resolve(svc._data.areas);
+    }
+    return deferred.promise;
+  };
+
 
   return svc;
 }]);
