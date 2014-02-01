@@ -12,6 +12,7 @@ module.exports = function(config) {
     // list of files / patterns to load in the browser
     files: [
       'app/bower_components/jquery/jquery.js',
+      'app/bower_components/jasmine-jquery/lib/jasmine-jquery.js',
       'app/bower_components/lodash/dist/lodash.compat.js',
       'app/bower_components/angular/angular.js',
       'app/bower_components/angular-mocks/angular-mocks.js',
@@ -30,7 +31,12 @@ module.exports = function(config) {
       'app/scripts/*.js',
       'app/scripts/**/*.js',
       'test/mock/**/*.js',
-      'test/spec/**/*.js'
+      'test/spec/**/*.js',
+
+      // Fixtures
+      {pattern: 'app/scripts/geo/*.json', watched: true, included: false, served: true},
+      {pattern: 'app/scripts/mappings/*.json', watched: true, included: false, served: true},
+
     ],
 
     // list of files / patterns to exclude
