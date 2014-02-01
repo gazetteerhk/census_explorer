@@ -12,7 +12,7 @@ angular.module('frontendApp').factory('Mappings', ['$http', '$q', function($http
     regions: ['hk', 'nt', 'kl']
   };
 
-  // Load the data
+  // Load GeoTree data
   var loadGeoTree = function() {
     var promise = $http.get('scripts/mappings/geo-tree.json', {cache: true}).success(function(data) {
       svc._data.geoTree = data;
