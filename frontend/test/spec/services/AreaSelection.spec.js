@@ -226,4 +226,31 @@ describe('Services: AreaSelection', function() {
     expect(mdl._selected).toEqual({b01: true});
   });
 
+  it('isSelected checks if area is selected', function() {
+    mdl._selected = {a01: true};
+    expect(mdl.isSelected('a01')).toBeTruthy();
+    expect(mdl.isSelected('b01')).toBeFalsy();
+  });
+
+  it('isSelected checks if district is selected', function() {
+    var selected = {};
+    _.forEach(_.values(geoTree.hk.a), function(area) {selected[area] = true;});
+    mdl._selected = selected;
+    expect(mdl.isSelected('a')).toBeTruthy();
+    expect(mdl.isSelected('b')).toBeFalsy();
+
+    mdl.removeArea('a01');
+    expect(mdl.isSelected('a')).toBeFalsy();
+  });
+
+  it('isSelected checks if region is selected', function() {
+    var selected = {};
+    _.forEach(_.flatten(_.values(geoTree.hk)), function(area) {selected[area] = true;});
+    mdl._selected = selected;
+    expect(mdl.isSelected('hk')).toBeTruthy();
+    expect(mdl.isSelected('kl')).toBeFalsy();
+
+    mdl.removeArea('a01');
+    expect(mdl.isSelected('hk')).toBeFalsy();
+  });
 });
