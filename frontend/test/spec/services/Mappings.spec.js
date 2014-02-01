@@ -36,6 +36,20 @@ describe('Services: Mappings', function() {
     expect(nonexistant).toThrow();
   });
 
+  it('getDistrictFromArea returns parent district', function() {
+    // This is pretty simple, just get the first letter of the district code, but we structure with a promise for consistency
+    var res;
+    Mappings.getDistrictFromArea('a01').then(function(data) {res = data;});
+    $rootScope.$apply();
+    expect(res).toEqual('a');
+
+    var nonexistant = function() {
+      Mappings.getDistrictFromArea('x02');
+      $rootScope.$apply();
+    };
+    expect(nonexistant).toThrow();
+  });
+
   it('getDistrictsFromRegion returns the districts in a region', function() {
     var res;
     Mappings.getDistrictsFromRegion('hk').then(function(data) {res = data;});
@@ -54,6 +68,27 @@ describe('Services: Mappings', function() {
     };
     expect(nonexistant).toThrow();
 
+  });
+
+  it('getRegionFromDistricts returns the parent region', function() {
+    var res;
+    Mappings.getRegionFromDistrict('a').then(function(data) {res = data;});
+    $httpBackend.flush();
+    $rootScope.$apply();
+    expect(res).toEqual('hk');
+
+    res = undefined;
+    Mappings.getRegionFromDistrict('A').then(function(data) {res = data;});
+    $rootScope.$apply();
+    expect(res).toEqual('hk');
+
+
+    var nonexistant = function() {
+      Mappings.getRegionFromDistrict('x');
+      $rootScope.$apply();
+    };
+
+    expect(nonexistant).toThrow();
   });
 
 });
