@@ -3,7 +3,7 @@
 describe('Services: AreaSelection', function() {
   beforeEach(module('frontendApp'));
 
-  var AreaSelection, $rootScope, $httpBackend;
+  var AreaSelection, $rootScope, $httpBackend, geoTree;
   var mdl;
 
   beforeEach(function() {
@@ -16,42 +16,43 @@ describe('Services: AreaSelection', function() {
     mdl = AreaSelection.getModel();
     jasmine.getJSONFixtures().fixturesPath = 'base/app/scripts/mappings';
     $httpBackend.whenGET('scripts/mappings/geo-tree.json').respond(getJSONFixture('geo-tree.json'));
+    geoTree = getJSONFixture('geo-tree.json');
   });
 
   it('should instantiate empty selection models', function() {
-    expect(mdl._selected.areas).toEqual({});
+    expect(mdl._selected).toEqual({});
   });
 
   it('should allow adding areas', function() {
     mdl.addArea('a01');
     $httpBackend.flush();
     $rootScope.$apply();
-    expect(mdl._selected.areas).toEqual({a01: true});
+    expect(mdl._selected).toEqual({a01: true});
   });
 
   it('should handle uppercase areas', function() {
     mdl.addArea('A01');
     $httpBackend.flush();
     $rootScope.$apply();
-    expect(mdl._selected.areas).toEqual({a01: true});
+    expect(mdl._selected).toEqual({a01: true});
   });
 
   it('should handle multiple areas', function() {
     mdl.addArea(['a02', 'a03']);
     $httpBackend.flush();
     $rootScope.$apply();
-    expect(mdl._selected.areas).toEqual({a03: true, a02: true});
+    expect(mdl._selected).toEqual({a03: true, a02: true});
   });
 
   it('should handle duplicates', function() {
     mdl.addArea('a01');
     $httpBackend.flush();
     $rootScope.$apply();
-    expect(mdl._selected.areas).toEqual({a01: true});
+    expect(mdl._selected).toEqual({a01: true});
 
     mdl.addArea('a01');
     $rootScope.$apply();
-    expect(mdl._selected.areas).toEqual({a01: true});
+    expect(mdl._selected).toEqual({a01: true});
   });
 
   it('should throw on nonexistant areas', function() {
@@ -64,96 +65,112 @@ describe('Services: AreaSelection', function() {
   });
 
   it('should allow adding districts', function() {
-    mdl.addDistrict('a');
+    var allAreas;
+    mdl.addArea('a');
     $httpBackend.flush();
     $rootScope.$apply();
-    expect(mdl._selected.districts).toEqual({a: true});
+    var res = {};
+    _.forEach(geoTree.hk.a, function(area) {res[area] = true;});
+    expect(mdl._selected).toEqual(res);
   });
 
   it('should handle uppercase districts', function() {
-    mdl.addDistrict('A');
+    mdl.addArea('A');
     $httpBackend.flush();
     $rootScope.$apply();
-    expect(mdl._selected.districts).toEqual({a: true});
+    var res = {};
+    _.forEach(geoTree.hk.a, function(area) {res[area] = true;});
+    expect(mdl._selected).toEqual(res);
   });
 
   it('should handle arrays of districts', function() {
-    mdl.addDistrict(['b', 'c']);
+    mdl.addArea(['b', 'c']);
     $httpBackend.flush();
     $rootScope.$apply();
-    expect(mdl._selected.districts).toEqual({b: true, c: true});
+    var res = {};
+    _.forEach(geoTree.hk.b, function(area) {res[area] = true;});
+    _.forEach(geoTree.hk.c, function(area) {res[area] = true;});
+    expect(mdl._selected).toEqual(res);
   });
 
   it('should handle duplicate districts', function() {
     // duplicates
-    mdl.addDistrict('a');
+    mdl.addArea('a');
     $httpBackend.flush();
     $rootScope.$apply();
-    expect(mdl._selected.districts).toEqual({a: true});
-    mdl.addDistrict('a');
+    var res = {};
+    _.forEach(geoTree.hk.a, function(area) {res[area] = true;});
+    expect(mdl._selected).toEqual(res);
+    mdl.addArea('a');
     $rootScope.$apply();
-    expect(mdl._selected.districts).toEqual({a: true});
+    expect(mdl._selected).toEqual(res);
   });
 
   it('should allow adding regions', function() {
-    mdl.addRegion('hk');
+    mdl.addArea('hk');
     $httpBackend.flush();
     $rootScope.$apply();
-    expect(mdl._selected.regions).toEqual({hk: true});
+    var res = {};
+    _.forEach(_.flatten(_.values(geoTree.hk)), function(area) {res[area] = true;});
+    expect(mdl._selected).toEqual(res);
   });
 
   it('should allow adding uppercase regions', function() {
-    mdl.addRegion('HK');
+    mdl.addArea('HK');
     $httpBackend.flush();
     $rootScope.$apply();
-    expect(mdl._selected.regions).toEqual({hk: true});
+    var res = {};
+    _.forEach(_.flatten(_.values(geoTree.hk)), function(area) {res[area] = true;});
+    expect(mdl._selected).toEqual(res);
   });
 
   it('should allow adding multiple regions', function() {
-    mdl.addRegion(['hk', 'kl']);
+    mdl.addArea(['hk', 'kl']);
     $httpBackend.flush();
     $rootScope.$apply();
-    expect(mdl._selected.regions).toEqual({hk: true, kl: true});
+    var res = {};
+    _.forEach(_.flatten(_.values(geoTree.hk)), function(area) {res[area] = true;});
+    _.forEach(_.flatten(_.values(geoTree.kl)), function(area) {res[area] = true;});
+    expect(mdl._selected).toEqual(res);
   });
 
   it('should handle duplicate regions', function() {
-    mdl.addRegion('hk');
+    mdl.addArea('hk');
     $httpBackend.flush();
     $rootScope.$apply();
-    expect(mdl._selected.regions).toEqual({hk: true});
-    mdl.addRegion('hk');
+    var res = {};
+    _.forEach(_.flatten(_.values(geoTree.hk)), function(area) {res[area] = true;});
+    expect(mdl._selected).toEqual(res);
+    mdl.addArea('hk');
     $rootScope.$apply();
-    expect(mdl._selected.regions).toEqual({hk: true});
+    expect(mdl._selected).toEqual(res);
   });
 
   it('should throw on nonexistant region', function() {
     var nonexistant = function() {
-      mdl.addRegion('xx');
+      mdl.addArea('xx');
+      $httpBackend.flush();
+      $rootScope.$apply();
     };
 
     expect(nonexistant).toThrow();
   });
 
   it('selectedAreas returns areas', function() {
-    mdl.selected.areas = {a01: true, b01: true};
+    mdl.selected = {a01: true, b01: true};
     expect(mdl.selectedAreas()).toEqual(['a01', 'b01']);
   });
 
-  it('selectedAreas expands districts', function() {
-    mdl._selected.districts = {a: true};
-    expect(mdl.selectedAreas()).toEqual(_.sortBy(["a08", "a09", "a02", "a03", "a01", "a06", "a07", "a04", "a05", "a15", "a14", "a11", "a10", "a13", "a12"]));
-  });
-
-  it('selectedAreas expands regions', function() {
-    mdl._selected.regions = {hk: true};
-    expect(mdl.selectedAreas()).toEqual();
-  });
-
-  it('selectedAreas merges districts, regions, and areas', function() {
-    expect(true).toBeFalsy();
-  });
-
   it('should clear selection', function() {
+  });
+
+  it('should remove areas', function() {
+  });
+
+  it('should remove districts', function() {
+  });
+
+  it('should remove regions', function() {
   });
 
 });
