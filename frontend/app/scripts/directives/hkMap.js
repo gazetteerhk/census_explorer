@@ -24,28 +24,39 @@ angular.module('frontendApp').directive('hkMap', function() {
       // Need relative positioning for overlay
       elem.css('position', 'relative');
     },
-    controller: ['$scope', 'GeoFiles', function($scope, GeoFiles) {
+    controller: ['$scope', 'GeoFiles', '$attrs', 'AreaSelection', '$parse', '$element', function($scope, GeoFiles, $attrs, AreaSelection, $parse, $element) {
       // Default initializations
       $scope.defaults =  {
         scrollWheelZoom: false,
         maxZoom: 18
       };
 
-      $scope.center = {
-        lat: 22.298,
-        lng: 114.151,
-        zoom: 12
-      };
+      if (_.isUndefined($attrs.mapCenter)) {
+        $scope.center = {};
+      } else {
+        $scope.center = $parse($attrs.mapCenter)($scope);
+      }
+
+      if (_.isEmpty($scope.center)) {
+        angular.extend($scope.center,
+          {
+            lat: 22.298,
+            lng: 114.151,
+            zoom: 12
+          }
+        );
+      }
 
       var defaultStyle = {
         color: "#2b8cbe",
-        fillOpacity: 0.2,
+        fillOpacity: 0,
         weight: 3
       };
 
       var hoverStyle = {
         color: "#000",
-        fillOpacity: 0,
+        fillColor: "#2b8cbe",
+        fillOpacity: 0.2,
         weight: 6
       };
 
@@ -54,6 +65,13 @@ angular.module('frontendApp').directive('hkMap', function() {
         fillOpacity: 0.2,
         weight: 6
       };
+
+      // Model for tracking selected areas
+      if (_.isUndefined($attrs.selectedAreas)) {
+        $scope.selectedAreas = AreaSelection.getModel();
+      } else {
+        $scope.selectedAreas = $parse($attrs.selectedAreas)($scope);
+      }
 
       // Handlers for interaction
       var mouseoverHandler = function(e) {

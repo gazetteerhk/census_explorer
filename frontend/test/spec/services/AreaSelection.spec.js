@@ -232,6 +232,7 @@ describe('Services: AreaSelection', function() {
     expect(mdl.isSelected('b01')).toBeFalsy();
   });
 
+  /*
   it('isSelected checks if district is selected', function() {
     var selected = {};
     _.forEach(_.values(geoTree.hk.a), function(area) {selected[area] = true;});
@@ -253,4 +254,5 @@ describe('Services: AreaSelection', function() {
     mdl.removeArea('a01');
     expect(mdl.isSelected('hk')).toBeFalsy();
   });
+  */
 });
