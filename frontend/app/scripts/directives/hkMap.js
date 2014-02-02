@@ -118,11 +118,18 @@ angular.module('frontendApp').directive('hkMap', function() {
       };
 
       var clickHandler = function(e) {
+        // If the object is an area:
         if (_targetIsArea(e)) {
-          // If the object is an area:
-          // Check if the object is already in the selectedItems hash
-          // If it is, apply the defaultStyle and remove it from the hash
-          // If it isn't, apply the selectedStyle and add it to the hash
+          var caCode = e.target.feature.properties.CACODE;
+          if ($scope.selectedAreas.isSelected(caCode)) {
+            // If the object is already selected, unselect it
+            e.target.setStyle(defaultStyle)
+            $scope.selectedAreas.removeArea(caCode);
+          } else {
+            // If it isn't already selected, select it
+            e.target.setStyle(selectedStyle)
+            $scope.selectedAreas.addArea(caCode);
+          }
         } else {
           // If the object is a district, center on the district and zoom in
           $scope.getMap().then(function(map) {

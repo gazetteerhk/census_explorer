@@ -130,8 +130,9 @@ angular.module('frontendApp').factory('AreaSelection', ['Mappings', function(Map
     area = area.toLowerCase();
     var areaType = _getType(area);
     if (areaType === REGION) {
+      return false;
     } else if (areaType === DISTRICT) {
-
+      return false;
     } else {
       return _.has(this._selected, area);
     }

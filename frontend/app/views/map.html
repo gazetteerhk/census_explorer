@@ -3,5 +3,8 @@
   <!--<leaflet width="1024px" height="800px" center="center" defaults="defaults" geojson="geojson"></leaflet>-->
   <!--{{center}}-->
   <!--<leaflet width="1024px" height="800px" center="center" defaults="defaults" geojson="geojson_orig"></leaflet>-->
-  <hk-map height="500px"></hk-map>
+  <hk-map height="500px" selected-areas="selection"></hk-map>
+  <pre>
+    {{ selection.selectedAreas() }}
+  </pre>
 </div>
