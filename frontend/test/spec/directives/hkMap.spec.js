@@ -4,7 +4,7 @@ describe('Directives: hkMap', function() {
 
   beforeEach(module('frontendApp'));
 
-  var $compile, $httpBackend, $rootScope, AreaSelection;
+  var $compile, $httpBackend, $rootScope, AreaSelection, leafletData;
   var scope, template, elem, mapScope, mapElement;
 
   beforeEach(function() {
@@ -13,6 +13,7 @@ describe('Directives: hkMap', function() {
       $httpBackend = $injector.get('$httpBackend');
       $rootScope = $injector.get('$rootScope');
       AreaSelection = $injector.get('AreaSelection');
+      leafletData = $injector.get('leafletData');
     });
 
     // Load the json fixtures -- need base because Karma adds that path
@@ -33,6 +34,11 @@ describe('Directives: hkMap', function() {
 
   var getMapElement = function(element) {
     return angular.element(element.children()[0]);
+  };
+
+  var getLeafletScope = function(template) {
+    // Gotta be doing something wrong here...
+    return angular.element(angular.element(template.children()[0]).children()[0]).scope();
   };
 
   it("accepts mapCenter attribute for two way updating", function() {
@@ -68,6 +74,24 @@ describe('Directives: hkMap', function() {
     mapScope.selectedAreas.addArea('b01');
     $rootScope.$apply();
     expect(mapScope.selectedAreas.selectedAreas()).toEqual(scope.outerModel.selectedAreas());
+  });
+
+  it("gets the map object from the leaflet-directive scope", function() {
+    elem = angular.element('<div class="container"><hk-map map-id="one"></hk-map><hk-map map-id="two"></hk-map></div>');
+    template = $compile(elem)(scope);
+    var map1 = angular.element(template.children()[0]);
+    var mapScope1 = map1.scope();
+    var map2 = angular.element(template.children()[1]);
+    var mapScope2 = map2.scope();
+    $httpBackend.flush();
+    $rootScope.$apply();
+    mapScope1.getMap().then(function(map) {
+      expect($(map._container)).toBe('#one');
+    });
+    mapScope2.getMap('two').then(function(map) {
+      expect($(map._container)).toBe('#two');
+    });
+    $rootScope.$apply();
   });
 
 });
