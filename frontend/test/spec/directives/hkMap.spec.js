@@ -94,16 +94,37 @@ describe('Directives: hkMap', function() {
     $rootScope.$apply();
   });
 
-  iit("modifying the selectedAreas model updates the map", function() {
+  /*
+  it("modifying the selectedAreas model updates the map", function() {
     scope.outerModel = AreaSelection.getModel();
+    // Make sure we are zoomed in such that areas are visible
+    // For some reason this doesn't work -- still not zoomed in
+    scope.center = {
+      lat: 22.298,
+      lng: 114.151,
+      zoom: 15
+    };
     scope.outerModel.addArea(['a01', 'b01', 'c01']);
     mapElement.attr('selected-areas', 'outerModel');
+    mapElement.attr('map-center', 'center');
 
     template = $compile(elem)(scope);
     mapScope = getMapScope(template);
     $httpBackend.flush();
     $rootScope.$apply();
-    console.log(angular.element('.map-selected').length);
+    // a01, b01, and c01 should have the _selectedStyle attached to them.  Check the fillColor and fillOpacity
+    mapScope.getMap().then(function(map) {
+      var layers = _.values(map._layers);
+//      console.log(_.values(map._layers));
+      _.forEach(layers, function(layer) {
+        if (!_.isUndefined(layer.feature) && !_.isUndefined(layer.feature.properties)) {
+//          console.log(layer.feature.properties)
+        }
+      });
+
+    });
+    $rootScope.$apply();
   });
+  */
 
 });

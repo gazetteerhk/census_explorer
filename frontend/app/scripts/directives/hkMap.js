@@ -68,25 +68,24 @@ angular.module('frontendApp').directive('hkMap', function() {
       };
 
       // Styles
-      var defaultStyle = {
+      $scope._defaultStyle = {
         color: "#2b8cbe",
         fillOpacity: 0,
         weight: 3
       };
 
-      var hoverStyle = {
+      $scope._hoverStyle = {
         color: "#000",
         fillColor: "#2b8cbe",
         fillOpacity: 0.2,
         weight: 6
       };
 
-      var selectedStyle = {
+      $scope._selectedStyle = {
         color: "#ff0",
         fillColor: "#ff0",
         fillOpacity: 0.2,
-        weight: 6,
-        className: 'map-selected'
+        weight: 6
       };
 
       var _isArea = function(feature) {
@@ -97,9 +96,9 @@ angular.module('frontendApp').directive('hkMap', function() {
       // Styler that styles a layer based on whether it is selected or not
       var featureStyler = function(feature) {
         if (_isArea(feature) && $scope.selectedAreas.isSelected(feature.properties.CACODE)) {
-          return selectedStyle;
+          return $scope._selectedStyle;
         } else {
-          return defaultStyle;
+          return $scope._defaultStyle;
         }
       };
 
@@ -110,12 +109,26 @@ angular.module('frontendApp').directive('hkMap', function() {
         $scope.selectedAreas = $parse($attrs.selectedAreas)($scope);
       }
 
+      // Problem -- if we have a watch, it'll get triggered when objects are added by a click as well.
+      // Since the map is already styling the layers, this would be redundant
+      var _applyStylesToMap = function(map) {
+        // Given a map, loop through the layers in the map and apply the appropriate style given
+        // the current state of selectedAreas
+        var layers = _.values(map._layers);
+
+      };
+      // We have to set a watch on the selectedAreas to keep the map styling in sync
+      // If it changes, then we need to getMap(), then loop through map._layers and update each layer's style
+      $scope.getMap().then(function(map){
+//        console.log(map)
+      });
+
       // Handlers for interaction
       var mouseoverHandler = function(e) {
         var layer = e.target;
         // only change the style if the area is not already selected
         if (!_isTriggeredByArea(e) || !$scope.selectedAreas.isSelected(e.target.feature.properties.CACODE)) {
-          layer.setStyle(hoverStyle);
+          layer.setStyle($scope._hoverStyle);
           if (!L.Browser.ie && !L.Browser.opera) {
             layer.bringToFront();
           }
@@ -129,7 +142,7 @@ angular.module('frontendApp').directive('hkMap', function() {
         var layer = e.target;
         // Only reset if the area is not selected
         if (!_isTriggeredByArea(e) || !$scope.selectedAreas.isSelected(e.target.feature.properties.CACODE)) {
-          layer.setStyle(defaultStyle);
+          layer.setStyle($scope._defaultStyle);
         }
         $scope.hoveredFeature = undefined;
       };
@@ -145,11 +158,11 @@ angular.module('frontendApp').directive('hkMap', function() {
           var caCode = e.target.feature.properties.CACODE;
           if ($scope.selectedAreas.isSelected(caCode)) {
             // If the object is already selected, unselect it
-            e.target.setStyle(defaultStyle)
+            e.target.setStyle($scope._defaultStyle)
             $scope.selectedAreas.removeArea(caCode);
           } else {
             // If it isn't already selected, select it
-            e.target.setStyle(selectedStyle)
+            e.target.setStyle($scope._selectedStyle)
             $scope.selectedAreas.addArea(caCode);
           }
         } else {
@@ -176,7 +189,7 @@ angular.module('frontendApp').directive('hkMap', function() {
       GeoFiles.getDistricts().then(function(data) {
         $scope.districts = {
           data: data,
-          style: defaultStyle,
+          style: $scope._defaultStyle,
           onEachFeature: onEachFeature // Need handlers here
         };
         $scope.geojson = $scope.districts;
@@ -199,8 +212,6 @@ angular.module('frontendApp').directive('hkMap', function() {
         }
       });
 
-      // We have to set a watch on the selectedAreas to keep the map styling in sync
-      // If it changes, then we need to getMap(), then loop through map._layers and update each layer
     }],
     template: '<leaflet center="center" defaults="defaults" geojson="geojson"></leaflet>' +
       '<div class="map-overlay" ng-show="hoveredFeature">{{ hoveredFeature }}</div><span>{{ center }}</span>'
