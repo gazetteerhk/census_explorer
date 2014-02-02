@@ -94,4 +94,16 @@ describe('Directives: hkMap', function() {
     $rootScope.$apply();
   });
 
+  iit("modifying the selectedAreas model updates the map", function() {
+    scope.outerModel = AreaSelection.getModel();
+    scope.outerModel.addArea(['a01', 'b01', 'c01']);
+    mapElement.attr('selected-areas', 'outerModel');
+
+    template = $compile(elem)(scope);
+    mapScope = getMapScope(template);
+    $httpBackend.flush();
+    $rootScope.$apply();
+    console.log(angular.element('.map-selected').length);
+  });
+
 });

@@ -85,7 +85,22 @@ angular.module('frontendApp').directive('hkMap', function() {
         color: "#ff0",
         fillColor: "#ff0",
         fillOpacity: 0.2,
-        weight: 6
+        weight: 6,
+        className: 'map-selected'
+      };
+
+      var _isArea = function(feature) {
+        // Checks if a feature is an area
+        return !_.isUndefined(feature.properties.CACODE);
+      };
+
+      // Styler that styles a layer based on whether it is selected or not
+      var featureStyler = function(feature) {
+        if (_isArea(feature) && $scope.selectedAreas.isSelected(feature.properties.CACODE)) {
+          return selectedStyle;
+        } else {
+          return defaultStyle;
+        }
       };
 
       // Model for tracking selected areas
@@ -99,7 +114,7 @@ angular.module('frontendApp').directive('hkMap', function() {
       var mouseoverHandler = function(e) {
         var layer = e.target;
         // only change the style if the area is not already selected
-        if (!_targetIsArea(e) || !$scope.selectedAreas.isSelected(e.target.feature.properties.CACODE)) {
+        if (!_isTriggeredByArea(e) || !$scope.selectedAreas.isSelected(e.target.feature.properties.CACODE)) {
           layer.setStyle(hoverStyle);
           if (!L.Browser.ie && !L.Browser.opera) {
             layer.bringToFront();
@@ -113,20 +128,20 @@ angular.module('frontendApp').directive('hkMap', function() {
         // Can't use resetStyle because we don't have access to the GeoJSON object
         var layer = e.target;
         // Only reset if the area is not selected
-        if (!_targetIsArea(e) || !$scope.selectedAreas.isSelected(e.target.feature.properties.CACODE)) {
+        if (!_isTriggeredByArea(e) || !$scope.selectedAreas.isSelected(e.target.feature.properties.CACODE)) {
           layer.setStyle(defaultStyle);
         }
         $scope.hoveredFeature = undefined;
       };
 
-      var _targetIsArea = function(event) {
+      var _isTriggeredByArea = function(event) {
         // Checks if the event was sent by an area polygon
         return !_.isUndefined(event.target.feature.properties.CACODE);
       };
 
       var clickHandler = function(e) {
         // If the object is an area:
-        if (_targetIsArea(e)) {
+        if (_isTriggeredByArea(e)) {
           var caCode = e.target.feature.properties.CACODE;
           if ($scope.selectedAreas.isSelected(caCode)) {
             // If the object is already selected, unselect it
@@ -170,7 +185,7 @@ angular.module('frontendApp').directive('hkMap', function() {
       GeoFiles.getAreas().then(function(data) {
         $scope.areas = {
           data: data,
-          style: defaultStyle,
+          style: featureStyler,
           onEachFeature: onEachFeature
         };
       });
@@ -183,6 +198,9 @@ angular.module('frontendApp').directive('hkMap', function() {
           $scope.geojson = $scope.districts;
         }
       });
+
+      // We have to set a watch on the selectedAreas to keep the map styling in sync
+      // If it changes, then we need to getMap(), then loop through map._layers and update each layer
     }],
     template: '<leaflet center="center" defaults="defaults" geojson="geojson"></leaflet>' +
       '<div class="map-overlay" ng-show="hoveredFeature">{{ hoveredFeature }}</div><span>{{ center }}</span>'
