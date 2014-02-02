@@ -109,18 +109,27 @@ angular.module('frontendApp').directive('hkMap', function() {
         $scope.selectedAreas = $parse($attrs.selectedAreas)($scope);
       }
 
-      // Problem -- if we have a watch, it'll get triggered when objects are added by a click as well.
-      // Since the map is already styling the layers, this would be redundant
+      // We have to set a watch on the selectedAreas to keep the map styling in sync
+      // If it changes, then we need to getMap(), then loop through map._layers and update each layer's style
+      // But, we can't use a watch on the selectedAreas object, otherwise layers get styled twice when clicking on the map
       var _applyStylesToMap = function(map) {
         // Given a map, loop through the layers in the map and apply the appropriate style given
         // the current state of selectedAreas
         var layers = _.values(map._layers);
-
+        _.forEach(layers, function(layer) {
+          if (!_.isUndefined(layer.feature) &&
+            !_.isUndefined(layer.feature.properties) &&
+            _isArea(layer.feature)) {
+            layer.setStyle(featureStyler(layer.feature));
+          }
+        });
       };
-      // We have to set a watch on the selectedAreas to keep the map styling in sync
-      // If it changes, then we need to getMap(), then loop through map._layers and update each layer's style
-      $scope.getMap().then(function(map){
-//        console.log(map)
+      // So instead, use a listener.
+      $scope.$on('redrawMap', function() {
+        console.log('redrawing map');
+        $scope.getMap().then(function(map){
+          _applyStylesToMap(map);
+        });
       });
 
       // Handlers for interaction
@@ -158,11 +167,11 @@ angular.module('frontendApp').directive('hkMap', function() {
           var caCode = e.target.feature.properties.CACODE;
           if ($scope.selectedAreas.isSelected(caCode)) {
             // If the object is already selected, unselect it
-            e.target.setStyle($scope._defaultStyle)
+            e.target.setStyle($scope._hoverStyle);
             $scope.selectedAreas.removeArea(caCode);
           } else {
             // If it isn't already selected, select it
-            e.target.setStyle($scope._selectedStyle)
+            e.target.setStyle($scope._selectedStyle);
             $scope.selectedAreas.addArea(caCode);
           }
         } else {
@@ -204,7 +213,7 @@ angular.module('frontendApp').directive('hkMap', function() {
       });
 
       // If we zoom in further than >= 14, then switch over to the constituency areas layer
-      $scope.$watch('center.zoom', function(newVal, oldVal) {
+      $scope.$watch('center.zoom', function(newVal) {
         if (newVal >= AREATHRESHOLD) {
           $scope.geojson = $scope.areas;
         } else {

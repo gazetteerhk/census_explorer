@@ -4,7 +4,7 @@
   <!--{{center}}-->
   <!--<leaflet width="1024px" height="800px" center="center" defaults="defaults" geojson="geojson_orig"></leaflet>-->
   <hk-map height="500px" selected-areas="selection"></hk-map>
-  <button class="btn btn-warning" ng-click="selection.clearSelected()">Clear selection</button>
+  <button class="btn btn-warning" ng-click="clearAndRedraw()">Clear selection</button>
   <pre>
     {{ selection.selectedAreas() }}
   </pre>
