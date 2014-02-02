@@ -83,6 +83,7 @@ angular.module('frontendApp').directive('hkMap', function() {
 
       var selectedStyle = {
         color: "#ff0",
+        fillColor: "#ff0",
         fillOpacity: 0.2,
         weight: 6
       };
@@ -97,9 +98,12 @@ angular.module('frontendApp').directive('hkMap', function() {
       // Handlers for interaction
       var mouseoverHandler = function(e) {
         var layer = e.target;
-        layer.setStyle(hoverStyle);
-        if (!L.Browser.ie && !L.Browser.opera) {
-          layer.bringToFront();
+        // only change the style if the area is not already selected
+        if (!_targetIsArea(e) || !$scope.selectedAreas.isSelected(e.target.feature.properties.CACODE)) {
+          layer.setStyle(hoverStyle);
+          if (!L.Browser.ie && !L.Browser.opera) {
+            layer.bringToFront();
+          }
         }
 
         $scope.hoveredFeature = e.target.feature.properties.DCCODE || e.target.feature.properties.CACODE;
@@ -108,7 +112,10 @@ angular.module('frontendApp').directive('hkMap', function() {
       var resetStyle = function(e) {
         // Can't use resetStyle because we don't have access to the GeoJSON object
         var layer = e.target;
-        layer.setStyle(defaultStyle);
+        // Only reset if the area is not selected
+        if (!_targetIsArea(e) || !$scope.selectedAreas.isSelected(e.target.feature.properties.CACODE)) {
+          layer.setStyle(defaultStyle);
+        }
         $scope.hoveredFeature = undefined;
       };
 
