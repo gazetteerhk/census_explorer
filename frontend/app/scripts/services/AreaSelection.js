@@ -44,34 +44,31 @@ angular.module('frontendApp').factory('AreaSelection', ['Mappings', function(Map
     } else if (areaType === DISTRICT) {
       _addDistrict(self, area);
     } else {
-      Mappings.getAllAreas().then(function(allAreas) {
-        if (_.has(self._selected, area)) {
-          return;
-        }
-        if (_.indexOf(allAreas, area, true) > -1) {
-          self._selected[area] = true;
-        } else {
-          throw String(area) + ' is not a valid area';
-        }
-      });
+      var allAreas = Mappings.getAllAreas();
+
+      if (_.has(self._selected, area)) {
+        return;
+      }
+      if (_.indexOf(allAreas, area, true) > -1) {
+        self._selected[area] = true;
+      } else {
+        throw String(area) + ' is not a valid area';
+      }
     }
   };
 
   var _addDistrict = function(self, district) {
     district = district.toLowerCase();
-    Mappings.getAreasFromDistrict(district).then(function(areas) {
-      _.forEach(areas, function(area) {
-        self._selected[area] = true;
-      });
+    var areas = Mappings.getAreasFromDistrict(district);
+    _.forEach(areas, function(area) {
+      self._selected[area] = true;
     });
   };
 
   var _addRegion = function(self, region) {
     region = region.toLowerCase();
-    Mappings.getDistrictsFromRegion(region)
-      .then(function(districts) {
-        _.forEach(districts, _.partial(_addDistrict, self))
-      });
+    var districts = Mappings.getDistrictsFromRegion(region);
+    _.forEach(districts, _.partial(_addDistrict, self));
   };
 
   AreaModel.prototype.addArea = function(area) {
@@ -103,16 +100,14 @@ angular.module('frontendApp').factory('AreaSelection', ['Mappings', function(Map
 
   var _removeRegion = function(self, region) {
     region = region.toLowerCase();
-    Mappings.getDistrictsFromRegion(region).then(function(districts) {
-      _.forEach(districts, _.partial(_removeDistrict, self));
-    });
+    var districts = Mappings.getDistrictsFromRegion(region);
+    _.forEach(districts, _.partial(_removeDistrict, self));
   };
 
   var _removeDistrict = function(self, district) {
     district = district.toLowerCase();
-    Mappings.getAreasFromDistrict(district).then(function(areas) {
-      _.forEach(areas, function(area) {delete self._selected[area];})
-    });
+    var areas = Mappings.getAreasFromDistrict(district);
+    _.forEach(areas, function(area) {delete self._selected[area];})
   };
 
   AreaModel.prototype.removeArea = function(area) {
