@@ -119,17 +119,19 @@ angular.module('frontendApp').factory('AreaSelection', ['Mappings', function(Map
   };
 
   // Selection checking
-  // Want this to be synchronous, but because Mappings is asynchronous, it doesn't seem like
-  // there is a way to extend this for districts and regions
   AreaModel.prototype.isSelected = function(area) {
+    var self = this;
+
     area = area.toLowerCase();
     var areaType = _getType(area);
     if (areaType === REGION) {
-      return false;
+      var areas = _.flatten(_.map(Mappings.getDistrictsFromRegion(area)), function(d) {return Mappings.getAreasFromDistrict(d);});
+      return _.every(_.map(areas, function(a){return _.has(self._selected, a);}));
     } else if (areaType === DISTRICT) {
-      return false;
+      var areas = Mappings.getAreasFromDistrict(area);
+      return _.every(_.map(areas, function(a){return _.has(self._selected, a);}));
     } else {
-      return _.has(this._selected, area);
+      return _.has(self._selected, area);
     }
   };
 

@@ -5,7 +5,7 @@
  * Basically a set of metadata
  */
 
-angular.module('frontendApp').factory('Mappings', ['$http', '$q', function($http, $q) {
+angular.module('frontendApp').factory('Mappings', [function() {
   var svc = {};
   svc._data = {
     geoTree: {
