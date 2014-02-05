@@ -81,9 +81,16 @@ angular.module('frontendApp').directive('hkMap', function() {
         weight: 6
       };
 
-      $scope._selectedStyle = {
+      $scope._partiallySelectedStyle = {
         color: "#ff0",
         fillColor: "#ff0",
+        fillOpacity: 0.2,
+        weight: 6
+      };
+
+      $scope._selectedStyle = {
+        color: "#2ca25f",
+        fillColor: "#2ca25f",
         fillOpacity: 0.2,
         weight: 6
       };
@@ -97,7 +104,8 @@ angular.module('frontendApp').directive('hkMap', function() {
 
       // Styler that styles a layer based on whether it is selected or not
       var featureStyler = function(feature) {
-        if (_isArea(feature) && $scope.selectedAreas.isSelected(feature.properties.CACODE)) {
+        var code = feature.properties.CACODE || feature.properties.DCCODE;
+        if ($scope.selectedAreas.isSelected(code)) {
           return $scope._selectedStyle;
         } else {
           return $scope._defaultStyle;
@@ -201,8 +209,8 @@ angular.module('frontendApp').directive('hkMap', function() {
       GeoFiles.getDistricts().then(function(data) {
         $scope.districts = {
           data: data,
-          style: $scope._defaultStyle,
-          onEachFeature: onEachFeature // Need handlers here
+          style: featureStyler,
+          onEachFeature: onEachFeature
         };
         $scope.geojson = $scope.districts;
       });
