@@ -34,7 +34,7 @@ angular.module('frontendApp').directive('hkMap', function() {
     controller: ['$scope', 'GeoFiles', '$attrs', 'AreaSelection', '$parse', 'leafletData', function($scope, GeoFiles, $attrs, AreaSelection, $parse, leafletData) {
       // Default initializations
       $scope.defaults =  {
-        scrollWheelZoom: false,
+        scrollWheelZoom: true,
         maxZoom: 18
       };
 
@@ -88,6 +88,8 @@ angular.module('frontendApp').directive('hkMap', function() {
         weight: 6
       };
 
+      // TODO: Add partially selected district styling
+
       var _isArea = function(feature) {
         // Checks if a feature is an area
         return !_.isUndefined(feature.properties.CACODE);
@@ -135,22 +137,24 @@ angular.module('frontendApp').directive('hkMap', function() {
       // Handlers for interaction
       var mouseoverHandler = function(e) {
         var layer = e.target;
+        var code = _getLayerCode(e);
         // only change the style if the area is not already selected
-        if (!_isTriggeredByArea(e) || !$scope.selectedAreas.isSelected(e.target.feature.properties.CACODE)) {
+        if (!$scope.selectedAreas.isSelected(code)) {
           layer.setStyle($scope._hoverStyle);
           if (!L.Browser.ie && !L.Browser.opera) {
             layer.bringToFront();
           }
         }
 
-        $scope.hoveredFeature = e.target.feature.properties.DCCODE || e.target.feature.properties.CACODE;
+        $scope.hoveredFeature = code;
       };
 
       var resetStyle = function(e) {
         // Can't use resetStyle because we don't have access to the GeoJSON object
         var layer = e.target;
+        var code = _getLayerCode(e);
         // Only reset if the area is not selected
-        if (!_isTriggeredByArea(e) || !$scope.selectedAreas.isSelected(e.target.feature.properties.CACODE)) {
+        if (!$scope.selectedAreas.isSelected(code)) {
           layer.setStyle($scope._defaultStyle);
         }
         $scope.hoveredFeature = undefined;
@@ -161,27 +165,26 @@ angular.module('frontendApp').directive('hkMap', function() {
         return !_.isUndefined(event.target.feature.properties.CACODE);
       };
 
+      var _getLayerCode = function(e) {
+        if (_isTriggeredByArea(e)) {
+          return e.target.feature.properties.CACODE;
+        } else {
+          return e.target.feature.properties.DCCODE;
+        }
+      };
+
       var clickHandler = function(e) {
         // If the object is an area:
-        if (_isTriggeredByArea(e)) {
-          var caCode = e.target.feature.properties.CACODE;
-          if ($scope.selectedAreas.isSelected(caCode)) {
-            // If the object is already selected, unselect it
-            e.target.setStyle($scope._hoverStyle);
-            $scope.selectedAreas.removeArea(caCode);
-          } else {
-            // If it isn't already selected, select it
-            e.target.setStyle($scope._selectedStyle);
-            $scope.selectedAreas.addArea(caCode);
-          }
-        } else {
-          // If the object is a district, center on the district and zoom in
-          $scope.getMap().then(function(map) {
-            map.fitBounds(e.target.getBounds());
-            // Ensure that we zoom in far enough
-            map.setZoom(AREATHRESHOLD);
-          });
+        var code = _getLayerCode(e);
 
+        if ($scope.selectedAreas.isSelected(code)) {
+          // If the object is already selected, unselect it
+          e.target.setStyle($scope._hoverStyle);
+          $scope.selectedAreas.removeArea(code);
+        } else {
+          // If it isn't already selected, select it
+          e.target.setStyle($scope._selectedStyle);
+          $scope.selectedAreas.addArea(code);
         }
       };
 

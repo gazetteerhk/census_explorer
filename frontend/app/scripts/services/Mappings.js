@@ -52,12 +52,12 @@ angular.module('frontendApp').factory('Mappings', [function() {
 
   // Districts to Region
   svc.getRegionFromDistrict = function(district) {
-    var this_region;
+    var thisRegion;
     district = district.toLowerCase();
     for (var i = 0; i < svc._data.regions.length; i++) {
-      this_region = svc._data.regions[i];
-      if (_.contains(_.keys(svc._data.geoTree[this_region]), district)) {
-        return this_region;
+      thisRegion = svc._data.regions[i];
+      if (_.contains(_.keys(svc._data.geoTree[thisRegion]), district)) {
+        return thisRegion;
       }
     }
 
