@@ -30,7 +30,7 @@ module.exports = function (grunt) {
     watch: {
       js: {
         files: ['<%= yeoman.app %>/scripts/{,*/}*.js'],
-        tasks: ['newer:jshint:all'],
+        tasks: [],
         options: {
           livereload: true
         }
@@ -332,6 +332,11 @@ module.exports = function (grunt) {
       unit: {
         configFile: 'karma.conf.js',
         singleRun: true
+      },
+      continuous: {
+        configFile: 'karma.conf.js',
+        singleRun: false,
+        autoWatch: true
       }
     }
   });
@@ -359,11 +364,16 @@ module.exports = function (grunt) {
   });
 
   grunt.registerTask('test', [
-    'clean:server',
-    'concurrent:test',
-    'autoprefixer',
-    'connect:test',
+    // Not really sure why it needs to start the background server.
+//    'clean:server',
+//    'concurrent:test',
+//    'autoprefixer',
+//    'connect:test',
     'karma'
+  ]);
+
+  grunt.registerTask('test:continuous', [
+    'karma:continuous'
   ]);
 
   grunt.registerTask('build', [

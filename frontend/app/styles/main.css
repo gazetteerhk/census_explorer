@@ -121,3 +121,18 @@ body {
 .marketing p + h4 {
   margin-top: 28px;
 }
+
+/* Mapping */
+.map-overlay {
+  font-size: 1.5em;
+  /*font-weight: bold;*/
+  position: absolute;
+  bottom: 2em;
+  left: 1em;
+  z-index: 100;
+  padding: .2em .5em;
+  line-height: 1.1em;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 5px;
+}
