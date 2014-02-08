@@ -15,8 +15,8 @@ angular.module('frontendApp', [
       //   controller: 'MainCtrl'
       // })
       .when('/', {
-        templateUrl: 'views/query.html',
-        controller: 'QueryCtrl'
+        templateUrl: 'views/main.html',
+        controller: 'MainCtrl'
       })
       .when('/about', {
         templateUrl: 'views/about.html',
@@ -33,10 +33,6 @@ angular.module('frontendApp', [
       .when('/explore', {
         templateUrl: 'views/explore.html',
         controller: 'ExploreCtrl'
-      })
-      .when('/map', {
-        templateUrl: 'views/map.html',
-        controller: 'MapCtrl'
       })
       .when('/query', {
         templateUrl: 'views/query.html',
