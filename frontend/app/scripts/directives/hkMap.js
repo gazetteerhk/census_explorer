@@ -128,8 +128,7 @@ angular.module('frontendApp').directive('hkMap', function() {
         var layers = _.values(map._layers);
         _.forEach(layers, function(layer) {
           if (!_.isUndefined(layer.feature) &&
-            !_.isUndefined(layer.feature.properties) &&
-            _isArea(layer.feature)) {
+            !_.isUndefined(layer.feature.properties)) {
             layer.setStyle(featureStyler(layer.feature));
           }
         });
