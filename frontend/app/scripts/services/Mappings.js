@@ -86,6 +86,10 @@ angular.module('frontendApp').factory('Mappings', [function() {
     return svc._data.areas;
   };
 
+  svc.getAllDistricts = function() {
+    return svc._data.districts;
+  };
+
 
   return svc;
 }]);

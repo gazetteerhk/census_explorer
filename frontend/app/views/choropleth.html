@@ -1,3 +1,10 @@
 <h1>Map the data</h1>
 
-<hk-choropleth height="600px" class="col-md-12"></hk-choropleth>
+<hk-choropleth height="600px" class="col-md-12" map-data="areaData" map-level="mapLevel"></hk-choropleth>
+
+<button class="btn btn-primary" ng-click="mapLevel = 'ca'">Show areas</button>
+<button class="btn btn-primary" ng-click="mapLevel = 'dc'">Show districts</button>
+
+<pre>
+  {{ mapLevel }}
+</pre>
