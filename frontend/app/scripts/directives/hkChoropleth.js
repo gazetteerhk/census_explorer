@@ -76,7 +76,6 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
       $scope._defaultStyle = {
         color: "#2b8cbe",
         fillOpacity: 0,
-        clickable: false,
         weight: 2
       };
 
