@@ -34,9 +34,9 @@ angular.module('frontendApp', [
         templateUrl: 'views/explore.html',
         controller: 'ExploreCtrl'
       })
-      .when('/query', {
-        templateUrl: 'views/query.html',
-        controller: 'QueryCtrl'
+      .when('/choropleth', {
+        templateUrl: 'views/choropleth.html',
+        controller: 'ChoroplethCtrl'
       })
       .otherwise({
         redirectTo: '/'
@@ -109,7 +109,6 @@ angular.module('frontendApp').factory('CensusAPI', ['$log', '$http', function($l
   };
 
   svc.Query = Query;
-//  svc.endpointURL = 'http://golden-shine-471.appspot.com/api';
 
   return svc;
 }]);
