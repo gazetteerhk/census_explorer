@@ -102,7 +102,11 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
       };
 
       $scope.$watch(_getMapData, function() {
+        console.log('data changed');
         _parseData();
+        $scope.getMap().then(function(map){
+          _applyStylesToMap(map);
+        });
       });
 
       // Parse and quantize the data
@@ -193,6 +197,7 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
       };
 
       $scope.$watch(_getMapLevel, function(newVal) {
+        console.log('level changed');
         if (newVal == 'dc') {
           GeoFiles.getDistricts().then(function(data) {
             $scope.geojson = {
