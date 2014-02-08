@@ -34,12 +34,13 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
     },
 
     controller: ['$scope', 'GeoFiles', '$attrs', 'AreaSelection', '$parse', 'leafletData', function($scope, GeoFiles, $attrs, AreaSelection, $parse, leafletData) {
-
       // Default initializations
       $scope.defaults =  {
         scrollWheelZoom: true,
         maxZoom: 18
       };
+
+      $scope._colors = colorbrewer.Blues[5];
 
       // The zoom level after which areas are drawn
       var AREATHRESHOLD = 14;
@@ -75,7 +76,8 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
       $scope._defaultStyle = {
         color: "#2b8cbe",
         fillOpacity: 0,
-        weight: 1
+        clickable: false,
+        weight: 2
       };
 
       var _isArea = function(feature) {
@@ -86,30 +88,43 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
       // Styler that styles a layer based on whether it is selected or not
       var featureStyler = function(feature) {
         var code = feature.properties.CACODE || feature.properties.DCCODE;
-        var value = $scope._mapDataHash[code];
+        var style = _.clone($scope._defaultStyle);
+        style.fillColor = $scope._colors[$scope._colorScale(_getValueFromCode(code))];
+        style.fillOpacity = 0.3;
+        return style;
       };
 
       // Get the mapData object
       var _mapDataGetter = $parse($attrs.mapData);
       var _getMapData = function() {
         $scope._mapData = _mapDataGetter($scope);
+        return $scope._mapData;
+      };
+
+      $scope.$watch(_getMapData, function() {
+        _parseData();
+      });
+
+      // Parse and quantize the data
+      var _parseData = function() {
+        var vals = _.sortBy(_.pluck($scope._mapData, 'value'));
+
         // Also store a dict for looking up data
         $scope._mapDataHash = {};
         _.forEach($scope._mapData, function(val) {
           $scope._mapDataHash[val.code] = val.value;
         });
 
-        return $scope._mapData;
-      };
-
-      // Parse and quantize the data
-      var _parseData = function() {
-        var vals = _.sortBy(_.pluck($scope._mapData, 'value'));
         $scope._colorScale = d3.scale.quantize()
           .domain(vals)
           .range(d3.range(5));  // 5 here, but can configure later, maybe
       };
 
+      // Accessor for _mapDataHash that handles lowercasing
+      var _getValueFromCode = function(code) {
+        code = code.toLowerCase();
+        return $scope._mapDataHash[code];
+      };
 
       var _applyStylesToMap = function(map) {
         // Given a map, loop through the layers in the map and apply the appropriate style given
@@ -173,7 +188,6 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
       // Watch the attribute value for mapLevel and set the geojson object based on that
       var _mapLevelParser = $parse($attrs.mapLevel);
       var _getMapLevel = function() {
-        console.log('getting map level');
         $scope._mapLevel = _mapLevelParser($scope);
         return $scope.mapLevel;
       };
@@ -199,7 +213,13 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
       });
     }],
     template: '<leaflet center="center" defaults="defaults" geojson="geojson"></leaflet>' +
-      '<div class="map-overlay" ng-show="hoveredFeature">{{ hoveredFeature }}</div><span>{{ center }}</span>' +
-      '<pre>{{ mapLevel }}</pre>'
+      '<div class="map-overlay" ng-show="hoveredFeature">{{ hoveredFeature }} - {{ _getValueFromCode(hoveredFeature) }}</div><span>{{ center }}</span>' +
+      '<pre>{{ mapLevel }}\n</pre>'
   };
 });
+
+/*
+ * Several things can trigger map redraws:
+ *  - mapLevel - whether it shows areas or districts
+ *  - mapData - if there are any changes to the data
+ */
