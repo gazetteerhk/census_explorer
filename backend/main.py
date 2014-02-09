@@ -1,100 +1,14 @@
 import collections
-from flask import Flask, jsonify, request
-import models
 import urllib
-from google.appengine.api import memcache
-import hashlib
+from flask import Flask, jsonify, request
 
 app = Flask(__name__)
 
 import logging
 
-from models import Admin
-
 @app.route('/')
 def hello_world():
     return 'Census Explorer'
-
-def require_admin(func):
-    def decorated(*args, **kwargs):
-        r = list(Admin.query(Admin.name=='admin'))
-        if len(r) == 0 or (r[0].enabled == True and r[0].token == request.args.get('token', None)):
-            # len(r) == 0: init admin
-            return func(*args, **kwargs)
-        else:
-            return "404"
-    # Without the following line, you will see the error:
-    #   "View function mapping is overwriting an existing endpoint"
-    decorated.__name__ = func.__name__
-    return decorated
-
-def cache_it(func):
-    def decorated(*args, **kwargs):
-        #logging.warning((request.query_string))
-        key = hashlib.md5((request.path + request.query_string).encode('utf-8')).hexdigest()
-        logging.warning('key: %s', key)
-        res = memcache.get(key)
-        if not res:
-            cache_time = 300
-            res = func(*args, **kwargs)
-            memcache.add(key, res, cache_time)
-        return res
-    decorated.__name__ = func.__name__
-    return decorated
-
-@app.route('/_admin/init/')
-@require_admin
-def admin_init():
-    import random
-    admin = Admin(id="0", enabled=True, name='admin',
-            token=hashlib.md5(str(random.random()).encode('utf-8')).hexdigest()[:16])
-    admin.put()
-    return 'OK'
-
-@app.route('/upload/<constituency_area>/<sheet_name>/<table>/', methods = ['POST'])
-@require_admin
-def upload(constituency_area, sheet_name, table):
-    import json
-    from models import *
-    #logging.warning(str(request.data))
-    # request.data contains the raw HTTP request body IFF Flask does not know the type...
-    data = json.loads(str(request.data))
-    first_column_name = data['meta']['first_column_name']
-    table_name = data['meta']['name']
-    for d in data['data']:
-        row = d.pop(first_column_name)
-        for (k, v) in d.items():
-            constituency_area = constituency_area.lower()
-            language = {'sheet0': u'traditional',
-                    'sheet1': u'simplified',
-                    'sheet2': u'english'}[sheet_name]
-            table = table_name #.decode('utf-8')
-            column = k.strip() #.decode('utf-8')
-            row = row.strip() #.decode('utf-8')
-            value = v
-            _info = (constituency_area, language, table, row, column, value)
-            #logging.warning(str(_info))
-            ok = True
-
-            if value == u'':
-                # missing value
-                ok = False
-
-            if ok:
-                _id = hashlib.md5((u'%s %s %s %s %s %s' % _info).encode('utf-8')).hexdigest()
-                constituency_area_key = list(ConstituencyArea.query(ConstituencyArea.code == constituency_area))[0].key
-                #logging.warning(constituency_area_key)
-                dp = Datapoint(id=_id, 
-                        constituency_area=constituency_area_key,
-                        language=language,
-                        table=table,
-                        column=column,
-                        row=row,
-                        value=value)
-                #logging.warning(dp)
-                dp.put()
-    return "OK"
-
 
 def parse_argument(query_string):
     """
@@ -111,7 +25,6 @@ def parse_argument(query_string):
 
 
 @app.route('/api')
-@cache_it
 def api():
     """
     API Endpoint for accessing the data
@@ -162,9 +75,11 @@ def api():
 
 
     """
+
+    return jsonify({'test hub': 'OK'})
+
     import time
     _time_start = time.time()
-
 
     # Parse the arguments
     ca = parse_argument(request.args.getlist('ca', None))
