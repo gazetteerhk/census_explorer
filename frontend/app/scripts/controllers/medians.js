@@ -1,6 +1,9 @@
 'use strict';
 
 angular.module('frontendApp')
-  .controller('MediansCtrl', ['$scope', function($scope) {
+  .controller('MediansCtrl', ['$scope', 'AreaSelection', function($scope, AreaSelection) {
+
+    $scope.selection = AreaSelection.getModel();
+
 
 }]);

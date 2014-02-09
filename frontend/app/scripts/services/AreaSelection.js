@@ -135,6 +135,11 @@ angular.module('frontendApp').factory('AreaSelection', ['Mappings', function(Map
     }
   };
 
+  // Is there a selection in the model?
+  AreaModel.prototype.hasSelection = function() {
+    return _.keys(this._selected).length > 0;
+  };
+
   svc.AreaModel = AreaModel;
 
   svc.getModel = function() {

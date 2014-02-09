@@ -8,7 +8,7 @@
  *
  * @param {string} [height="300px"] Height of the map.
  * @param {class} class Use the class declaration to set width in Bootstrap column system.
- * @param {object} selectedItems Object that stores which elements in the map are selected
+ * @param {object} selectedAreas Object that stores which elements in the map are selected
  * @params {} singleSelect If this attribute is present, then only a single district or area is allowed to be selected at once
  *
  */
