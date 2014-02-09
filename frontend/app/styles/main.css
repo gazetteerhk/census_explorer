@@ -136,3 +136,32 @@ body {
   background: rgba(255, 255, 255, 0.9);
   border-radius: 5px;
 }
+
+.map-legend {
+  position: absolute;
+  right: 10px;
+  margin-right: 10px;
+  z-index: 100;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 5px;
+  top: 10px;
+}
+
+.map-legend ul {
+  padding: 5px;
+  list-style-type: none;
+  margin: 0;
+}
+
+.key-symbol {
+  display: block;
+  width: 10px;
+  height: 20px;
+  border: #000 1px solid;
+  float: left;
+  margin-right: 5px;
+}
+
+.key-label {
+  font-size: 0.8em;
+}

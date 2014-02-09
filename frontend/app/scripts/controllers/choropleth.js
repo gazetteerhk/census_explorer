@@ -15,4 +15,5 @@ angular.module('frontendApp')
     $scope.newData();
 
     $scope.mapLevel = 'ca';
+    $scope.theData = $scope.areaData;
   }]);

@@ -88,7 +88,7 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
       var featureStyler = function(feature) {
         var code = feature.properties.CACODE || feature.properties.DCCODE;
         var style = _.clone($scope._defaultStyle);
-        style.fillColor = $scope._colors[$scope._colorScale(_getValueFromCode(code))];
+        style.fillColor = $scope._colors[$scope._colorScale($scope._getValueFromCode(code))];
         style.fillOpacity = 0.3;
         return style;
       };
@@ -121,10 +121,46 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
         $scope._colorScale = d3.scale.quantize()
           .domain(vals)
           .range(d3.range(5));  // 5 here, but can configure later, maybe
+
+        _drawLegend();
+      };
+
+      // Draw the legend
+      var _drawLegend = function() {
+        var legendContainer = d3.select(".map-legend");
+        var formatter = d3.format("0f");
+
+        // Clear existing legend
+        legendContainer.selectAll('ul').remove();
+
+        var legend = legendContainer.append('ul')
+          .attr('class', 'Blues');
+
+        var keys = legend.selectAll('li.key')
+          .data($scope._colorScale.range());
+
+        keys.enter().append('li')
+          .attr('class', 'key');
+
+        keys.append('span')
+          .attr('class', 'key-symbol')
+          .style('background-color', function(d) {
+            return $scope._colors[d];
+          });
+
+        keys.append('span')
+          .attr('class', 'key-label')
+          .text(function(d) {
+            var r = $scope._colorScale.invertExtent(d);
+            return formatter(r[0]) + " - " + formatter(r[1]);
+          });
       };
 
       // Accessor for _mapDataHash that handles lowercasing
-      var _getValueFromCode = function(code) {
+      $scope._getValueFromCode = function(code) {
+        if (_.isUndefined(code)) {
+         return;
+        }
         code = code.toLowerCase();
         return $scope._mapDataHash[code];
       };
@@ -139,13 +175,6 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
           }
         });
       };
-
-      $scope.$on('redrawMap', function() {
-        console.log('redrawing map');
-        $scope.getMap().then(function(map){
-          _applyStylesToMap(map);
-        });
-      });
 
       // Handlers for interaction
       var mouseoverHandler = function(e) {
@@ -215,9 +244,18 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
           });
         }
       });
+
+      $scope.$on('redrawMap', function() {
+        console.log('redrawing map');
+        $scope.getMap().then(function(map){
+          _applyStylesToMap(map);
+        });
+      });
     }],
     template: '<leaflet center="center" defaults="defaults" geojson="geojson"></leaflet>' +
-      '<div class="map-overlay" ng-show="hoveredFeature">{{ hoveredFeature }} - {{ _getValueFromCode(hoveredFeature) }}</div><span>{{ center }}</span>' +
+      '<div class="map-overlay" ng-show="hoveredFeature">{{ hoveredFeature }} - {{ _getValueFromCode(hoveredFeature) }}</div>' +
+      '<div class="map-legend"></div>' +
+      '<span>{{ center }}</span>' +
       '<pre>{{ mapLevel }}\n</pre>'
   };
 });
