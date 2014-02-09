@@ -167,7 +167,8 @@ def api():
     # Functions:
     ret_options = parse_argument(request.args.getlist('return', None))
     if not ret_options:
-        ret_options = ['data', 'groups', 'options']
+        #ret_options = ['data', 'groups', 'options']
+        ret_options = []
     #NOTE: Can not parse_argument on it, or the str converts to a list
     groupby = request.args.get('groupby', None)
     #NOTE: Can not parse_argument on it, or the str converts to a list
