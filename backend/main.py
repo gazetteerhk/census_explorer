@@ -1,6 +1,7 @@
 import collections
 import urllib
 import pandas
+import numpy
 from flask import Flask, jsonify, request
 
 app = Flask(__name__)
@@ -39,6 +40,12 @@ def parse_argument(query_string):
     # res = urllib.unquote_plus(query_string).split(',')
     res = map(urllib.unquote_plus, query_string)
     return res
+
+def _project_dataframe(df, projectors):
+    data = {}
+    for p in projectors:
+        data[p] = list(df[p])
+    return data
 
 @app.route('/api/')
 def api():
@@ -101,7 +108,8 @@ def api():
     projectors = request.args.get('projectors', 'value').split(',')
     # Functions:
     ret_options = int(request.args.get('options', 2))
-    groupby = parse_argument(request.args.get('groupby', None))
+    #NOTE: Can not parse_argument on it, or the str converts to a list
+    groupby = request.args.get('groupby', None)
     aggregate = parse_argument(request.args.get('aggregate', None))
 
     response = {'meta': {}}
@@ -117,27 +125,35 @@ def api():
                 pandas.Series([False] * len(df), index=df.index))]
         logger.info('df len: %d', len(df))
 
+    response['meta']['length'] = len(df)
+
     # Options
     options = {}
     for f in filters:
         options[f] = list(df[f].unique())
 
     # Projectors
-    data = {}
-    for p in projectors:
-        data[p] = list(df[p])
+    data = _project_dataframe(df, projectors)
+
+    # Groupby and Aggregate
+    groups = {}
+    if groupby:
+        df['groupby'] = df[groupby]
+        for name, group in df.groupby(groupby):
+            groups[name] = _project_dataframe(group, projectors)
 
     if ret_options == 0:
         response['data'] = data
+        response['groups'] = groups
     elif ret_options == 1:
         response['options'] = options
     else:
         # assume ret_options == 2...
         response['data'] = data
+        response['groups'] = groups
         response['options'] = options
-
+            
     response['meta']['success'] = True
-    response['meta']['length'] = len(df)
 
     logger.info('API process time: %s', time.time() - _time_start)
     return jsonify(response)
