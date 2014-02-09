@@ -3,13 +3,13 @@
 describe('Services: AreaSelection', function() {
   beforeEach(module('frontendApp'));
 
-  var AreaSelection, Mappings;
+  var AreaSelection, GeoMappings;
   var mdl;
 
   beforeEach(function() {
     inject(function($injector) {
       AreaSelection = $injector.get('AreaSelection');
-      Mappings = $injector.get('Mappings');
+      GeoMappings = $injector.get('GeoMappings');
     });
 
     mdl = AreaSelection.getModel();
@@ -53,22 +53,22 @@ describe('Services: AreaSelection', function() {
     var allAreas;
     mdl.addArea('a');
     var res = {};
-    _.forEach(Mappings._data.geoTree.hk.a, function(area) {res[area] = true;});
+    _.forEach(GeoMappings._data.geoTree.hk.a, function(area) {res[area] = true;});
     expect(mdl._selected).toEqual(res);
   });
 
   it('addArea handles uppercase districts', function() {
     mdl.addArea('A');
     var res = {};
-    _.forEach(Mappings._data.geoTree.hk.a, function(area) {res[area] = true;});
+    _.forEach(GeoMappings._data.geoTree.hk.a, function(area) {res[area] = true;});
     expect(mdl._selected).toEqual(res);
   });
 
   it('addArea handles arrays of districts', function() {
     mdl.addArea(['b', 'c']);
     var res = {};
-    _.forEach(Mappings._data.geoTree.hk.b, function(area) {res[area] = true;});
-    _.forEach(Mappings._data.geoTree.hk.c, function(area) {res[area] = true;});
+    _.forEach(GeoMappings._data.geoTree.hk.b, function(area) {res[area] = true;});
+    _.forEach(GeoMappings._data.geoTree.hk.c, function(area) {res[area] = true;});
     expect(mdl._selected).toEqual(res);
   });
 
@@ -76,7 +76,7 @@ describe('Services: AreaSelection', function() {
     // duplicates
     mdl.addArea('a');
     var res = {};
-    _.forEach(Mappings._data.geoTree.hk.a, function(area) {res[area] = true;});
+    _.forEach(GeoMappings._data.geoTree.hk.a, function(area) {res[area] = true;});
     expect(mdl._selected).toEqual(res);
     mdl.addArea('a');
     expect(mdl._selected).toEqual(res);
@@ -85,29 +85,29 @@ describe('Services: AreaSelection', function() {
   it('addArea allows adding regions', function() {
     mdl.addArea('hk');
     var res = {};
-    _.forEach(_.flatten(_.values(Mappings._data.geoTree.hk)), function(area) {res[area] = true;});
+    _.forEach(_.flatten(_.values(GeoMappings._data.geoTree.hk)), function(area) {res[area] = true;});
     expect(mdl._selected).toEqual(res);
   });
 
   it('addArea allows adding uppercase regions', function() {
     mdl.addArea('HK');
     var res = {};
-    _.forEach(_.flatten(_.values(Mappings._data.geoTree.hk)), function(area) {res[area] = true;});
+    _.forEach(_.flatten(_.values(GeoMappings._data.geoTree.hk)), function(area) {res[area] = true;});
     expect(mdl._selected).toEqual(res);
   });
 
   it('addArea allows adding multiple regions', function() {
     mdl.addArea(['hk', 'kl']);
     var res = {};
-    _.forEach(_.flatten(_.values(Mappings._data.geoTree.hk)), function(area) {res[area] = true;});
-    _.forEach(_.flatten(_.values(Mappings._data.geoTree.kl)), function(area) {res[area] = true;});
+    _.forEach(_.flatten(_.values(GeoMappings._data.geoTree.hk)), function(area) {res[area] = true;});
+    _.forEach(_.flatten(_.values(GeoMappings._data.geoTree.kl)), function(area) {res[area] = true;});
     expect(mdl._selected).toEqual(res);
   });
 
   it('addArea handles duplicate regions', function() {
     mdl.addArea('hk');
     var res = {};
-    _.forEach(_.flatten(_.values(Mappings._data.geoTree.hk)), function(area) {res[area] = true;});
+    _.forEach(_.flatten(_.values(GeoMappings._data.geoTree.hk)), function(area) {res[area] = true;});
     expect(mdl._selected).toEqual(res);
     mdl.addArea('hk');
     expect(mdl._selected).toEqual(res);
@@ -116,7 +116,7 @@ describe('Services: AreaSelection', function() {
   it('addArea handles mixed types', function() {
     mdl.addArea(['a01', 'b'])
     var res = {a01: true};
-    _.forEach(_.values(Mappings._data.geoTree.hk.b), function(area) {res[area] = true;});
+    _.forEach(_.values(GeoMappings._data.geoTree.hk.b), function(area) {res[area] = true;});
     expect(mdl._selected).toEqual(res);
   });
 
@@ -189,7 +189,7 @@ describe('Services: AreaSelection', function() {
 
   it('isSelected checks if district is selected', function() {
     var selected = {};
-    _.forEach(_.values(Mappings._data.geoTree.hk.a), function(area) {selected[area] = true;});
+    _.forEach(_.values(GeoMappings._data.geoTree.hk.a), function(area) {selected[area] = true;});
     mdl._selected = selected;
     expect(mdl.isSelected('a')).toBeTruthy();
     expect(mdl.isSelected('b')).toBeFalsy();
@@ -200,7 +200,7 @@ describe('Services: AreaSelection', function() {
 
   it('isSelected checks if region is selected', function() {
     var selected = {};
-    _.forEach(_.flatten(_.values(Mappings._data.geoTree.hk)), function(area) {selected[area] = true;});
+    _.forEach(_.flatten(_.values(GeoMappings._data.geoTree.hk)), function(area) {selected[area] = true;});
     mdl._selected = selected;
     expect(mdl.isSelected('hk')).toBeTruthy();
     expect(mdl.isSelected('kl')).toBeFalsy();

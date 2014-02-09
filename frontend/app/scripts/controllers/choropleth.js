@@ -1,14 +1,14 @@
 'use strict';
 
 angular.module('frontendApp')
-  .controller('ChoroplethCtrl', ['$scope', 'Mappings', function ($scope, Mappings) {
+  .controller('ChoroplethCtrl', ['$scope', 'GeoMappings', function ($scope, GeoMappings) {
     // Generate some dummy data
     $scope.newData = function() {
-      $scope.districtData = _.map(Mappings.getAllDistricts(), function(district) {
+      $scope.districtData = _.map(GeoMappings.getAllDistricts(), function(district) {
         return {code: district, value: Math.random() * 100};
       });
 
-      $scope.areaData = _.map(Mappings.getAllAreas(), function(area){
+      $scope.areaData = _.map(GeoMappings.getAllAreas(), function(area){
         return {code: area, value: Math.random() * 100};
       });
     };
