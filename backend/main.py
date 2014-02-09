@@ -55,7 +55,11 @@ def api():
 
     Arguments:
     ----------
-    ca: constituency areas
+    region:
+
+    district:
+
+    area: constituency areas
         Comma separated string of CA codes -- "a01,a02", etc.
 
     table: table name
@@ -67,10 +71,13 @@ def api():
     column: column name
         Comma separated string of the columns.  Urlencoded - "male"
 
-    returns: [ret, ...]
+    return: [ret, ...]
        * 'data'
        * 'groups'
        * 'options'
+
+    projector: 
+       * same as filters
 
     Returns:
     --------
@@ -103,9 +110,13 @@ def api():
     # Filters:
     filters = ['region', 'district', 'area', 'table', 'row', 'column']
     # Projectors:
-    projectors = request.args.get('projectors', 'value').split(',')
+    projectors = parse_argument(request.args.getlist('projector', None))
+    if not projectors:
+        projectors = ['value']
     # Functions:
-    ret_options = request.args.get('returns', 'data,groups,options').split(',')
+    ret_options = parse_argument(request.args.getlist('return', None))
+    if not ret_options:
+        ret_options = ['data', 'groups', 'options']
     #NOTE: Can not parse_argument on it, or the str converts to a list
     groupby = request.args.get('groupby', None)
     aggregate = parse_argument(request.args.get('aggregate', None))
