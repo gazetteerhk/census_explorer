@@ -38,6 +38,10 @@ angular.module('frontendApp', [
         templateUrl: 'views/choropleth.html',
         controller: 'ChoroplethCtrl'
       })
+      .when('/medians', {
+        templateUrl: 'views/medians.html',
+        controller: 'MediansCtrl'
+      })
       .otherwise({
         redirectTo: '/'
       })
