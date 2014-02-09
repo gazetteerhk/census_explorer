@@ -60,9 +60,10 @@ def api():
     column: column name
         Comma separated string of the columns.  Urlencoded - "male"
 
-    options: 0 or 1
-        If options 1, then the response also includes an "options" key that
-        lists the possible values for unspecified columns to further narrow the data down
+    options: 0 or 1 or 2
+        0: data only
+        1: options only
+        2: both (default)
 
         If there are no parameters provided, then options is 1 by default, and no data is returned
 
@@ -93,39 +94,47 @@ def api():
     import time
     _time_start = time.time()
 
-    response = {'meta': {}, 'data': {}, 'options': {}}
-
     # Parse the arguments
     # Filters:
     filters = ['region', 'district', 'area', 'table', 'row', 'column']
     # Projectors:
     projectors = request.args.get('projectors', 'value').split(',')
     # Functions:
-    options = bool(int(request.args.get('options', 1)))
+    ret_options = int(request.args.get('options', 2))
     groupby = parse_argument(request.args.get('groupby', None))
     aggregate = parse_argument(request.args.get('aggregate', None))
+
+    response = {'meta': {}}
 
     # Filters
     df = df_census
     logger.info('df len: %d', len(df))
     for f in filters:
-        #TODO:
-        #    Process a list of args
-        fval = parse_argument(request.args.getlist(f, None))
-        if fval:
-            df = df[df[f] == fval[0]]
+        fvals = parse_argument(request.args.getlist(f, None))
+        if fvals:
+            logger.info('filters %s: %s', f, fvals)
+            df = df[reduce(lambda a, b: a | (df[f] == b), fvals, 
+                pandas.Series([False] * len(df), index=df.index))]
         logger.info('df len: %d', len(df))
 
     # Options
-    if options:
-        options_list = response['options']
-        for f in filters:
-            options_list[f] = list(df[f].unique())
+    options = {}
+    for f in filters:
+        options[f] = list(df[f].unique())
 
     # Projectors
-    data = response['data']
+    data = {}
     for p in projectors:
         data[p] = list(df[p])
+
+    if ret_options == 0:
+        response['data'] = data
+    elif ret_options == 1:
+        response['options'] = options
+    else:
+        # assume ret_options == 2...
+        response['data'] = data
+        response['options'] = options
 
     response['meta']['success'] = True
     response['meta']['length'] = len(df)
