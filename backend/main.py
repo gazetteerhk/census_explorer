@@ -229,5 +229,5 @@ if __name__ == '__main__':
     # Run this script directly
     # NOTE: 
     #     Make debug=False in production
-    app.run(host="0.0.0.0", port=8080, debug=True)
+    app.run(host="0.0.0.0", port=8080)
     #app.run(host="0.0.0.0", port=8080, debug=False)
