@@ -14,6 +14,17 @@ angular.module('frontendApp')
     };
     $scope.newData();
 
+    $scope.indicators = [
+      {name: 'foo', identifier: 'bar'},
+      {name: 'bar', identifier: 'baz'}
+    ];
+
+    $scope.groups = [
+      {name: 'Both sexes', identifier: 'both'},
+      {name: 'Male', identifier: 'male'},
+      {name: 'Female', identifier: 'female'},
+    ];
+
     $scope.mapLevel = 'ca';
     $scope.theData = $scope.areaData;
   }]);
