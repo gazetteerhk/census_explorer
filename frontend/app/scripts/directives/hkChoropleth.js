@@ -44,6 +44,8 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
 
       // The zoom level after which areas are drawn
       var AREATHRESHOLD = 14;
+      // Fill level
+      var FILLOPACITY = 0.5;
 
       // Center object
       if (_.isUndefined($attrs.mapCenter)) {
@@ -89,7 +91,7 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
         var code = feature.properties.CACODE || feature.properties.DCCODE;
         var style = _.clone($scope._defaultStyle);
         style.fillColor = $scope._colors[$scope._colorScale($scope._getValueFromCode(code))];
-        style.fillOpacity = 0.3;
+        style.fillOpacity = FILLOPACITY;
         return style;
       };
 
@@ -146,7 +148,8 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
           .attr('class', 'key-symbol')
           .style('background-color', function(d) {
             return $scope._colors[d];
-          });
+          })
+          .style('opacity', FILLOPACITY);
 
         keys.append('span')
           .attr('class', 'key-label')
@@ -254,14 +257,6 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
     }],
     template: '<leaflet center="center" defaults="defaults" geojson="geojson"></leaflet>' +
       '<div class="map-overlay" ng-show="hoveredFeature">{{ hoveredFeature }} - {{ _getValueFromCode(hoveredFeature) }}</div>' +
-      '<div class="map-legend"></div>' +
-      '<span>{{ center }}</span>' +
-      '<pre>{{ mapLevel }}\n</pre>'
+      '<div class="map-legend"></div>'
   };
 });
-
-/*
- * Several things can trigger map redraws:
- *  - mapLevel - whether it shows areas or districts
- *  - mapData - if there are any changes to the data
- */

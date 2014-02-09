@@ -233,6 +233,6 @@ angular.module('frontendApp').directive('hkMap', function() {
 
     }],
     template: '<leaflet center="center" defaults="defaults" geojson="geojson"></leaflet>' +
-      '<div class="map-overlay" ng-show="hoveredFeature">{{ hoveredFeature }}</div><span>{{ center }}</span>'
+      '<div class="map-overlay" ng-show="hoveredFeature">{{ hoveredFeature }}</div>'
   }
 });
