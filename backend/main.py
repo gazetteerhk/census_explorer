@@ -72,15 +72,13 @@ def api():
     {
         data: [
             {
-                constituency_area: {
-                    name: string,
-                    code: string,
-                    district: string
-                },
-                table: string,
-                row: string,
-                column: string
-                value: float or None
+                region: [string, ...],
+                district: [string, ...],
+                area: [string, ...],
+                table: [string, ...],
+                row: [string, ...],
+                column: [string, ...],
+                value: [float, ...]
             },
             ...
         ],
@@ -95,16 +93,19 @@ def api():
     import time
     _time_start = time.time()
 
-    response = {'data': [], 'options': {}}
+    response = {'meta': {}, 'data': {}, 'options': {}}
 
     # Parse the arguments
     # Filters:
     filters = ['region', 'district', 'area', 'table', 'row', 'column']
+    # Projectors:
+    projectors = request.args.get('projectors', 'value').split(',')
     # Functions:
     options = bool(int(request.args.get('options', 1)))
     groupby = parse_argument(request.args.get('groupby', None))
     aggregate = parse_argument(request.args.get('aggregate', None))
 
+    # Filters
     df = df_census
     logger.info('df len: %d', len(df))
     for f in filters:
@@ -120,6 +121,14 @@ def api():
         options_list = response['options']
         for f in filters:
             options_list[f] = list(df[f].unique())
+
+    # Projectors
+    data = response['data']
+    for p in projectors:
+        data[p] = list(df[p])
+
+    response['meta']['success'] = True
+    response['meta']['length'] = len(df)
 
     logger.info('API process time: %s', time.time() - _time_start)
     return jsonify(response)
