@@ -5,3 +5,17 @@ scripts/data
 scripts/data-clean
 
 *.pyc
+
+# bower install
+bower_components
+# pip install
+build
+# grunt build
+dist
+
+backend/lib/*
+!backend/lib/README.md
+
+backend/index.yaml
+
+.grunt

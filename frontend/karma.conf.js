@@ -11,12 +11,32 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
+      'app/bower_components/jquery/jquery.js',
+      'app/bower_components/jasmine-jquery/lib/jasmine-jquery.js',
+      'app/bower_components/lodash/dist/lodash.compat.js',
       'app/bower_components/angular/angular.js',
       'app/bower_components/angular-mocks/angular-mocks.js',
+      'app/bower_components/angular-resource/angular-resource.js',
+      'app/bower_components/angular-cookies/angular-cookies.js',
+      'app/bower_components/angular-sanitize/angular-sanitize.js',
+      'app/bower_components/angular-route/angular-route.js',
+      'app/bower_components/angular-animate/angular-animate.js',
+      'app/bower_components/bootstrap/dist/js/bootstrap.js',
+      'app/bower_components/d3/d3.js',
+      'app/bower_components/dimple/dist/dimple.v1.1.3.js',
+      'app/bower_components/ng-i18next/dist/ng-i18next.js',
+      'app/bower_components/leaflet-dist/leaflet.js',
+      'app/bower_components/angular-leaflet-directive/dist/angular-leaflet-directive.js',
+      'app/bower_components/topojson/topojson.js',
       'app/scripts/*.js',
       'app/scripts/**/*.js',
       'test/mock/**/*.js',
-      'test/spec/**/*.js'
+      'test/spec/**/*.js',
+
+      // Fixtures
+      {pattern: 'app/scripts/geo/*.json', watched: true, included: false, served: true},
+      {pattern: 'app/scripts/mappings/*.json', watched: true, included: false, served: true},
+
     ],
 
     // list of files / patterns to exclude
@@ -42,7 +62,7 @@ module.exports = function(config) {
     // - Safari (only Mac)
     // - PhantomJS
     // - IE (only Windows)
-    browsers: ['Chrome'],
+    browsers: ['PhantomJS'],
 
 
     // Continuous Integration mode
