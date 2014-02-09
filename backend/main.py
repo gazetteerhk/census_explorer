@@ -47,6 +47,18 @@ def _project_dataframe(df, projectors):
         data[p] = list(df[p])
     return data
 
+def _agg_identity(df):
+    return df
+
+# To test the aggregate interface
+def _agg_first(df):
+    return df[:1]
+
+_agg_sum = _agg_identity
+_agg_median = _agg_identity
+_agg_min = _agg_identity
+_agg_max = _agg_identity
+
 @app.route('/api/')
 def api():
     """
@@ -119,7 +131,8 @@ def api():
         ret_options = ['data', 'groups', 'options']
     #NOTE: Can not parse_argument on it, or the str converts to a list
     groupby = request.args.get('groupby', None)
-    aggregate = parse_argument(request.args.get('aggregate', None))
+    #NOTE: Can not parse_argument on it, or the str converts to a list
+    aggregate = request.args.get('aggregate', None)
 
     response = {'meta': {}}
 
@@ -147,9 +160,19 @@ def api():
     # Groupby and Aggregate
     groups = {}
     if groupby:
+        if aggregate:
+            agg_func = {
+                    'sum': _agg_sum,
+                    'median': _agg_median,
+                    'max': _agg_max,
+                    'min': _agg_min,
+                    'first': _agg_first,
+                    }[aggregate]
+        else:
+            agg_func = _agg_identity
         df['groupby'] = df[groupby]
         for name, group in df.groupby(groupby):
-            groups[name] = _project_dataframe(group, projectors)
+            groups[name] = _project_dataframe(agg_func(group), projectors)
 
     if 'data' in ret_options:
         response['data'] = data
