@@ -1,13 +1,30 @@
 import collections
 import urllib
+import pandas
 from flask import Flask, jsonify, request
 
 app = Flask(__name__)
 
 import logging
+# From /scripts/logger.py
+logger = logging.getLogger('log')
+logger.setLevel(logging.DEBUG)
+log_formatter = logging.Formatter('%(asctime)s - %(module)s - %(levelname)s - %(message)s',
+                                          datefmt='%Y-%m-%d %H:%M:%S')
+# Log to console
+logstream = logging.StreamHandler()
+logstream.setLevel(logging.INFO)
+logstream.setFormatter(log_formatter)
+logger.addHandler(logstream)
+
+
+def _load_dataframe():
+    logger.info('Load combined census.csv')
+    return pandas.io.parsers.read_csv('data/combined/census.csv', dtype={'table': 'str'})
+df_census = _load_dataframe()
 
 @app.route('/')
-def hello_world():
+def index():
     return 'Census Explorer'
 
 def parse_argument(query_string):
@@ -23,8 +40,7 @@ def parse_argument(query_string):
     res = map(urllib.unquote_plus, query_string)
     return res
 
-
-@app.route('/api')
+@app.route('/api/')
 def api():
     """
     API Endpoint for accessing the data
@@ -76,87 +92,41 @@ def api():
 
     """
 
-    return jsonify({'test hub': 'OK'})
-
     import time
     _time_start = time.time()
 
+    response = {'data': [], 'options': {}}
+
     # Parse the arguments
-    ca = parse_argument(request.args.getlist('ca', None))
-    table = parse_argument(request.args.getlist('table', None))
-    row = parse_argument(request.args.getlist('row', None))
-    column = parse_argument(request.args.getlist('column', None))
-    options = bool(int(request.args.get('options', 0)))
+    # Filters:
+    filters = ['region', 'district', 'area', 'table', 'row', 'column']
+    # Functions:
+    options = bool(int(request.args.get('options', 1)))
+    groupby = parse_argument(request.args.get('groupby', None))
+    aggregate = parse_argument(request.args.get('aggregate', None))
 
-    ca_obj_cache = None
+    df = df_census
+    logger.info('df len: %d', len(df))
+    for f in filters:
+        #TODO:
+        #    Process a list of args
+        fval = parse_argument(request.args.getlist(f, None))
+        if fval:
+            df = df[df[f] == fval[0]]
+        logger.info('df len: %d', len(df))
 
-    # Incrementally build the query
-    query = models.Datapoint.query()
-    if ca is not None:
-        # constituency_area is a KeyProperty, so we need to retrieve these separately
-        # Need to keep these objects later for
-        ca_objs = models.ConstituencyArea.query(models.ConstituencyArea.code.IN(ca)).fetch()
-        ca_obj_cache = dict((x.code, x) for x in ca_objs)
-        ca_keys = [x.key for x in ca_objs]
-        query = query.filter(models.Datapoint.constituency_area.IN(ca_keys))
-    if table is not None:
-        query = query.filter(models.Datapoint.table.IN(table))
-    if row is not None:
-        query = query.filter(models.Datapoint.row.IN(row))
-    if column is not None:
-        query = query.filter(models.Datapoint.column.IN(column))
+    # Options
+    if options:
+        options_list = response['options']
+        for f in filters:
+            options_list[f] = list(df[f].unique())
 
-    res = {}
-
-    # If the query was filtered, then get the data
-    no_filters_provided = all([ca is None, table is None, row is None, column is None])
-    if not no_filters_provided:
-        data = [x.to_dict() for x in query.fetch()]
-        # Replace each constituency area with the actual entity
-        # If the ca argument was not provided, we need to get a fetch
-        if ca_obj_cache is None:
-            ca = set([x['constituency_area'].id() for x in data])
-            ca_objs = models.ConstituencyArea.query(models.ConstituencyArea.code.IN(list(ca))).fetch()
-            ca_obj_cache = dict((x.code, x) for x in ca_objs)
-        for d in data:
-            ca_code = d['constituency_area'].id()
-            d['constituency_area'] = ca_obj_cache[ca_code].to_dict()
-        res['data'] = data
-
-    if options or no_filters_provided:
-        option_res = {}
-
-        # Incrementally build the available options for other columns
-        # We need to do this after building the initial query, since we
-        # only want the options for columns that we didn't filter on
-
-        # This method issues four queries, but will return fewer results in cases
-        # When no filter parameters are provided.  Issuing one query with a projection
-        # Will return all combinations of the distinct values
-        if ca is None:
-            tmp = [x.constituency_area for x in models.Datapoint.query(filters=query._Query__filters, projection=['constituency_area'], distinct=True).fetch()]
-            tmp = models.ConstituencyArea.query(models.ConstituencyArea.key.IN(tmp))
-            option_res['ca'] = [x.code for x in tmp]
-        if table is None:
-            tmp = models.Datapoint.query(filters=query._Query__filters, projection=['table'], distinct=True).fetch()
-            option_res['table'] = [x.table for x in tmp]
-        if row is None:
-            tmp = models.Datapoint.query(filters=query._Query__filters, projection=['row'], distinct=True).fetch()
-            option_res['row'] = [x.row for x in tmp]
-        if column is None:
-            tmp = models.Datapoint.query(filters=query._Query__filters, projection=['column'], distinct=True).fetch()
-            option_res['column'] = [x.column for x in tmp]
-
-        res['options'] = option_res
-
-    res['meta'] = {}
-    res['meta']['execution_time'] = time.time() - _time_start
-
-    response = jsonify(**res)
-    # Add the cross site request header
-    response.headers["Access-Control-Allow-Origin"] = "*"
-
-    return response
+    logger.info('API process time: %s', time.time() - _time_start)
+    return jsonify(response)
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0")
+    # Run this script directly
+    # NOTE: 
+    #     Make debug=False in production
+    app.run(host="0.0.0.0", port=8080, debug=True)
+    #app.run(host="0.0.0.0", port=8080, debug=False)
