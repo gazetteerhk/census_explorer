@@ -9,6 +9,7 @@
  * @param {string} [height="300px"] Height of the map.
  * @param {class} class Use the class declaration to set width in Bootstrap column system.
  * @param {object} selectedItems Object that stores which elements in the map are selected
+ * @params {} singleSelect If this attribute is present, then only a single district or area is allowed to be selected at once
  *
  */
 
@@ -37,6 +38,8 @@ angular.module('frontendApp').directive('hkMap', function() {
         scrollWheelZoom: true,
         maxZoom: 18
       };
+
+      $scope._singleSelect = _.has($attrs, 'singleSelect');
 
       // The zoom level after which areas are drawn
       var AREATHRESHOLD = 14;
@@ -133,12 +136,16 @@ angular.module('frontendApp').directive('hkMap', function() {
           }
         });
       };
+
+      var _redrawMap = function() {
+         $scope.getMap().then(function(map){
+          _applyStylesToMap(map);
+        });
+      };
       // So instead, use a listener.
       $scope.$on('redrawMap', function() {
         console.log('redrawing map');
-        $scope.getMap().then(function(map){
-          _applyStylesToMap(map);
-        });
+        _redrawMap();
       });
 
       // Handlers for interaction
@@ -183,6 +190,16 @@ angular.module('frontendApp').directive('hkMap', function() {
       var clickHandler = function(e) {
         // If the object is an area:
         var code = _getLayerCode(e);
+
+        // If single select is turned on, then clear map state before doing anything else
+        if ($scope._singleSelect === true) {
+          // We use redraw map instead of directly removing the style on the last selected layer
+          // Also clearing the state early handles a couple edge cases, mostly involving zooming in to areas from districts
+          // - select district -> zoom in -> click on already selected area
+          // - select district -> zoom in -> select area
+          $scope.selectedAreas.clearSelected();
+          _redrawMap();
+        }
 
         if ($scope.selectedAreas.isSelected(code)) {
           // If the object is already selected, unselect it
