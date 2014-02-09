@@ -223,8 +223,11 @@ def api():
 
     response['meta']['success'] = True
 
+    res = jsonify(response) 
+    res.headers["Access-Control-Allow-Origin"] = "*"
+
     logger.info('API process time: %s', time.time() - _time_start)
-    return jsonify(response)
+    return res
 
 if __name__ == '__main__':
     # Run this script directly
