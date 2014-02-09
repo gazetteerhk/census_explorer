@@ -1,7 +1,7 @@
 'use strict';
 
 
-angular.module('frontendApp').factory('CensusAPI', ['$log', '$http', function($log, $http) {
+angular.module('frontendApp').factory('CensusAPI', ['$log', '$http', '$q', function($log, $http, $q) {
   var svc = {};
   svc.endpointURL = 'http://137.189.97.90:5901/api';
 
@@ -65,13 +65,24 @@ angular.module('frontendApp').factory('CensusAPI', ['$log', '$http', function($l
      * Promise object
      */
 
-    var promise = $http.get(svc.endpointURL, {params: this._filters});
+    var promise = $http.get(svc.endpointURL, {params: this._filters, cache: true});
 
     return promise;
   };
 
   Query.prototype.fetchOptions = function() {
+    /*
+     * Sends an options only request
+     */
 
+    var filters = _.clone(this._filters, true);
+    filters.return = ['options'];
+    var deferred = $q.defer();
+
+    $http.get(svc.endpointURL, {params: filters, cache: true}).success(function(data) {
+      deferred.resolve(data.options);
+    });
+    return deferred.promise;
   };
 
   svc.Query = Query;

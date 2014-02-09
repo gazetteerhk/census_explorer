@@ -12,6 +12,8 @@ describe("Services: CensusAPI", function() {
       $httpBackend = $injector.get('$httpBackend');
       $rootScope = $injector.get('$rootScope');
     });
+
+    $httpBackend.whenGET(CensusAPI.endpointURL).respond('');
   });
 
   it("instantiates with blank filters", function() {
@@ -83,5 +85,13 @@ describe("Services: CensusAPI", function() {
 
     q.addFilter('projector', 'row');
     expect(q._filters.projector).toEqual({area: true, row: true});
+  });
+
+  it("fetches and unpacks options", function() {
+
+  });
+
+  it("fetches and unpacks data", function() {
+
   });
 });
