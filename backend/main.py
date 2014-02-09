@@ -67,12 +67,10 @@ def api():
     column: column name
         Comma separated string of the columns.  Urlencoded - "male"
 
-    options: 0 or 1 or 2
-        0: data only
-        1: options only
-        2: both (default)
-
-        If there are no parameters provided, then options is 1 by default, and no data is returned
+    returns: [ret, ...]
+       * 'data'
+       * 'groups'
+       * 'options'
 
     Returns:
     --------
@@ -107,7 +105,7 @@ def api():
     # Projectors:
     projectors = request.args.get('projectors', 'value').split(',')
     # Functions:
-    ret_options = int(request.args.get('options', 2))
+    ret_options = request.args.get('returns', 'data,groups,options').split(',')
     #NOTE: Can not parse_argument on it, or the str converts to a list
     groupby = request.args.get('groupby', None)
     aggregate = parse_argument(request.args.get('aggregate', None))
@@ -142,17 +140,13 @@ def api():
         for name, group in df.groupby(groupby):
             groups[name] = _project_dataframe(group, projectors)
 
-    if ret_options == 0:
+    if 'data' in ret_options:
         response['data'] = data
+    if 'groups' in ret_options:
         response['groups'] = groups
-    elif ret_options == 1:
+    if 'options' in ret_options:
         response['options'] = options
-    else:
-        # assume ret_options == 2...
-        response['data'] = data
-        response['groups'] = groups
-        response['options'] = options
-            
+
     response['meta']['success'] = True
 
     logger.info('API process time: %s', time.time() - _time_start)
