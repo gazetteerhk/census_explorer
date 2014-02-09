@@ -2,12 +2,20 @@
 
 angular.module('frontendApp')
   .controller('TestCtrl', ['$scope', 'GeoMappings', '$http', function ($scope, GeoMappings, $http) {
-    // Generate some dummy data
 
-//    var url = 'http://137.189.97.90:5901/api/?aggregate=median&return=groups&return=options&groupby=area&table=18&column=n118_households&projector=value&projector=row';
-    var url = 'http://137.189.97.90:5901/api/?aggregate=median&return=groups&return=options&groupby=area&table=20&projector=value&projector=row';
-    $http.get(url).success(function(data){
-      console.log(data);
+$scope.refresh = function(){
+  console.log('indicator:');
+  console.log($scope.selectedIndicator);
+  //TODO:
+  //    An application scope configuration entry to store the server_prefix
+  var server_prefix = 'http://137.189.97.90:5901';
+  var url = server_prefix
+    + '/api/?return=groups&return=options&groupby=area&projector=value&projector=row'
+    + $scope.selectedIndicator;
+  console.log('refresh with url:' + url);
+
+  $http.get(url).success(function(data){
+    console.log(data);
         //NOTE:
         //    Do not plot by .value. They are just the min, max, median number.
         //    What we want to plot is .row, which are categorical information.
@@ -18,33 +26,28 @@ angular.module('frontendApp')
         for (var i=0; i < data.options.row.length; i++){
           m[data.options.row[i]] = i
         }
-      $scope.areaData =_.map(data.groups, function(area,k) {
-        var v = m[area.row[0]];
-        return {code: k, value: v};
-      }); 
-    });
-
-    // $scope.newData = function() {
-    //   $scope.districtData = _.map(GeoMappings.getAllDistricts(), function(district) {
-    //     return {code: district, value: Math.random() * 0};
-    //   });
-
-    //   $scope.areaData = _.map(GeoMappings.getAllAreas(), function(area){
-    //     return {code: area, value: Math.random() * 0};
-    //   });
-    // };
-    // $scope.newData();
+        $scope.areaData =_.map(data.groups, function(area,k) {
+          var v = m[area.row[0]];
+          //TODO:
+          //    suggest data structure:
+          //    - area: area
+          //    - value: a numerical level for coloring purpose
+          //    - name: the human readable category name, e.g. '>= 20000'.
+          //            Can be used in legend.
+          return {code: k, value: v};
+        }); 
+      });
+};
 
     $scope.indicators = [
-      {name: 'foo', identifier: 'bar'},
-      {name: 'bar', identifier: 'baz'}
+      {name: 'The median monthly income across areas?', identifier: '&table=18&column=n118_households&aggregate=median'},
+      {name: 'The mode (max frequency) of monthly income across areas?', identifier: '&table=18&column=n118_households&aggregate=max'},
+      {name: 'The median rental fee across area?', identifier: '&table=20&aggregate=median'}
     ];
 
-    $scope.groups = [
-      {name: 'Both sexes', identifier: 'both'},
-      {name: 'Male', identifier: 'male'},
-      {name: 'Female', identifier: 'female'},
-    ];
+    // init with one plot
+    $scope.selectedIndicator = '&table=18&column=n118_households&aggregate=median';
+    $scope.refresh();
 
     $scope.mapLevel = 'ca';
     $scope.theData = $scope.areaData;
