@@ -47,6 +47,17 @@ def _project_dataframe(df, projectors):
         data[p] = list(df[p])
     return data
 
+# Aggregation functions: --------------
+# Input: DataFrame
+# Output: DataFrame (1 row)
+
+#NOTE:
+#    1. Our datapoints are not usual pandas data points.
+#       Direct .aggregate on groups will not give what we want
+#    2. To write new aggregation functions, decorate it with 
+#       _agg_sorted_group to conform to the protocol, unless 
+#       you are sure that order does not matter
+
 def _agg_identity(df):
     return df
 
@@ -54,10 +65,38 @@ def _agg_identity(df):
 def _agg_first(df):
     return df[:1]
 
-_agg_sum = _agg_identity
-_agg_median = _agg_identity
-_agg_min = _agg_identity
-_agg_max = _agg_identity
+def _agg_sorted_group(func):
+    def wrapped(df):
+        return func(df.sort(columns=['row', 'column']))
+    return wrapped
+
+#@_agg_sorted_group
+def _agg_min(df):
+    return df[df['value'] == df['value'].min()]
+
+#@_agg_sorted_group
+def _agg_max(df):
+    return df[df['value'] == df['value'].max()]
+
+#@_agg_sorted_group
+def _agg_sum(df):
+    # Pick any row to convey the sum value
+    h = df[:1]
+    h['value'] = df['value'].sum()
+    return h
+
+@_agg_sorted_group
+def _agg_median(df):
+    s = df['value'].sum()
+    acc = 0.0
+    for i, row in df.iterrows():
+        acc += row['value']
+        if acc >= s / 2.0:
+            # Return DataFrame rather than Series
+            return pandas.DataFrame([tuple(row.values)], columns=list(row.index), index=[i])
+
+# -------------------------------------
+
 
 @app.route('/api/')
 def api():
