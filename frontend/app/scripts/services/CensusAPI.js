@@ -3,7 +3,15 @@
 
 angular.module('frontendApp').factory('CensusAPI', ['$log', '$http', function($log, $http) {
   var svc = {};
-  svc.endpointURL = 'http://golden-shine-471.appspot.com/api';
+  svc.endpointURL = 'http://137.189.97.90:5901/api';
+
+  svc._baseFilters = {
+    area: {},
+    table: {},
+    column: {},
+    row: {},
+    projector: {}
+  };
 
   var Query = function(filters) {
     /*
@@ -12,44 +20,40 @@ angular.module('frontendApp').factory('CensusAPI', ['$log', '$http', function($l
      *
      * If constructor is passed an object, then that becomes the filters
      */
-    if (_.isObject(filters)) {
-      this._filters = _.clone(filters);
+
+    this._filters = _.clone(svc._baseFilters, true);
+
+    if (!_.isUndefined(filters)) {
+      this.addFilter(filters);
+    }
+  };
+
+  var _isValidField = function(field) {
+    var valid_fields = ['area', 'district', 'region', 'table', 'column', 'row', 'projector'];
+    if (_.indexOf(valid_fields, field) === -1) {
+      throw String(field) + " is not a valid field for filtering";
+    }
+  };
+
+  Query.prototype._addSingleFieldFilter = function(field, values) {
+    _isValidField(field);
+    if (_.isArray(values)) {
+      _.forEach(values, function(val) {
+        this._filters[field][val] = true;
+      }, this);
     } else {
-      this._filters = {
-        ca: [],
-        table: [],
-        column: [],
-        row: []
-      };
+      this._filters[field][values] = true;
     }
   };
 
   Query.prototype.addFilter = function(field, values) {
-    /*
-     * Adds a filter to query object
-     * The field determines which field to filter on, and values is appended to the internal filter hash for that field
-     *
-     * Arguments:
-     * ----------
-     * field: string, 'ca', 'table', 'column', or 'row
-     * values: array of strings, or string
-     *
-     * Returns: null
-     */
-
-    var valid_fields = ['ca', 'table', 'column', 'row'];
-    if (_.indexOf(valid_fields, field) === -1) {
-      throw String(field) + "is not a valid field for filtering";
-    }
-
-    if (_.isArray(values)) {
-      // Concatenate the array
-      this._filters[field] = _.union(this._filters[field], values);
+    if (_.isPlainObject(field)) {
+      _.forOwn(field, function(vals, f) {
+        this._addSingleFieldFilter.apply(this, [f, vals]);
+      }, this);
     } else {
-      this._filters[field] = _.union(this._filters[field], [values]);
+      this._addSingleFieldFilter(field, values);
     }
-
-    $log.debug(this._filters);
   };
 
   Query.prototype.fetch = function() {
@@ -58,12 +62,16 @@ angular.module('frontendApp').factory('CensusAPI', ['$log', '$http', function($l
      *
      * Returns:
      * --------
-     * Promise object encapsulating
+     * Promise object
      */
 
     var promise = $http.get(svc.endpointURL, {params: this._filters});
 
     return promise;
+  };
+
+  Query.prototype.fetchOptions = function() {
+
   };
 
   svc.Query = Query;
