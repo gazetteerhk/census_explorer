@@ -1,19 +1,29 @@
 'use strict';
 
 angular.module('frontendApp')
-  .controller('TestCtrl', ['$scope', 'GeoMappings', '$http', function ($scope, GeoMappings, $http) {
+  .controller('TestCtrl', ['$scope', 'GeoMappings', '$http', 'CensusAPI', function ($scope, GeoMappings, $http, CensusAPI) {
 
     $scope.refresh = function(){
       console.log('indicator:');
       console.log($scope.selectedIndicator);
       //TODO:
       //    An application scope configuration entry to store the server_prefix
-      var server_prefix = 'http://192.168.222.3:8080';
-      var url = server_prefix
-        + '/api/?return=groups&return=options&groupby=area&projector=value&projector=row'
-        + $scope.selectedIndicator;
-      console.log('refresh with url:' + url);
 
+      var query = new CensusAPI.Query({
+        projector: ['area', 'value', 'row'],
+        return: ['data', 'groups'],
+        groupby: 'area'
+      });
+      query.addParam($scope.selectedIndicator);
+
+      console.log("query filters:");
+      console.log(query._filters);
+
+      query.fetch().then(function(data) {
+        console.log(data);
+      });
+
+      /*
       $http.get(url).success(function(data){
         console.log(data);
         //NOTE:
@@ -37,16 +47,17 @@ angular.module('frontendApp')
           return {area: k, value: v};
         });
       });
+      */
     };
 
     $scope.indicators = [
-      {name: 'The median monthly income across areas?', identifier: '&table=18&column=n118_households&aggregate=median'},
-      {name: 'The mode (max frequency) of monthly income across areas?', identifier: '&table=18&column=n118_households&aggregate=max'},
-      {name: 'The median rental fee across area?', identifier: '&table=20&aggregate=median'}
+      {name: 'The median monthly income across areas?', identifier: {table: 18, column: 'n118_households', aggregate: 'median'}},
+      {name: 'The mode (max frequency) of monthly income across areas?', identifier: {table: 18, column: 'n118_households', aggregate: 'max'}},
+      {name: 'The median rental fee across area?', identifier: {table: 20, aggregate: 'median'}}
     ];
 
     // init with one plot
-    $scope.selectedIndicator = '&table=18&column=n118_households&aggregate=median';
+    $scope.selectedIndicator = $scope.indicators[0].identifier;
     $scope.refresh();
 
     $scope.mapLevel = 'ca';

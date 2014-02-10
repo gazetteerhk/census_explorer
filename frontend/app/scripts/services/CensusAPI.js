@@ -3,7 +3,8 @@
 
 angular.module('frontendApp').factory('CensusAPI', ['$log', '$http', '$q', function($log, $http, $q) {
   var svc = {};
-  svc.endpointURL = 'http://137.189.97.90:5901/api';
+//  svc.endpointURL = 'http://137.189.97.90:5901/api';
+  svc.endpointURL = 'http://192.168.222.3:8080/api/';
 
   svc._baseFilters = {
     area: {},
@@ -11,11 +12,12 @@ angular.module('frontendApp').factory('CensusAPI', ['$log', '$http', '$q', funct
     column: {},
     row: {},
     projector: {},
-    options: {},
-    groupBy: {}
+    return: {},
+    groupby: {},
+    aggregate: {}
   };
 
-  svc._joinData = function(data) {
+  svc.joinData = function(data) {
     /*
      * Given a data hash of structure
      * {
@@ -70,7 +72,7 @@ angular.module('frontendApp').factory('CensusAPI', ['$log', '$http', '$q', funct
   var _isValidParam = function(param) {
     var valid_fields = _.keys(svc._baseFilters);
     if (_.indexOf(valid_fields, param) === -1) {
-      throw String(param) + " is not a valid parameter";
+      throw '[CensusAPI]: "' + String(param) + '" is not a valid parameter';
     }
   };
 
@@ -99,6 +101,16 @@ angular.module('frontendApp').factory('CensusAPI', ['$log', '$http', '$q', funct
     }
   };
 
+  var _prepFilters = function(filters) {
+    /*
+     * Converts objects in the filters dictionary to arrays, so that they can be changed to a query string by $http
+     */
+
+    return _.mapValues(filters, function(val) {
+      return _.keys(val);
+    });
+  };
+
   Query.prototype.fetch = function() {
     /*
      * Sends the request to the API with the provided filters
@@ -108,9 +120,12 @@ angular.module('frontendApp').factory('CensusAPI', ['$log', '$http', '$q', funct
      * Promise object
      */
 
-    var promise = $http.get(svc.endpointURL, {params: this._filters, cache: true});
+    var deferred = $q.defer();
+    $http.get(svc.endpointURL, {params: _prepFilters(this._filters), cache: true}).then(function(res) {
+      deferred.resolve(res.data);
+    });
 
-    return promise;
+    return deferred.promise;
   };
 
   Query.prototype.clone = function() {
