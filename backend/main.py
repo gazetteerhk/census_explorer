@@ -2,9 +2,11 @@ import collections
 import urllib
 import pandas
 import numpy
+import os
 from flask import Flask, jsonify, request
+from flask import redirect, url_for
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='/_static', static_folder='static')
 
 import logging
 # From /scripts/logger.py
@@ -228,6 +230,19 @@ def api():
 
     logger.info('API process time: %s', time.time() - _time_start)
     return res
+
+@app.route('/static/<path:path>')
+def custom_static(path):
+    # Add index for easier navigation
+    #TODO:
+    #    This is a hack to serve index files.
+    #    Find a better way.
+    if path.endswith('/'):
+        path = os.path.join(path, 'index.html')
+    fullpath = os.path.join('static', path)
+    if os.path.isdir(fullpath):
+        return redirect(fullpath + '/')
+    return app.send_static_file(path)
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=8080, debug=False)
