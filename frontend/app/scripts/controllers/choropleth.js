@@ -5,11 +5,11 @@ angular.module('frontendApp')
     // Generate some dummy data
     $scope.newData = function() {
       $scope.districtData = _.map(GeoMappings.getAllDistricts(), function(district) {
-        return {code: district, value: Math.random() * 100};
+        return {area: district, value: Math.random() * 100};
       });
 
       $scope.areaData = _.map(GeoMappings.getAllAreas(), function(area){
-        return {code: area, value: Math.random() * 100};
+        return {area: area, value: Math.random() * 100};
       });
     };
     $scope.newData();

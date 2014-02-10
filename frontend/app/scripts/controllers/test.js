@@ -3,19 +3,19 @@
 angular.module('frontendApp')
   .controller('TestCtrl', ['$scope', 'GeoMappings', '$http', function ($scope, GeoMappings, $http) {
 
-$scope.refresh = function(){
-  console.log('indicator:');
-  console.log($scope.selectedIndicator);
-  //TODO:
-  //    An application scope configuration entry to store the server_prefix
-  var server_prefix = 'http://137.189.97.90:5901';
-  var url = server_prefix
-    + '/api/?return=groups&return=options&groupby=area&projector=value&projector=row'
-    + $scope.selectedIndicator;
-  console.log('refresh with url:' + url);
+    $scope.refresh = function(){
+      console.log('indicator:');
+      console.log($scope.selectedIndicator);
+      //TODO:
+      //    An application scope configuration entry to store the server_prefix
+      var server_prefix = 'http://137.189.97.90:5901';
+      var url = server_prefix
+        + '/api/?return=groups&return=options&groupby=area&projector=value&projector=row'
+        + $scope.selectedIndicator;
+      console.log('refresh with url:' + url);
 
-  $http.get(url).success(function(data){
-    console.log(data);
+      $http.get(url).success(function(data){
+        console.log(data);
         //NOTE:
         //    Do not plot by .value. They are just the min, max, median number.
         //    What we want to plot is .row, which are categorical information.
@@ -34,10 +34,10 @@ $scope.refresh = function(){
           //    - value: a numerical level for coloring purpose
           //    - name: the human readable category name, e.g. '>= 20000'.
           //            Can be used in legend.
-          return {code: k, value: v};
-        }); 
+          return {area: k, value: v};
+        });
       });
-};
+    };
 
     $scope.indicators = [
       {name: 'The median monthly income across areas?', identifier: '&table=18&column=n118_households&aggregate=median'},

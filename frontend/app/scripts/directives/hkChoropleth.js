@@ -90,7 +90,7 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
       var featureStyler = function(feature) {
         var code = feature.properties.CACODE || feature.properties.DCCODE;
         var style = _.clone($scope._defaultStyle);
-        style.fillColor = $scope._colors[$scope._colorScale($scope._getValueFromCode(code))];
+        style.fillColor = $scope._colors[$scope._colorScale($scope._getValueFromArea(code))];
         style.fillOpacity = FILLOPACITY;
         return style;
       };
@@ -117,7 +117,7 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
         // Also store a dict for looking up data
         $scope._mapDataHash = {};
         _.forEach($scope._mapData, function(val) {
-          $scope._mapDataHash[val.code] = val.value;
+          $scope._mapDataHash[val.area] = val.value;
         });
 
         $scope._colorScale = d3.scale.quantize()
@@ -160,12 +160,12 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
       };
 
       // Accessor for _mapDataHash that handles lowercasing
-      $scope._getValueFromCode = function(code) {
-        if (_.isUndefined(code)) {
+      $scope._getValueFromArea = function(area) {
+        if (_.isUndefined(area)) {
          return;
         }
-        code = code.toLowerCase();
-        return $scope._mapDataHash[code];
+        area = area.toLowerCase();
+        return $scope._mapDataHash[area];
       };
 
       var _applyStylesToMap = function(map) {
@@ -256,7 +256,7 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
       });
     }],
     template: '<leaflet center="center" defaults="defaults" geojson="geojson"></leaflet>' +
-      '<div class="map-overlay" ng-show="hoveredFeature">{{ hoveredFeature }} - {{ _getValueFromCode(hoveredFeature) }}</div>' +
+      '<div class="map-overlay" ng-show="hoveredFeature">{{ hoveredFeature }} - {{ _getValueFromArea(hoveredFeature) }}</div>' +
       '<div class="map-legend"></div>'
   };
 });
