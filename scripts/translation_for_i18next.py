@@ -1,5 +1,6 @@
 import config
 import sh
+import os
 from os import path
 import json
 
@@ -18,6 +19,7 @@ sources = [
 
 def gen_one_language(sources, lang_code, fn_output):
     d =  {}
+    sh.mkdir('-p', os.path.dirname(fn_output))
     for (name, path) in sources:
         j = json.load(open(path))
         identifiers = j.keys()
@@ -27,8 +29,12 @@ def gen_one_language(sources, lang_code, fn_output):
     json.dump(d, open(fn_output, 'w'))
     return d
 
+def main():
+    gen_one_language(sources, 'E', path.join(config.DIR_TRANSLATION, 'en_US', 'translation.json'))
+    gen_one_language(sources, 'E', path.join(config.DIR_TRANSLATION, 'dev', 'translation.json'))
+    gen_one_language(sources, 'S', path.join(config.DIR_TRANSLATION, 'zh_CN', 'translation.json'))
+    gen_one_language(sources, 'T', path.join(config.DIR_TRANSLATION, 'zh_HK', 'translation.json'))
+    gen_one_language(sources, 'T', path.join(config.DIR_TRANSLATION, 'zh_TW', 'translation.json'))
+
 if __name__ == '__main__':
-    gen_one_language(sources, 'E', path.join(config.DIR_TRANSLATION, 'en_US.json'))
-    gen_one_language(sources, 'S', path.join(config.DIR_TRANSLATION, 'zh_CN.json'))
-    gen_one_language(sources, 'T', path.join(config.DIR_TRANSLATION, 'zh_HK.json'))
-    gen_one_language(sources, 'T', path.join(config.DIR_TRANSLATION, 'zh_TW.json'))
+    main()
