@@ -18,6 +18,10 @@ angular.module('frontendApp', [
         templateUrl: 'views/main.html',
         controller: 'MainCtrl'
       })
+      .when('/test', {
+        templateUrl: 'views/test.html',
+        controller: 'TestCtrl'
+      })
       .when('/about', {
         templateUrl: 'views/about.html',
         controller: 'AboutCtrl'
