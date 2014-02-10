@@ -1,100 +1,32 @@
 import collections
-from flask import Flask, jsonify, request
-import models
 import urllib
-from google.appengine.api import memcache
-import hashlib
+import pandas
+import numpy
+from flask import Flask, jsonify, request
 
 app = Flask(__name__)
 
 import logging
+# From /scripts/logger.py
+logger = logging.getLogger('log')
+logger.setLevel(logging.DEBUG)
+log_formatter = logging.Formatter('%(asctime)s - %(module)s - %(levelname)s - %(message)s',
+                                          datefmt='%Y-%m-%d %H:%M:%S')
+# Log to console
+logstream = logging.StreamHandler()
+logstream.setLevel(logging.INFO)
+logstream.setFormatter(log_formatter)
+logger.addHandler(logstream)
 
-from models import Admin
+
+def _load_dataframe():
+    logger.info('Load combined census.csv')
+    return pandas.io.parsers.read_csv('data/combined/census.csv', dtype={'table': 'str'})
+df_census = _load_dataframe()
 
 @app.route('/')
-def hello_world():
+def index():
     return 'Census Explorer'
-
-def require_admin(func):
-    def decorated(*args, **kwargs):
-        r = list(Admin.query(Admin.name=='admin'))
-        if len(r) == 0 or (r[0].enabled == True and r[0].token == request.args.get('token', None)):
-            # len(r) == 0: init admin
-            return func(*args, **kwargs)
-        else:
-            return "404"
-    # Without the following line, you will see the error:
-    #   "View function mapping is overwriting an existing endpoint"
-    decorated.__name__ = func.__name__
-    return decorated
-
-def cache_it(func):
-    def decorated(*args, **kwargs):
-        #logging.warning((request.query_string))
-        key = hashlib.md5((request.path + request.query_string).encode('utf-8')).hexdigest()
-        logging.warning('key: %s', key)
-        res = memcache.get(key)
-        if not res:
-            cache_time = 300
-            res = func(*args, **kwargs)
-            memcache.add(key, res, cache_time)
-        return res
-    decorated.__name__ = func.__name__
-    return decorated
-
-@app.route('/_admin/init/')
-@require_admin
-def admin_init():
-    import random
-    admin = Admin(id="0", enabled=True, name='admin',
-            token=hashlib.md5(str(random.random()).encode('utf-8')).hexdigest()[:16])
-    admin.put()
-    return 'OK'
-
-@app.route('/upload/<constituency_area>/<sheet_name>/<table>/', methods = ['POST'])
-@require_admin
-def upload(constituency_area, sheet_name, table):
-    import json
-    from models import *
-    #logging.warning(str(request.data))
-    # request.data contains the raw HTTP request body IFF Flask does not know the type...
-    data = json.loads(str(request.data))
-    first_column_name = data['meta']['first_column_name']
-    table_name = data['meta']['name']
-    for d in data['data']:
-        row = d.pop(first_column_name)
-        for (k, v) in d.items():
-            constituency_area = constituency_area.lower()
-            language = {'sheet0': u'traditional',
-                    'sheet1': u'simplified',
-                    'sheet2': u'english'}[sheet_name]
-            table = table_name #.decode('utf-8')
-            column = k.strip() #.decode('utf-8')
-            row = row.strip() #.decode('utf-8')
-            value = v
-            _info = (constituency_area, language, table, row, column, value)
-            #logging.warning(str(_info))
-            ok = True
-
-            if value == u'':
-                # missing value
-                ok = False
-
-            if ok:
-                _id = hashlib.md5((u'%s %s %s %s %s %s' % _info).encode('utf-8')).hexdigest()
-                constituency_area_key = list(ConstituencyArea.query(ConstituencyArea.code == constituency_area))[0].key
-                #logging.warning(constituency_area_key)
-                dp = Datapoint(id=_id, 
-                        constituency_area=constituency_area_key,
-                        language=language,
-                        table=table,
-                        column=column,
-                        row=row,
-                        value=value)
-                #logging.warning(dp)
-                dp.put()
-    return "OK"
-
 
 def parse_argument(query_string):
     """
@@ -109,9 +41,64 @@ def parse_argument(query_string):
     res = map(urllib.unquote_plus, query_string)
     return res
 
+def _project_dataframe(df, projectors):
+    data = {}
+    for p in projectors:
+        data[p] = list(df[p])
+    return data
 
-@app.route('/api')
-@cache_it
+# Aggregation functions: --------------
+# Input: DataFrame
+# Output: DataFrame (1 row)
+
+#NOTE:
+#    1. Our datapoints are not usual pandas data points.
+#       Direct .aggregate on groups will not give what we want
+#    2. To write new aggregation functions, decorate it with 
+#       _agg_sorted_group to conform to the protocol, unless 
+#       you are sure that order does not matter
+
+def _agg_identity(df):
+    return df
+
+# To test the aggregate interface
+def _agg_first(df):
+    return df[:1]
+
+def _agg_sorted_group(func):
+    def wrapped(df):
+        return func(df.sort(columns=['row', 'column']))
+    return wrapped
+
+#@_agg_sorted_group
+def _agg_min(df):
+    return df[df['value'] == df['value'].min()]
+
+#@_agg_sorted_group
+def _agg_max(df):
+    return df[df['value'] == df['value'].max()]
+
+#@_agg_sorted_group
+def _agg_sum(df):
+    # Pick any row to convey the sum value
+    h = df[:1]
+    h['value'] = df['value'].sum()
+    return h
+
+@_agg_sorted_group
+def _agg_median(df):
+    s = df['value'].sum()
+    acc = 0.0
+    for i, row in df.iterrows():
+        acc += row['value']
+        if acc >= s / 2.0:
+            # Return DataFrame rather than Series
+            return pandas.DataFrame([tuple(row.values)], columns=list(row.index), index=[i])
+
+# -------------------------------------
+
+
+@app.route('/api/')
 def api():
     """
     API Endpoint for accessing the data
@@ -119,7 +106,11 @@ def api():
 
     Arguments:
     ----------
-    ca: constituency areas
+    region:
+
+    district:
+
+    area: constituency areas
         Comma separated string of CA codes -- "a01,a02", etc.
 
     table: table name
@@ -131,11 +122,13 @@ def api():
     column: column name
         Comma separated string of the columns.  Urlencoded - "male"
 
-    options: 0 or 1
-        If options 1, then the response also includes an "options" key that
-        lists the possible values for unspecified columns to further narrow the data down
+    return: [ret, ...]
+       * 'data'
+       * 'groups'
+       * 'options'
 
-        If there are no parameters provided, then options is 1 by default, and no data is returned
+    projector: 
+       * same as filters
 
     Returns:
     --------
@@ -143,15 +136,13 @@ def api():
     {
         data: [
             {
-                constituency_area: {
-                    name: string,
-                    code: string,
-                    district: string
-                },
-                table: string,
-                row: string,
-                column: string
-                value: float or None
+                region: [string, ...],
+                district: [string, ...],
+                area: [string, ...],
+                table: [string, ...],
+                row: [string, ...],
+                column: [string, ...],
+                value: [float, ...]
             },
             ...
         ],
@@ -162,86 +153,81 @@ def api():
 
 
     """
+
     import time
     _time_start = time.time()
 
-
     # Parse the arguments
-    ca = parse_argument(request.args.getlist('ca', None))
-    table = parse_argument(request.args.getlist('table', None))
-    row = parse_argument(request.args.getlist('row', None))
-    column = parse_argument(request.args.getlist('column', None))
-    options = bool(int(request.args.get('options', 0)))
+    # Filters:
+    filters = ['region', 'district', 'area', 'table', 'row', 'column']
+    # Projectors:
+    projectors = parse_argument(request.args.getlist('projector', None))
+    if not projectors:
+        projectors = ['value']
+    # Functions:
+    ret_options = parse_argument(request.args.getlist('return', None))
+    if not ret_options:
+        #ret_options = ['data', 'groups', 'options']
+        ret_options = []
+    #NOTE: Can not parse_argument on it, or the str converts to a list
+    groupby = request.args.get('groupby', None)
+    #NOTE: Can not parse_argument on it, or the str converts to a list
+    aggregate = request.args.get('aggregate', None)
 
-    ca_obj_cache = None
+    response = {'meta': {}}
 
-    # Incrementally build the query
-    query = models.Datapoint.query()
-    if ca is not None:
-        # constituency_area is a KeyProperty, so we need to retrieve these separately
-        # Need to keep these objects later for
-        ca_objs = models.ConstituencyArea.query(models.ConstituencyArea.code.IN(ca)).fetch()
-        ca_obj_cache = dict((x.code, x) for x in ca_objs)
-        ca_keys = [x.key for x in ca_objs]
-        query = query.filter(models.Datapoint.constituency_area.IN(ca_keys))
-    if table is not None:
-        query = query.filter(models.Datapoint.table.IN(table))
-    if row is not None:
-        query = query.filter(models.Datapoint.row.IN(row))
-    if column is not None:
-        query = query.filter(models.Datapoint.column.IN(column))
+    # Filters
+    df = df_census
+    logger.info('start filtering. df len: %d', len(df))
+    for f in filters:
+        fvals = parse_argument(request.args.getlist(f, None))
+        if fvals:
+            df = df[reduce(lambda a, b: a | (df[f] == b), fvals, 
+                pandas.Series([False] * len(df), index=df.index))]
+            logger.info('filters %s: %s', f, fvals)
+            logger.info('df len: %d', len(df))
 
-    res = {}
+    response['meta']['length'] = len(df)
 
-    # If the query was filtered, then get the data
-    no_filters_provided = all([ca is None, table is None, row is None, column is None])
-    if not no_filters_provided:
-        data = [x.to_dict() for x in query.fetch()]
-        # Replace each constituency area with the actual entity
-        # If the ca argument was not provided, we need to get a fetch
-        if ca_obj_cache is None:
-            ca = set([x['constituency_area'].id() for x in data])
-            ca_objs = models.ConstituencyArea.query(models.ConstituencyArea.code.IN(list(ca))).fetch()
-            ca_obj_cache = dict((x.code, x) for x in ca_objs)
-        for d in data:
-            ca_code = d['constituency_area'].id()
-            d['constituency_area'] = ca_obj_cache[ca_code].to_dict()
-        res['data'] = data
+    # Options
+    options = {}
+    for f in filters:
+        options[f] = list(df[f].unique())
 
-    if options or no_filters_provided:
-        option_res = {}
+    # Projectors
+    data = _project_dataframe(df, projectors)
 
-        # Incrementally build the available options for other columns
-        # We need to do this after building the initial query, since we
-        # only want the options for columns that we didn't filter on
+    # Groupby and Aggregate
+    groups = {}
+    if groupby:
+        if aggregate:
+            agg_func = {
+                    'sum': _agg_sum,
+                    'median': _agg_median,
+                    'max': _agg_max,
+                    'min': _agg_min,
+                    'first': _agg_first,
+                    }[aggregate]
+        else:
+            agg_func = _agg_identity
+        df['groupby'] = df[groupby]
+        for name, group in df.groupby(groupby):
+            groups[name] = _project_dataframe(agg_func(group), projectors)
 
-        # This method issues four queries, but will return fewer results in cases
-        # When no filter parameters are provided.  Issuing one query with a projection
-        # Will return all combinations of the distinct values
-        if ca is None:
-            tmp = [x.constituency_area for x in models.Datapoint.query(filters=query._Query__filters, projection=['constituency_area'], distinct=True).fetch()]
-            tmp = models.ConstituencyArea.query(models.ConstituencyArea.key.IN(tmp))
-            option_res['ca'] = [x.code for x in tmp]
-        if table is None:
-            tmp = models.Datapoint.query(filters=query._Query__filters, projection=['table'], distinct=True).fetch()
-            option_res['table'] = [x.table for x in tmp]
-        if row is None:
-            tmp = models.Datapoint.query(filters=query._Query__filters, projection=['row'], distinct=True).fetch()
-            option_res['row'] = [x.row for x in tmp]
-        if column is None:
-            tmp = models.Datapoint.query(filters=query._Query__filters, projection=['column'], distinct=True).fetch()
-            option_res['column'] = [x.column for x in tmp]
+    if 'data' in ret_options:
+        response['data'] = data
+    if 'groups' in ret_options:
+        response['groups'] = groups
+    if 'options' in ret_options:
+        response['options'] = options
 
-        res['options'] = option_res
+    response['meta']['success'] = True
 
-    res['meta'] = {}
-    res['meta']['execution_time'] = time.time() - _time_start
+    res = jsonify(response) 
+    res.headers["Access-Control-Allow-Origin"] = "*"
 
-    response = jsonify(**res)
-    # Add the cross site request header
-    response.headers["Access-Control-Allow-Origin"] = "*"
-
-    return response
+    logger.info('API process time: %s', time.time() - _time_start)
+    return res
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0")
+    app.run(host="0.0.0.0", port=8080, debug=False)

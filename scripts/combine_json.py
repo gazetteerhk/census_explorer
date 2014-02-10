@@ -26,7 +26,7 @@ def json_to_data_points(args):
             # NOTE: 
             #    * 0 is meaningful and we will keep it.
             #    * 0 visually appears as '-' in original XLS file.
-            if value != '':
+            if value != '' and (not 'none' in row):
                 datapoints.append((region, district, area, table, row, column, value))
     logger.info('Add %s values from %s', len(datapoints), filename)
     return datapoints
