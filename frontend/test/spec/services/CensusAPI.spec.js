@@ -50,7 +50,7 @@ describe("Services: CensusAPI", function() {
   it("add single field filter", function() {
     q = new CensusAPI.Query();
 
-    q.addFilter('area', 'a01');
+    q.addParam('area', 'a01');
 
     var res = _.assign(_.clone(CensusAPI._baseFilters, true), {area: {a01: true}});
     expect(q._filters).toEqual(res);
@@ -59,7 +59,7 @@ describe("Services: CensusAPI", function() {
   it("add single field, multiple value filter", function() {
     q = new CensusAPI.Query();
 
-    q.addFilter('area', ['a01', 'a02']);
+    q.addParam('area', ['a01', 'a02']);
 
     var res = _.assign(_.clone(CensusAPI._baseFilters, true), {area: {a01: true, a02: true}});
     expect(q._filters).toEqual(res);
@@ -71,7 +71,7 @@ describe("Services: CensusAPI", function() {
     };
     q = new CensusAPI.Query();
 
-    q.addFilter(filter);
+    q.addParam(filter);
 
     var res = _.assign(_.clone(CensusAPI._baseFilters, true), {area: {a01: true, b01: true}});
     expect(q._filters).toEqual(res);
@@ -80,18 +80,24 @@ describe("Services: CensusAPI", function() {
   it("add projector", function() {
     q = new CensusAPI.Query();
 
-    q.addFilter('projector', 'area');
+    q.addParam('projector', 'area');
     expect(q._filters.projector).toEqual({area: true});
 
-    q.addFilter('projector', 'row');
+    q.addParam('projector', 'row');
     expect(q._filters.projector).toEqual({area: true, row: true});
   });
 
-  it("fetches and unpacks options", function() {
+  it("clones itself", function() {
+    var filter = {
+      area: ['a01', 'b01']
+    };
+    var q1 = new CensusAPI.Query(filter);
+    var q2 = q1.clone();
 
+    expect(q1._filters).not.toBe(q2._filters);
+    expect(q1._filters).toEqual(q2._filters);
+    q2.addParam('table', 0);
+    expect(q1._filters).not.toEqual(q2._filters);
   });
 
-  it("fetches and unpacks data", function() {
-
-  });
 });

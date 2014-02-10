@@ -10,7 +10,9 @@ angular.module('frontendApp').factory('CensusAPI', ['$log', '$http', '$q', funct
     table: {},
     column: {},
     row: {},
-    projector: {}
+    projector: {},
+    options: {},
+    groupBy: {}
   };
 
   var Query = function(filters) {
@@ -24,35 +26,39 @@ angular.module('frontendApp').factory('CensusAPI', ['$log', '$http', '$q', funct
     this._filters = _.clone(svc._baseFilters, true);
 
     if (!_.isUndefined(filters)) {
-      this.addFilter(filters);
+      this.addParam(filters);
     }
   };
 
-  var _isValidField = function(field) {
-    var valid_fields = ['area', 'district', 'region', 'table', 'column', 'row', 'projector'];
-    if (_.indexOf(valid_fields, field) === -1) {
-      throw String(field) + " is not a valid field for filtering";
+  var _isValidParam = function(param) {
+    var valid_fields = _.keys(svc._baseFilters);
+    if (_.indexOf(valid_fields, param) === -1) {
+      throw String(param) + " is not a valid parameter";
     }
   };
 
-  Query.prototype._addSingleFieldFilter = function(field, values) {
-    _isValidField(field);
+  Query.prototype._addSingleParam = function(param, values) {
+    _isValidParam(param);
     if (_.isArray(values)) {
       _.forEach(values, function(val) {
-        this._filters[field][val] = true;
+        this._filters[param][val] = true;
+      }, this);
+    } else if (_.isPlainObject(values)) {
+      _.forEach(_.keys(values), function(val) {
+        this._filters[param][val] = true;
       }, this);
     } else {
-      this._filters[field][values] = true;
+      this._filters[param][values] = true;
     }
   };
 
-  Query.prototype.addFilter = function(field, values) {
-    if (_.isPlainObject(field)) {
-      _.forOwn(field, function(vals, f) {
-        this._addSingleFieldFilter.apply(this, [f, vals]);
+  Query.prototype.addParam = function(param, values) {
+    if (_.isPlainObject(param)) {
+      _.forOwn(param, function(vals, f) {
+        this._addSingleParam.apply(this, [f, vals]);
       }, this);
     } else {
-      this._addSingleFieldFilter(field, values);
+      this._addSingleParam(param, values);
     }
   };
 
@@ -70,19 +76,12 @@ angular.module('frontendApp').factory('CensusAPI', ['$log', '$http', '$q', funct
     return promise;
   };
 
-  Query.prototype.fetchOptions = function() {
+  Query.prototype.clone = function() {
     /*
-     * Sends an options only request
+     * Returns a new Query instance with a copy of the parameters
      */
 
-    var filters = _.clone(this._filters, true);
-    filters.return = ['options'];
-    var deferred = $q.defer();
-
-    $http.get(svc.endpointURL, {params: filters, cache: true}).success(function(data) {
-      deferred.resolve(data.options);
-    });
-    return deferred.promise;
+    return new Query(this._filters);
   };
 
   svc.Query = Query;
