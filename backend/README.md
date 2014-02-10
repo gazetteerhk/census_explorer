@@ -1,3 +1,8 @@
-GAE files are obsolete now.
+Before running the API server, 
+make sure you have run `/scripts/data_preparation.py`.
 
-`python main.py` directly to fire up the backend API server.
+Usage: 
+
+   * `python main.py` directly to fire up the backend API server.
+   * `python debug.py` for the DEBUG version.
+

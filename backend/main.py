@@ -178,14 +178,14 @@ def api():
 
     # Filters
     df = df_census
-    logger.info('df len: %d', len(df))
+    logger.info('start filtering. df len: %d', len(df))
     for f in filters:
         fvals = parse_argument(request.args.getlist(f, None))
         if fvals:
-            logger.info('filters %s: %s', f, fvals)
             df = df[reduce(lambda a, b: a | (df[f] == b), fvals, 
                 pandas.Series([False] * len(df), index=df.index))]
-        logger.info('df len: %d', len(df))
+            logger.info('filters %s: %s', f, fvals)
+            logger.info('df len: %d', len(df))
 
     response['meta']['length'] = len(df)
 
@@ -230,8 +230,4 @@ def api():
     return res
 
 if __name__ == '__main__':
-    # Run this script directly
-    # NOTE: 
-    #     Make debug=False in production
-    app.run(host="0.0.0.0", port=8080)
-    #app.run(host="0.0.0.0", port=8080, debug=False)
+    app.run(host="0.0.0.0", port=8080, debug=False)
