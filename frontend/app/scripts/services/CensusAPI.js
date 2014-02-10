@@ -4,6 +4,10 @@
 angular.module('frontendApp').factory('CensusAPI', ['$log', '$http', '$q', function($log, $http, $q) {
   var svc = {};
 //  svc.endpointURL = 'http://137.189.97.90:5901/api';
+
+  //TODO:
+  //    An application scope configuration entry to store the server_prefix
+  //    Expose this to a config block or something
   svc.endpointURL = 'http://192.168.222.3:8080/api/';
 
   svc._baseFilters = {
@@ -52,6 +56,35 @@ angular.module('frontendApp').factory('CensusAPI', ['$log', '$http', '$q', funct
     }
 
     return res;
+  };
+
+  svc.asPercentage = function(data, grouping) {
+    /*
+     * Given an array of data objects:
+     * [
+     *   {
+     *     area: 'a01',
+     *     table: 1,
+     *     value: 1
+     *   },
+     *   {
+     *     area: 'a02',
+     *     table: 1,
+     *     value: 2
+     *   }
+     * ]
+     *
+     * Returns a new array of data objects with value replaced as the percentage of the total within the grouping
+     *
+     * The grouping is specified as either a string or an array of strings representing data keys, and the total is taken to be the
+     * sum of the values over unique combinations of the groups.
+     * For example, if grouping were 'table', then the values from both objects in the array above would be added to gether
+     * to get the table total
+     */
+
+    // Check the grouping
+    return undefined;
+
   };
 
   var Query = function(filters) {

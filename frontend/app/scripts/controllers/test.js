@@ -6,8 +6,6 @@ angular.module('frontendApp')
     $scope.refresh = function(){
       console.log('indicator:');
       console.log($scope.selectedIndicator);
-      //TODO:
-      //    An application scope configuration entry to store the server_prefix
 
       var query = new CensusAPI.Query({
         projector: ['area', 'value', 'row'],
@@ -20,7 +18,8 @@ angular.module('frontendApp')
       console.log(query._filters);
 
       query.fetch().then(function(data) {
-        console.log(data);
+        var d = CensusAPI.joinData(data.data);
+        $scope.areaData = d;
       });
 
       /*
@@ -30,8 +29,6 @@ angular.module('frontendApp')
         //    Do not plot by .value. They are just the min, max, median number.
         //    What we want to plot is .row, which are categorical information.
         //    The following code creates a general map from categories to numerical values.
-        //TODO:
-        //    Try to find better curving function to make the colorscheme visually clearer.
         var m = {};
         for (var i=0; i < data.options.row.length; i++){
           m[data.options.row[i]] = i
@@ -50,10 +47,11 @@ angular.module('frontendApp')
       */
     };
 
+    // TODO: These are just for show, because the asPercentage scaling is still a WIP
     $scope.indicators = [
-      {name: 'The median monthly income across areas?', identifier: {table: 18, column: 'n118_households', aggregate: 'median'}},
-      {name: 'The mode (max frequency) of monthly income across areas?', identifier: {table: 18, column: 'n118_households', aggregate: 'max'}},
-      {name: 'The median rental fee across area?', identifier: {table: 20, aggregate: 'median'}}
+      {name: 'Total population', identifier: {table: 0, column: 'tab0_both', row: 'tab0_total'}},
+      {name: 'Population of divorcees', identifier: {table: 2, column: 'e28_both', row: 'a32_divorced'}},
+      {name: 'Population of self-employed people', identifier: {table: 4, column: 'e61_both', row: 'a65_self-employed'}}
     ];
 
     // init with one plot

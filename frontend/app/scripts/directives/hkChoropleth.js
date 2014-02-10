@@ -40,6 +40,8 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
         maxZoom: 18
       };
 
+      //TODO:
+      //    Try to find better curving function to make the colorscheme visually clearer.
       $scope._colors = colorbrewer.Blues[5];
 
       // The zoom level after which areas are drawn
