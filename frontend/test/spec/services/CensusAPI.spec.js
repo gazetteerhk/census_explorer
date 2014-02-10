@@ -100,4 +100,20 @@ describe("Services: CensusAPI", function() {
     expect(q1._filters).not.toEqual(q2._filters);
   });
 
+  it('_joinData joins data hash', function() {
+    var data = {
+      area: ['a01', 'a02'],
+      value: [1, 2],
+      table: [1, 1]
+    };
+    var expected_res = [
+      {area: 'a01', value: 1, table: 1},
+      {area: 'a02', value: 2, table: 1}
+    ];
+
+    var res = CensusAPI._joinData(data);
+
+    expect(res).toEqual(expected_res);
+  });
+
 });

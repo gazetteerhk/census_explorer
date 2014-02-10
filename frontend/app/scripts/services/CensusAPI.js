@@ -15,6 +15,43 @@ angular.module('frontendApp').factory('CensusAPI', ['$log', '$http', '$q', funct
     groupBy: {}
   };
 
+  svc._joinData = function(data) {
+    /*
+     * Given a data hash of structure
+     * {
+     *   area: ['a01', 'a02'],
+     *   value: [1, 2]
+     * }
+     *
+     * Returns an array of structure:
+     * [
+     *   {
+     *     area: 'a01',
+     *     value: 1
+     *   },
+     *   {
+     *     area: 'a02',
+     *     value: 2
+     *   }
+     * ]
+     */
+
+    var len = _.values(data)[0].length;
+    var res = [];
+    var thisDatum;
+    var dataKeys = _.keys(data);
+
+    for (var i=0; i<len; i++) {
+      thisDatum = {};
+      _.forEach(dataKeys, function(key) {
+        thisDatum[key] = data[key][i];
+      });
+      res.push(thisDatum);
+    }
+
+    return res;
+  };
+
   var Query = function(filters) {
     /*
      * Object for handling queries to the Census API

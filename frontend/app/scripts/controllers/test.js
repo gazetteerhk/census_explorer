@@ -8,7 +8,7 @@ angular.module('frontendApp')
       console.log($scope.selectedIndicator);
       //TODO:
       //    An application scope configuration entry to store the server_prefix
-      var server_prefix = 'http://137.189.97.90:5901';
+      var server_prefix = 'http://192.168.222.3:8080';
       var url = server_prefix
         + '/api/?return=groups&return=options&groupby=area&projector=value&projector=row'
         + $scope.selectedIndicator;
