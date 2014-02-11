@@ -83,14 +83,9 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
         weight: 2
       };
 
-      var _isArea = function(feature) {
-        // Checks if a feature is an area
-        return !_.isUndefined(feature.properties.CACODE);
-      };
-
       // Styler that styles a layer based on whether it is selected or not
       var featureStyler = function(feature) {
-        var code = feature.properties.CACODE || feature.properties.DCCODE;
+        var code = feature.properties.CODE;
         var style = _.clone($scope._defaultStyle);
         style.fillColor = $scope._colors[$scope._colorScale($scope._getValueFromArea(code))];
         style.fillOpacity = FILLOPACITY;
@@ -200,17 +195,8 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
         $scope.hoveredFeature = undefined;
       };
 
-      var _isTriggeredByArea = function(event) {
-        // Checks if the event was sent by an area polygon
-        return !_.isUndefined(event.target.feature.properties.CACODE);
-      };
-
       var _getLayerCode = function(e) {
-        if (_isTriggeredByArea(e)) {
-          return e.target.feature.properties.CACODE;
-        } else {
-          return e.target.feature.properties.DCCODE;
-        }
+        return e.target.feature.properties.CODE;
       };
 
       var onEachFeature = function(feature, layer) {
