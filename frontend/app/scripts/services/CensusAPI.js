@@ -184,14 +184,20 @@ angular.module('frontendApp').factory('CensusAPI', ['$log', '$http', '$q', funct
     }
   };
 
+  // Uncomment this when backend is ready for comma separated parameters
   var _prepFilters = function(filters) {
     /*
      * Converts objects in the filters dictionary to comma separated strings
      */
+    /*
     var theFilters = _.omit(filters, function(val, key) {return _.isEmpty(val);});
 
-    return _.mapValues(theFilters, function(val) {
-      return _.keys(val).join(',');
+     return _.mapValues(theFilters, function(val) {
+     return _.keys(val).join(',');
+     });
+     */
+    return _.mapValues(filters, function(val) {
+      return _.keys(val);
     });
   };
 
