@@ -41,6 +41,13 @@ def parse_argument(query_string):
     res = map(urllib.unquote_plus, query_string)
     return res
 
+def get_arg_list(key):
+    value = request.args.get(key, None)
+    if value:
+        return value.split(',')
+    else:
+        return []
+
 def _project_dataframe(df, projectors):
     data = {}
     for p in projectors:
@@ -161,11 +168,11 @@ def api():
     # Filters:
     filters = ['region', 'district', 'area', 'table', 'row', 'column']
     # Projectors:
-    projectors = parse_argument(request.args.getlist('projector', None))
+    projectors = parse_argument(get_arg_list('projector'))
     if not projectors:
         projectors = ['value']
     # Functions:
-    ret_options = parse_argument(request.args.getlist('return', None))
+    ret_options = parse_argument(get_arg_list('return'))
     if not ret_options:
         #ret_options = ['data', 'groups', 'options']
         ret_options = []
@@ -180,7 +187,7 @@ def api():
     df = df_census
     logger.info('start filtering. df len: %d', len(df))
     for f in filters:
-        fvals = parse_argument(request.args.getlist(f, None))
+        fvals = parse_argument(get_arg_list(f))
         if fvals:
             df = df[reduce(lambda a, b: a | (df[f] == b), fvals, 
                 pandas.Series([False] * len(df), index=df.index))]
