@@ -4,7 +4,7 @@
  * Service that creates model instances for handling Constituency Area / District selection logic
  */
 
-angular.module('frontendApp').factory('AreaSelection', ['Mappings', function(Mappings) {
+angular.module('frontendApp').factory('AreaSelection', ['GeoMappings', function(GeoMappings) {
   var AREA = 0;
   var DISTRICT = 1;
   var REGION = 2;
@@ -26,9 +26,9 @@ angular.module('frontendApp').factory('AreaSelection', ['Mappings', function(Map
     // Determines whether the area is a region, district, or area
     // Actually not a guarantee that it is an area -- could possible not be a valid area
     area = area.toLowerCase();
-    if (_.contains(Mappings._data.regions, area)) {
+    if (_.contains(GeoMappings._data.regions, area)) {
       return REGION;
-    } else if (_.contains(Mappings._data.districts, area)) {
+    } else if (_.contains(GeoMappings._data.districts, area)) {
       return DISTRICT;
     } else {
       return AREA;
@@ -44,7 +44,7 @@ angular.module('frontendApp').factory('AreaSelection', ['Mappings', function(Map
     } else if (areaType === DISTRICT) {
       _addDistrict(self, area);
     } else {
-      var allAreas = Mappings.getAllAreas();
+      var allAreas = GeoMappings.getAllAreas();
 
       if (_.has(self._selected, area)) {
         return;
@@ -59,7 +59,7 @@ angular.module('frontendApp').factory('AreaSelection', ['Mappings', function(Map
 
   var _addDistrict = function(self, district) {
     district = district.toLowerCase();
-    var areas = Mappings.getAreasFromDistrict(district);
+    var areas = GeoMappings.getAreasFromDistrict(district);
     _.forEach(areas, function(area) {
       self._selected[area] = true;
     });
@@ -67,7 +67,7 @@ angular.module('frontendApp').factory('AreaSelection', ['Mappings', function(Map
 
   var _addRegion = function(self, region) {
     region = region.toLowerCase();
-    var districts = Mappings.getDistrictsFromRegion(region);
+    var districts = GeoMappings.getDistrictsFromRegion(region);
     _.forEach(districts, _.partial(_addDistrict, self));
   };
 
@@ -100,13 +100,13 @@ angular.module('frontendApp').factory('AreaSelection', ['Mappings', function(Map
 
   var _removeRegion = function(self, region) {
     region = region.toLowerCase();
-    var districts = Mappings.getDistrictsFromRegion(region);
+    var districts = GeoMappings.getDistrictsFromRegion(region);
     _.forEach(districts, _.partial(_removeDistrict, self));
   };
 
   var _removeDistrict = function(self, district) {
     district = district.toLowerCase();
-    var areas = Mappings.getAreasFromDistrict(district);
+    var areas = GeoMappings.getAreasFromDistrict(district);
     _.forEach(areas, function(area) {delete self._selected[area];})
   };
 
@@ -125,10 +125,10 @@ angular.module('frontendApp').factory('AreaSelection', ['Mappings', function(Map
     area = area.toLowerCase();
     var areaType = _getType(area);
     if (areaType === REGION) {
-      var areas = _.flatten(_.map(Mappings.getDistrictsFromRegion(area)), function(d) {return Mappings.getAreasFromDistrict(d);});
+      var areas = _.flatten(_.map(GeoMappings.getDistrictsFromRegion(area)), function(d) {return GeoMappings.getAreasFromDistrict(d);});
       return _.every(_.map(areas, function(a){return _.has(self._selected, a);}));
     } else if (areaType === DISTRICT) {
-      var areas = Mappings.getAreasFromDistrict(area);
+      var areas = GeoMappings.getAreasFromDistrict(area);
       return _.every(_.map(areas, function(a){return _.has(self._selected, a);}));
     } else {
       return _.has(self._selected, area);
