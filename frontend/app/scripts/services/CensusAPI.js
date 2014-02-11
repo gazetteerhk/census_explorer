@@ -136,11 +136,12 @@ angular.module('frontendApp').factory('CensusAPI', ['$log', '$http', '$q', funct
 
   var _prepFilters = function(filters) {
     /*
-     * Converts objects in the filters dictionary to arrays, so that they can be changed to a query string by $http
+     * Converts objects in the filters dictionary to comma separated strings
      */
+    var theFilters = _.omit(filters, function(val, key) {return _.isEmpty(val);});
 
-    return _.mapValues(filters, function(val) {
-      return _.keys(val);
+    return _.mapValues(theFilters, function(val) {
+      return _.keys(val).join(',');
     });
   };
 

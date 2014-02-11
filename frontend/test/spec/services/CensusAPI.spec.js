@@ -116,4 +116,17 @@ describe("Services: CensusAPI", function() {
     expect(res).toEqual(expected_res);
   });
 
+  iit('uses comma separated query parameters', function() {
+    var filter = {
+      area: ['a01', 'a02'],
+      table: '1'
+    };
+
+    $httpBackend.expectGET(CensusAPI.endpointURL + '?area=a01,a02&table=1').respond('');
+
+    q = new CensusAPI.Query(filter);
+    q.fetch();
+    $httpBackend.flush();
+  })
+
 });
