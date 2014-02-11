@@ -3,12 +3,12 @@
 
 angular.module('frontendApp').factory('CensusAPI', ['$log', '$http', '$q', function($log, $http, $q) {
   var svc = {};
-//  svc.endpointURL = 'http://137.189.97.90:5901/api';
-
+  
   //TODO:
   //    An application scope configuration entry to store the server_prefix
   //    Expose this to a config block or something
-  svc.endpointURL = 'http://192.168.222.3:8080/api/';
+  svc.endpointURL = 'http://137.189.97.90:5901/api/';
+  //svc.endpointURL = 'http://192.168.222.3:8080/api/';
 
   svc._baseFilters = {
     area: {},
@@ -184,18 +184,17 @@ angular.module('frontendApp').factory('CensusAPI', ['$log', '$http', '$q', funct
     }
   };
 
-  // Uncomment this when backend is ready for comma separated parameters
   var _prepFilters = function(filters) {
     /*
      * Converts objects in the filters dictionary to comma separated strings
      */
-    /*
+    
     var theFilters = _.omit(filters, function(val, key) {return _.isEmpty(val);});
 
      return _.mapValues(theFilters, function(val) {
      return _.keys(val).join(',');
      });
-     */
+     
     return _.mapValues(filters, function(val) {
       return _.keys(val);
     });

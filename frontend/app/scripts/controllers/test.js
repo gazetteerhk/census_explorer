@@ -51,7 +51,8 @@ angular.module('frontendApp')
     $scope.indicators = [
       {name: 'Total population', identifier: {table: 0, column: 'tab0_both', row: 'tab0_total'}},
       {name: 'Population of divorcees', identifier: {table: 2, column: 'e28_both', row: 'a32_divorced'}},
-      {name: 'Population of self-employed people', identifier: {table: 4, column: 'e61_both', row: 'a65_self-employed'}}
+      {name: 'Population of self-employed people', identifier: {table: 4, column: 'e61_both', row: 'a65_self-employed'}},
+      //{name: 'Median monthly income', identifier: {table: 18, column: 'n118_households', aggregate: 'median'}}
     ];
 
     // init with one plot
