@@ -1,0 +1,25 @@
+Steps to generate pub_facility_with_CACODE.geojson
+
+1) run processPubFacilityCSV.py
+
+requirement:
+- a folder named "data" which contains all the public facilities csv filesfiles
+
+output: combine.csv
+
+2) use qgis to convert the combine.csv to a JSON file
+
+output: pub_facility.geojson
+
+
+3) run addCACODEProperty.py
+
+requirement:
+- pub_facility.geojson (from step 2)
+- HKConstituencyArea.json
+
+output: pub_facility_with_CACODE.geojson
+
+===
+
+all the output files are zipped in pub_facility_output_files.zip
