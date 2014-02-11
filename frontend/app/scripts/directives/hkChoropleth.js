@@ -40,6 +40,8 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
         maxZoom: 18
       };
 
+      //TODO:
+      //    Try to find better curving function to make the colorscheme visually clearer.
       $scope._colors = colorbrewer.Blues[5];
 
       // The zoom level after which areas are drawn
@@ -81,16 +83,11 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
         weight: 2
       };
 
-      var _isArea = function(feature) {
-        // Checks if a feature is an area
-        return !_.isUndefined(feature.properties.CACODE);
-      };
-
       // Styler that styles a layer based on whether it is selected or not
       var featureStyler = function(feature) {
-        var code = feature.properties.CACODE || feature.properties.DCCODE;
+        var code = feature.properties.CODE;
         var style = _.clone($scope._defaultStyle);
-        style.fillColor = $scope._colors[$scope._colorScale($scope._getValueFromCode(code))];
+        style.fillColor = $scope._colors[$scope._colorScale($scope._getValueFromArea(code))];
         style.fillOpacity = FILLOPACITY;
         return style;
       };
@@ -117,7 +114,7 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
         // Also store a dict for looking up data
         $scope._mapDataHash = {};
         _.forEach($scope._mapData, function(val) {
-          $scope._mapDataHash[val.code] = val.value;
+          $scope._mapDataHash[val.area] = val.value;
         });
 
         $scope._colorScale = d3.scale.quantize()
@@ -160,12 +157,12 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
       };
 
       // Accessor for _mapDataHash that handles lowercasing
-      $scope._getValueFromCode = function(code) {
-        if (_.isUndefined(code)) {
+      $scope._getValueFromArea = function(area) {
+        if (_.isUndefined(area)) {
          return;
         }
-        code = code.toLowerCase();
-        return $scope._mapDataHash[code];
+        area = area.toLowerCase();
+        return $scope._mapDataHash[area];
       };
 
       var _applyStylesToMap = function(map) {
@@ -198,17 +195,8 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
         $scope.hoveredFeature = undefined;
       };
 
-      var _isTriggeredByArea = function(event) {
-        // Checks if the event was sent by an area polygon
-        return !_.isUndefined(event.target.feature.properties.CACODE);
-      };
-
       var _getLayerCode = function(e) {
-        if (_isTriggeredByArea(e)) {
-          return e.target.feature.properties.CACODE;
-        } else {
-          return e.target.feature.properties.DCCODE;
-        }
+        return e.target.feature.properties.CODE;
       };
 
       var onEachFeature = function(feature, layer) {
@@ -256,7 +244,7 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
       });
     }],
     template: '<leaflet center="center" defaults="defaults" geojson="geojson"></leaflet>' +
-      '<div class="map-overlay" ng-show="hoveredFeature">{{ hoveredFeature }} - {{ _getValueFromCode(hoveredFeature) }}</div>' +
+      '<div class="map-overlay" ng-show="hoveredFeature">{{ hoveredFeature }} - {{ _getValueFromArea(hoveredFeature) }}</div>' +
       '<div class="map-legend"></div>'
   };
 });

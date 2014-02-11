@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from collections import Counter, defaultdict
 import os
 import xlrd
@@ -221,6 +222,8 @@ def get_identifier(sheet, table, row, col):
     value = unicode(sheet.cell(row, col).value)
     # clean and shorten human readable strings
     value = _IDENTIFIER_CLEANER.sub('', value)
+    # ≧ -> >=
+    value = value.replace(u'\u2267', u'>=')
     terms = value.strip().split()
     if terms:
         leading_term = terms[0]

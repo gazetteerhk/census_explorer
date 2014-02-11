@@ -30,6 +30,7 @@ angular.module('frontendApp', [
   })
   .config(function($routeProvider) {
     $routeProvider
+<<<<<<< HEAD
     // .when('/', {
     //   templateUrl: 'views/main.html',
     //   controller: 'MainCtrl'
@@ -145,3 +146,46 @@ function($log, $http) {
     //hack to load explicitly extra namespace
     window.i18n.loadNamespaces(['generated_ns'], function() { /* loaded */ });
   });
+=======
+      // .when('/', {
+      //   templateUrl: 'views/main.html',
+      //   controller: 'MainCtrl'
+      // })
+      .when('/', {
+        templateUrl: 'views/main.html',
+        controller: 'MainCtrl'
+      })
+      .when('/test', {
+        templateUrl: 'views/test.html',
+        controller: 'TestCtrl'
+      })
+      .when('/about', {
+        templateUrl: 'views/about.html',
+        controller: 'AboutCtrl'
+      })
+      .when('/getdata', {
+        templateUrl: 'views/getdata.html',
+        controller: 'GetDataCtrl'
+      })
+      .when('/discover', {
+        templateUrl: 'views/discover.html',
+        controller: 'DiscoverCtrl'
+      })
+      .when('/explore', {
+        templateUrl: 'views/explore.html',
+        controller: 'ExploreCtrl'
+      })
+      .when('/choropleth', {
+        templateUrl: 'views/choropleth.html',
+        controller: 'ChoroplethCtrl'
+      })
+      .when('/medians', {
+        templateUrl: 'views/medians.html',
+        controller: 'MediansCtrl'
+      })
+      .otherwise({
+        redirectTo: '/'
+      })
+  });
+
+>>>>>>> 5b3e1d0221d83a56b6735089ca4586cd53fa59ee
