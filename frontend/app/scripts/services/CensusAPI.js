@@ -82,9 +82,24 @@ angular.module('frontendApp').factory('CensusAPI', ['$log', '$http', '$q', funct
     }
   };
 
+  svc.sumBy = function(data, grouping) {
+    var agg = {};
+    _.forEach(data, function(d) {
+      var group = d[grouping];
+      if (!_.isUndefined(group)) {
+        if (!_.has(agg, group)) {
+          agg[group] = 0;
+        }
+        agg[group] += d.value;
+      }
+    });
+
+    return agg;
+  };
+
   svc.asPercentage = function(data, grouping) {
     /*
-     * Given an array of data objects:
+     * Given a groups hash
      * [
      *   {
      *     area: 'a01',
@@ -102,8 +117,8 @@ angular.module('frontendApp').factory('CensusAPI', ['$log', '$http', '$q', funct
      *
      * The grouping is specified as either a string or an array of strings representing data keys, and the total is taken to be the
      * sum of the values over unique combinations of the groups.
-     * For example, if grouping were 'table', then the values from both objects in the array above would be added to gether
-     * to get the table total
+     * For example, if grouping were 'table', then the values from both objects in the array above would be added together
+     * to get the table total.  If grouping where ['area', 'table'], then each object would be 10
      */
 
     // Check the grouping

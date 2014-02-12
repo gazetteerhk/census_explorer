@@ -152,7 +152,7 @@ describe("Services: CensusAPI", function() {
       }
     };
 
-    var expected_res = [
+    var expectedRes = [
       {area: 'a01', value: 1, row: 'foo'},
       {area: 'a01', value: 2, row: 'bar'},
       {area: 'a02', value: 3, row: 'bar'},
@@ -161,7 +161,36 @@ describe("Services: CensusAPI", function() {
 
     var res = CensusAPI.joinGroups(groups, 'area');
 
-    expect(res).toEqual(expected_res);
+    expect(res).toEqual(expectedRes);
+  });
+
+  it('sumBy sums an array of data by a key', function() {
+    var data = [
+      {area: 'a01', value: 1, row: 'foo'},
+      {area: 'a01', value: 2, row: 'bar'},
+      {area: 'a02', value: 3, row: 'bar'},
+      {area: 'a02', value: 4, row: 'baz'}
+    ];
+
+    var expectedRes = {
+      a01: 3,
+      a02: 7
+    };
+
+    var res = CensusAPI.sumBy(data, 'area');
+    expect(res).toEqual(expectedRes);
+
+    /* No support for multi key sumBy yet
+    var expectedRes = [
+      {area: 'a01', row: 'foo', sum: 1},
+      {area: 'a01', row: 'bar', sum: 2},
+      {area: 'a02', row: 'bar', sum: 3},
+      {area: 'a02', row: 'baz', sum: 4},
+    ];
+
+    var res = CensusAPI.sumBy(data, ['area', 'row']);
+    expect(res).toEqual(expectedRes);
+    */
   });
 
   it('uses comma separated query parameters', function() {
