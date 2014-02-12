@@ -1,20 +1,20 @@
 'use strict';
 
 angular.module('frontendApp', [
-  'ngCookies',
-  'ngResource',
-  'ngSanitize',
-  'ngRoute',
-  'ngAnimate',
-  'leaflet-directive',
-  'jm.i18next'
-]).constant('serverPrefix',
-  '/')
+    'ngCookies',
+    'ngResource',
+    'ngSanitize',
+    'ngRoute',
+    'ngAnimate',
+    'leaflet-directive',
+    'jm.i18next'
+  ])
+  .constant('serverPrefix', '/')
   .config(function($i18nextProvider, serverPrefix) {
 
-    console.log('init translation');
-    console.log($i18nextProvider);
-    console.log(serverPrefix);
+//    console.log('init translation');
+//    console.log($i18nextProvider);
+//    console.log(serverPrefix);
     // window.i18n.loadNamespaces(['human_ns', 'generated_ns'], function() { /* loaded */ });
     //auto init , not necessary to call i18.init()
     $i18nextProvider.options = {
@@ -65,83 +65,8 @@ angular.module('frontendApp', [
       .otherwise({
         redirectTo: '/'
       })
+  }).run(
+  function($i18next) {
+    //hack to load explicitly extra namespace
+    window.i18n.loadNamespaces(['generated_ns'], function() { /* loaded */ });
   });
-
-angular.module('frontendApp').factory('CensusAPI', ['$log', '$http',
-  function($log, $http) {
-    var svc = {};
-    svc.endpointURL = 'http://golden-shine-471.appspot.com/api';
-
-    var Query = function(filters) {
-      /*
-       * Object for handling queries to the Census API
-       * Filters are added with methods on the object
-       *
-       * If constructor is passed an object, then that becomes the filters
-       */
-      if (_.isObject(filters)) {
-        this._filters = _.clone(filters);
-      } else {
-        this._filters = {
-          ca: [],
-          table: [],
-          column: [],
-          row: []
-        };
-      }
-    };
-
-    Query.prototype.addFilter = function(field, values) {
-      /*
-       * Adds a filter to query object
-       * The field determines which field to filter on, and values is appended to the internal filter hash for that field
-       *
-       * Arguments:
-       * ----------
-       * field: string, 'ca', 'table', 'column', or 'row
-       * values: array of strings, or string
-       *
-       * Returns: null
-       */
-
-      var valid_fields = ['ca', 'table', 'column', 'row'];
-      if (_.indexOf(valid_fields, field) === -1) {
-        throw String(field) + "is not a valid field for filtering";
-      }
-
-      if (_.isArray(values)) {
-        // Concatenate the array
-        this._filters[field] = _.union(this._filters[field], values);
-      } else {
-        this._filters[field] = _.union(this._filters[field], [values]);
-      }
-
-      $log.debug(this._filters);
-    };
-
-    Query.prototype.fetch = function() {
-      /*
-       * Sends the request to the API with the provided filters
-       *
-       * Returns:
-       * --------
-       * Promise object encapsulating
-       */
-
-      var promise = $http.get(svc.endpointURL, {
-        params: this._filters
-      });
-
-      return promise;
-    };
-
-    svc.Query = Query;
-
-    return svc;
-  }
-])
-  .run(
-    function($i18next) {
-      //hack to load explicitly extra namespace
-      window.i18n.loadNamespaces(['generated_ns'], function() { /* loaded */ });
-    });
