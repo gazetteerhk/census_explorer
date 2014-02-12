@@ -20,6 +20,7 @@ angular.module('frontendApp')
       console.log(query._filters);
 
       query.fetch().then(function(response) {
+        console.log('response:');
         console.log(response);
         var d = $scope.selectedIndicator.parser(response);
         $scope.mapConfig = $scope.selectedIndicator.config;
@@ -53,10 +54,10 @@ angular.module('frontendApp')
 
     var _medianMonthlyIncomeColors = _.clone(colorbrewer.Reds['7']).reverse().concat(colorbrewer.Greens['7']);
     var _medianMonthlyIncomeConfig = {
-      colors: _medianMonthlyIncomeColors
+      colors: _medianMonthlyIncomeColors,
+      valueVar: 'row'
     };
     var _medianMonthlyIncomeParser = function(data) {
-      console.log(data);
       var d = CensusAPI.joinGroups(data.groups, 'area');
       var scale = d3.scale.ordinal().domain(data.options.row).range(d3.range(14));
       _medianMonthlyIncomeConfig.scale = scale;

@@ -38,25 +38,30 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
     },
 
     controller: ['$scope', 'GeoFiles', '$attrs', 'AreaSelection', '$parse', 'leafletData', function($scope, GeoFiles, $attrs, AreaSelection, $parse, leafletData) {
+      /*
+       * Defaults and utilities
+       */
+
       // Default initializations
       $scope.defaults =  {
         scrollWheelZoom: true,
         maxZoom: 18
       };
 
+      // Default map configuration
       var _defaultConfig = {
         colors: colorbrewer.Blues[5],  // Colors to use for the scale
         scale: null,  // a d3 scale object, if none is provided, then we'll quantize the data into buckets
-        fillOpacity: 0.5   // Fill opacity of the colors
+        valueVar: 'value',  // The name of the property in each data object that should be plotted
+        style: {
+          fillOpacity: 0.5
+        }  //  Any additional styles to apply to each layer.
       };
 
-
-      // The zoom level after which areas are drawn
-      var AREATHRESHOLD = 14;
       // Fill level
       var FILLOPACITY = 0.5;
 
-      // Center object
+      // Map Center object
       if (_.isUndefined($attrs.mapCenter)) {
         $scope.center = {};
       } else {
@@ -83,21 +88,18 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
         }
       };
 
-      // Styles
-      $scope._defaultStyle = {
-        color: "#2b8cbe",
-        fillOpacity: 0,
-        weight: 2
+      // Accessor for _mapDataHash that handles lowercasing of area codes
+      $scope._getValueFromArea = function(area) {
+        if (_.isUndefined(area) || _.isUndefined($scope._mapDataHash)) {
+          return;
+        }
+        area = area.toLowerCase();
+        return $scope._mapDataHash[area];
       };
 
-      // Styler that styles a layer based on whether it is selected or not
-      var featureStyler = function(feature) {
-        var code = feature.properties.CODE;
-        var style = _.clone($scope._defaultStyle);
-        style.fillColor = $scope._colors[$scope._colorScale($scope._getValueFromArea(code))];
-        style.fillOpacity = FILLOPACITY;
-        return style;
-      };
+      /*
+       * Map data
+       */
 
       // Get the mapData object
       var _mapDataGetter = $parse($attrs.mapData);
@@ -106,45 +108,51 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
         return $scope._mapData;
       };
 
+      // Whenever the map data object changes, we have to re-parse the data and configurations,
+      // then restyle the layers on the map
       $scope.$watch(_getMapData, function(newVal) {
         if (!_.isUndefined(newVal)) {
-          console.log('data changed');
+          _parseConfig();
           _parseData();
+          _setupScales();
+          _drawLegend();
           $scope.getMap().then(function(map){
             _applyStylesToMap(map);
           });
         }
       });
 
-      // Parse and quantize the data
+      // Parse the data into a hash object for easy access
       var _parseData = function() {
-        // Get the config object, if it exists
+        // Also store a dict for looking up data
+        $scope._mapDataHash = {};
+        _.forEach($scope._mapData, function(val) {
+          $scope._mapDataHash[val.area] = val[$scope._mapConfig.valueVar];
+        });
+      };
+
+      // Parse the config object, set up the scales and colors
+      var _parseConfig = function() {
+         // Get the config object, if it exists
         var config = _.clone(_defaultConfig);
         if (!_.isUndefined($attrs.mapConfig)) {
           var configGetter = $parse($attrs.mapConfig)
           _.assign(config, configGetter($scope));
         }
+        $scope._mapConfig = config;
+      };
 
-        // Also store a dict for looking up data
-        $scope._mapDataHash = {};
-        _.forEach($scope._mapData, function(val) {
-          $scope._mapDataHash[val.area] = val.value;
-        });
-
-        if (config.scale === null) {
-          var vals = _.sortBy(_.pluck($scope._mapData, 'value'));
+      var _setupScales = function() {
+        if ($scope._mapConfig.scale === null) {
+          var vals = _.sortBy(_.pluck($scope._mapData, $scope._mapConfig.valueVar));
           $scope._colorScale = d3.scale.quantize()
             .domain(vals)
             .range(d3.range(5));  // 5 here, but can configure later, maybe
         } else {
-          $scope._colorScale = config.scale;
+          $scope._colorScale = $scope._mapConfig.scale;
         }
 
-        //TODO:
-        //    Try to find better curving function to make the colorscheme visually clearer.
-        $scope._colors = config.colors;
-
-        _drawLegend();
+        $scope._colors = $scope._mapConfig.colors;
       };
 
       // Draw the legend
@@ -186,13 +194,24 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
           .text(textFunc);
       };
 
-      // Accessor for _mapDataHash that handles lowercasing
-      $scope._getValueFromArea = function(area) {
-        if (_.isUndefined(area) || _.isUndefined($scope._mapDataHash)) {
-         return;
+
+      // Styles
+      $scope._defaultStyle = {
+        color: "#2b8cbe",
+        fillOpacity: 0,
+        weight: 2
+      };
+
+      // Styler that styles a layer based on whether it is selected or not
+      // This is only called when data is present
+      var featureStyler = function(feature) {
+        var code = feature.properties.CODE;
+        var style =  _.clone($scope._defaultStyle);
+        if (!_.isUndefined($scope._mapConfig.style)) {
+          _.extend(style, $scope._mapConfig.style);
         }
-        area = area.toLowerCase();
-        return $scope._mapDataHash[area];
+        style.fillColor = $scope._colors[$scope._colorScale($scope._getValueFromArea(code))];
+        return style;
       };
 
       var _applyStylesToMap = function(map) {
@@ -246,7 +265,6 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
       };
 
       $scope.$watch(_getMapLevel, function(newVal) {
-        console.log('level changed');
         if (newVal == 'dc') {
           GeoFiles.getDistricts().then(function(data) {
             $scope.geojson = {
@@ -267,7 +285,6 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
       });
 
       $scope.$on('redrawMap', function() {
-        console.log('redrawing map');
         $scope.getMap().then(function(map){
           _applyStylesToMap(map);
         });
