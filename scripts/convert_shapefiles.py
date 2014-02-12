@@ -23,7 +23,10 @@ with open(CA_FILE, 'rb') as fl:
     ca = json.loads(fl.read())
 
 for f in ca['features']:
-    f['properties']['CODE'] = f['properties']['DC_CODE'] + f['properties']['CA']
+    ca_code = f['properties']['CACODE']
+    f['properties']['CODE'] = ca_code
+    f['properties']['DC_CODE'] = ca_code[0]
+    f['properties']['CA'] = ca_code[1:]
 
 with open(NEW_CA_FILE, 'wb') as fl:
     fl.write(json.dumps(ca))
