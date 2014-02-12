@@ -6,7 +6,7 @@
   <form class="form-inline">
     <div class="col-md-4">
       <div class="form-group">
-        <select class="form-control" ng-model="selectedIndicator" ng-options="i.identifier as i.name for i in indicators" ng-change="refresh()"></select>
+        <select class="form-control" ng-model="selectedIndicator" ng-options="i as i.name for i in indicators" ng-change="refresh()"></select>
       </div>
     </div>
   </form>
@@ -17,6 +17,6 @@
 </div>
 
 <div class="row">
-  <hk-choropleth height="600px" class="col-md-12" map-data="areaData" map-level="mapLevel"></hk-choropleth>
+  <hk-choropleth height="600px" class="col-md-12" map-data="areaData" map-level="mapLevel" map-config="mapConfig"></hk-choropleth>
 </div>
 

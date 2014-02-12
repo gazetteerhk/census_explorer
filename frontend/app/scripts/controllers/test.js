@@ -7,18 +7,22 @@ angular.module('frontendApp')
       console.log('indicator:');
       console.log($scope.selectedIndicator);
 
-      var query = new CensusAPI.Query({
+      var defaultParams = {
         projector: ['area', 'value', 'row'],
-        return: ['data', 'groups'],
+        return: ['groups', 'options'],
         groupby: 'area'
-      });
-      query.addParam($scope.selectedIndicator);
+      };
+
+      var query = new CensusAPI.Query(defaultParams);
+      query.addParam($scope.selectedIndicator.params);
 
       console.log("query filters:");
       console.log(query._filters);
 
-      query.fetch().then(function(data) {
-        var d = CensusAPI.joinData(data.data);
+      query.fetch().then(function(response) {
+        console.log(response);
+        var d = $scope.selectedIndicator.parser(response);
+        $scope.mapConfig = $scope.selectedIndicator.config;
         $scope.areaData = d;
       });
 
@@ -47,17 +51,36 @@ angular.module('frontendApp')
       */
     };
 
+    var _medianMonthlyIncomeColors = _.clone(colorbrewer.Reds['7']).reverse().concat(colorbrewer.Greens['7']);
+    var _medianMonthlyIncomeConfig = {
+      colors: _medianMonthlyIncomeColors
+    };
+    var _medianMonthlyIncomeParser = function(data) {
+      console.log(data);
+      var d = CensusAPI.joinGroups(data.groups, 'area');
+      var scale = d3.scale.ordinal().domain(data.options.row).range(d3.range(14));
+      _medianMonthlyIncomeConfig.scale = scale;
+      return d;
+    };
+
     // TODO: These are just for show, because the asPercentage scaling is still a WIP
     $scope.indicators = [
-      {name: 'Total population', identifier: {table: 0, column: 'tab0_both', row: 'tab0_total'}},
-      {name: 'Population of divorcees', identifier: {table: 2, column: 'e28_both', row: 'a32_divorced'}},
-      {name: 'Population of self-employed people', identifier: {table: 4, column: 'e61_both', row: 'a65_self-employed'}},
-      //{name: 'Median monthly income', identifier: {table: 18, column: 'n118_households', aggregate: 'median'}}
+//      {name: 'Total population', identifier: {table: 0, column: 'tab0_both', row: 'tab0_total'}},
+//      {name: 'Population of divorcees', identifier: {table: 2, column: 'e28_both', row: 'a32_divorced'}},
+//      {name: 'Population of self-employed people', identifier: {table: 4, column: 'e61_both', row: 'a65_self-employed'}},
+      {
+        name: 'Median monthly income',
+        params: {table: 18, column: 'n118_households', aggregate: 'median'},
+        config: _medianMonthlyIncomeConfig,
+        parser: _medianMonthlyIncomeParser
+      },
+//      {name: 'Most common monthly income', identifier: {table: 18, column: 'n118_households', aggregate: 'max'}},
+//      {name: 'Median housing rental amount', identifier: {table: 20, aggregate: 'median'}}
     ];
 
     // init with one plot
-    $scope.selectedIndicator = $scope.indicators[0].identifier;
-    $scope.refresh();
+//    $scope.selectedIndicator = $scope.indicators[0].identifier;
+//    $scope.refresh();
 
     $scope.mapLevel = 'ca';
     $scope.theData = $scope.areaData;

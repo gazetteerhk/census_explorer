@@ -10,6 +10,10 @@
  * @param {class} class Use the class declaration to set width in Bootstrap column system.
  * @param {array} map-data Array of objects with the data to be mapped
  * @param {object} [map-level="'ca'"] Either "ca" or "dc" for constituency areas or district councils.  Expects an object, so need to double quote
+ * @param {object} [map-config] A configuration object of the following form, all are optional and default values are shown:
+ * {
+ *   colors: colorbrew.Blues[5]  // The
+ * }
  *
  */
 
@@ -40,9 +44,12 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
         maxZoom: 18
       };
 
-      //TODO:
-      //    Try to find better curving function to make the colorscheme visually clearer.
-      $scope._colors = colorbrewer.Blues[5];
+      var _defaultConfig = {
+        colors: colorbrewer.Blues[5],  // Colors to use for the scale
+        scale: null,  // a d3 scale object, if none is provided, then we'll quantize the data into buckets
+        fillOpacity: 0.5   // Fill opacity of the colors
+      };
+
 
       // The zoom level after which areas are drawn
       var AREATHRESHOLD = 14;
@@ -99,17 +106,24 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
         return $scope._mapData;
       };
 
-      $scope.$watch(_getMapData, function() {
-        console.log('data changed');
-        _parseData();
-        $scope.getMap().then(function(map){
-          _applyStylesToMap(map);
-        });
+      $scope.$watch(_getMapData, function(newVal) {
+        if (!_.isUndefined(newVal)) {
+          console.log('data changed');
+          _parseData();
+          $scope.getMap().then(function(map){
+            _applyStylesToMap(map);
+          });
+        }
       });
 
       // Parse and quantize the data
       var _parseData = function() {
-        var vals = _.sortBy(_.pluck($scope._mapData, 'value'));
+        // Get the config object, if it exists
+        var config = _.clone(_defaultConfig);
+        if (!_.isUndefined($attrs.mapConfig)) {
+          var configGetter = $parse($attrs.mapConfig)
+          _.assign(config, configGetter($scope));
+        }
 
         // Also store a dict for looking up data
         $scope._mapDataHash = {};
@@ -117,9 +131,18 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
           $scope._mapDataHash[val.area] = val.value;
         });
 
-        $scope._colorScale = d3.scale.quantize()
-          .domain(vals)
-          .range(d3.range(5));  // 5 here, but can configure later, maybe
+        if (config.scale === null) {
+          var vals = _.sortBy(_.pluck($scope._mapData, 'value'));
+          $scope._colorScale = d3.scale.quantize()
+            .domain(vals)
+            .range(d3.range(5));  // 5 here, but can configure later, maybe
+        } else {
+          $scope._colorScale = config.scale;
+        }
+
+        //TODO:
+        //    Try to find better curving function to make the colorscheme visually clearer.
+        $scope._colors = config.colors;
 
         _drawLegend();
       };
@@ -132,8 +155,7 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
         // Clear existing legend
         legendContainer.selectAll('ul').remove();
 
-        var legend = legendContainer.append('ul')
-          .attr('class', 'Blues');
+        var legend = legendContainer.append('ul');
 
         var keys = legend.selectAll('li.key')
           .data($scope._colorScale.range());
@@ -148,17 +170,25 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
           })
           .style('opacity', FILLOPACITY);
 
-        keys.append('span')
-          .attr('class', 'key-label')
-          .text(function(d) {
+        if (_.isUndefined($scope._colorScale.invertExtent)) {
+          // Ordinal scale
+          var textFunc =  function(d) {
+            return $scope._colorScale.domain()[d];
+          };
+        } else {
+          var textFunc = function(d) {
             var r = $scope._colorScale.invertExtent(d);
             return formatter(r[0]) + " - " + formatter(r[1]);
-          });
+          };
+        }
+        keys.append('span')
+          .attr('class', 'key-label')
+          .text(textFunc);
       };
 
       // Accessor for _mapDataHash that handles lowercasing
       $scope._getValueFromArea = function(area) {
-        if (_.isUndefined(area)) {
+        if (_.isUndefined(area) || _.isUndefined($scope._mapDataHash)) {
          return;
         }
         area = area.toLowerCase();
@@ -221,7 +251,7 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
           GeoFiles.getDistricts().then(function(data) {
             $scope.geojson = {
               data: data,
-              style: featureStyler,
+              style: $scope._defaultStyle,
               onEachFeature: onEachFeature
             };
           });
@@ -229,7 +259,7 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
           GeoFiles.getAreas().then(function(data) {
             $scope.geojson = {
               data: data,
-              style: featureStyler,
+              style: $scope._defaultStyle,
               onEachFeature: onEachFeature
             };
           });
