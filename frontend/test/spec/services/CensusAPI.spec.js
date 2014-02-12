@@ -100,7 +100,7 @@ describe("Services: CensusAPI", function() {
     expect(q1._filters).not.toEqual(q2._filters);
   });
 
-  it('_joinData joins data hash', function() {
+  it('joinData joins data hash', function() {
     var data = {
       area: ['a01', 'a02'],
       value: [1, 2],
@@ -111,12 +111,60 @@ describe("Services: CensusAPI", function() {
       {area: 'a02', value: 2, table: 1}
     ];
 
-    var res = CensusAPI._joinData(data);
+    var res = CensusAPI.joinData(data);
 
     expect(res).toEqual(expected_res);
   });
 
-  iit('uses comma separated query parameters', function() {
+  it('joinGroup joins the group hash', function() {
+    var groups = {
+      a01: {
+        value: [1, 2],
+        row: ['foo', 'bar']
+      },
+      a02: {
+        value: [3, 4],
+        row: ['bar', 'baz']
+      }
+    };
+
+    var expected_res = [
+      {value: 1, row: 'foo'},
+      {value: 2, row: 'bar'},
+      {value: 3, row: 'bar'},
+      {value: 4, row: 'baz'}
+    ];
+
+    var res = CensusAPI.joinGroups(groups);
+
+    expect(res).toEqual(expected_res);
+  });
+
+  it('joinGroup joins the group hash', function() {
+    var groups = {
+      a01: {
+        value: [1, 2],
+        row: ['foo', 'bar']
+      },
+      a02: {
+        value: [3, 4],
+        row: ['bar', 'baz']
+      }
+    };
+
+    var expected_res = [
+      {area: 'a01', value: 1, row: 'foo'},
+      {area: 'a01', value: 2, row: 'bar'},
+      {area: 'a02', value: 3, row: 'bar'},
+      {area: 'a02', value: 4, row: 'baz'}
+    ];
+
+    var res = CensusAPI.joinGroups(groups, 'area');
+
+    expect(res).toEqual(expected_res);
+  });
+
+  it('uses comma separated query parameters', function() {
     var filter = {
       area: ['a01', 'a02'],
       table: '1'

@@ -58,6 +58,30 @@ angular.module('frontendApp').factory('CensusAPI', ['$log', '$http', '$q', funct
     return res;
   };
 
+  svc.joinGroups = function(data, groupName) {
+    /*
+     * Given a groups hash of this structure:
+     * {
+     *   a01: {data hash object},
+     *   a02: {data hash object}
+     * }
+     *
+     * Calling joinGroup(data) will unpack and concatenate the data hashes using joinData
+     * If groupName is provided, then the grouping key will be added to each element of the data hash
+     */
+    if (_.isString(groupName)) {
+      var res = [];
+      _.forOwn(data, function(d, k) {
+        var unpacked = svc.joinData(d);
+        _.forEach(unpacked, function(u) {u[groupName] = k;});
+        res.push(unpacked);
+      });
+      return _.flatten(res);
+    } else {
+      return _.flatten(_.map(_.values(data), svc.joinData));
+    }
+  };
+
   svc.asPercentage = function(data, grouping) {
     /*
      * Given an array of data objects:
