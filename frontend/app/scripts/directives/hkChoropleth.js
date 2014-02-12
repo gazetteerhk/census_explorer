@@ -194,7 +194,6 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
           .text(textFunc);
       };
 
-
       // Styles
       $scope._defaultStyle = {
         color: "#2b8cbe",
@@ -226,6 +225,8 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
       };
 
       // Handlers for interaction
+      // TODO: Some visual cue that the layer is moused over, but also needs to take into
+      // account that the weight may be overridden by a user provided value in the mapConfig
       var mouseoverHandler = function(e) {
         var layer = e.target;
         var code = _getLayerCode(e);

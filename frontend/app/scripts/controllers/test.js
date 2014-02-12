@@ -52,6 +52,10 @@ angular.module('frontendApp')
       */
     };
 
+    /*
+     * Median / mode income related indicators
+     */
+    // 14 categories total
     var _medianMonthlyIncomeColors = _.clone(colorbrewer.Reds['7']).reverse().concat(colorbrewer.Greens['7']);
     var _medianMonthlyIncomeConfig = {
       colors: _medianMonthlyIncomeColors,
@@ -64,7 +68,6 @@ angular.module('frontendApp')
       return d;
     };
 
-    // TODO: These are just for show, because the asPercentage scaling is still a WIP
     $scope.indicators = [
 //      {name: 'Total population', identifier: {table: 0, column: 'tab0_both', row: 'tab0_total'}},
 //      {name: 'Population of divorcees', identifier: {table: 2, column: 'e28_both', row: 'a32_divorced'}},
@@ -75,8 +78,18 @@ angular.module('frontendApp')
         config: _medianMonthlyIncomeConfig,
         parser: _medianMonthlyIncomeParser
       },
-//      {name: 'Most common monthly income', identifier: {table: 18, column: 'n118_households', aggregate: 'max'}},
-//      {name: 'Median housing rental amount', identifier: {table: 20, aggregate: 'median'}}
+      {
+        name: 'Most common monthly income',
+        params: {table: 18, column: 'n118_households', aggregate: 'max'},
+        config: _medianMonthlyIncomeConfig,
+        parser: _medianMonthlyIncomeParser
+      },
+      {
+        name: 'Median housing rental amount',
+        params: {table: 20, aggregate: 'median'},
+        config: _medianMonthlyIncomeConfig,
+        parser: _medianMonthlyIncomeParser
+      }
     ];
 
     // init with one plot
