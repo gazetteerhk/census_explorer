@@ -10,6 +10,7 @@ angular.module('frontendApp').factory('CensusAPI', ['$log', '$http', '$q', funct
   svc.endpointURL = 'http://137.189.97.90:5901/api/';
   //svc.endpointURL = 'http://192.168.222.3:8080/api/';
 
+  // All possible parameter keys
   svc._baseFilters = {
     area: {},
     table: {},
@@ -18,7 +19,9 @@ angular.module('frontendApp').factory('CensusAPI', ['$log', '$http', '$q', funct
     projector: {},
     return: {},
     groupby: {},
-    aggregate: {}
+    aggregate: {},
+    region: {},
+    district: {}
   };
 
   svc.joinData = function(data) {

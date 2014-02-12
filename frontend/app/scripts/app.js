@@ -62,6 +62,10 @@ angular.module('frontendApp', [
         templateUrl: 'views/medians.html',
         controller: 'MediansCtrl'
       })
+      .when('/browser', {
+        templateUrl: 'views/browser.html',
+        controller: 'BrowserCtrl'
+      })
       .otherwise({
         redirectTo: '/'
       })

@@ -1,0 +1,57 @@
+<div class="row">
+  <div class="col-md-12">
+    <h1>API Browser</h1>
+  </div>
+</div>
+
+<button ng-click="clear()" class="btn btn-danger">Clear all filters</button>
+
+<form>
+<div class="row">
+  <div class="col-md-4 form-group">
+    <label>Area - <a href ng-click="clear('area')">clear</a></label>
+    <select class="form-control" multiple size="10" ng-model="model.area" ng-options="a for a in options.area" ng-change="refresh()"></select>
+    {{ options.area.length }} areas, {{ model.area.length }} selected
+  </div>
+
+  <div class="col-md-4 form-group">
+    <label>District - <a href ng-click="clear('district')">clear</a></label>
+    <select class="form-control" multiple size="10" ng-model="model.district" ng-options="a for a in options.district" ng-change="refresh()"></select>
+    {{ options.district.length }} districts, {{ model.district.length }} selected
+  </div>
+
+  <div class="col-md-4 form-group">
+    <label>Region - <a href ng-click="clear('region')">clear</a></label>
+    <select class="form-control" multiple size="10" ng-model="model.region" ng-options="a for a in options.region" ng-change="refresh()"></select>
+    {{ options.region.length }} regions, {{ model.region.length }} selected
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-4 form-group">
+    <label>Table - <a href ng-click="clear('table')">clear</a></label>
+    <select class="form-control" multiple size="10" ng-model="model.table" ng-options="a for a in options.table" ng-change="refresh()"></select>
+    {{ options.table.length }} tables, {{ model.table.length }} selected
+  </div>
+
+  <div class="col-md-4 form-group">
+    <label>Column - <a href ng-click="clear('column')">clear</a></label>
+    <select class="form-control" multiple size="10" ng-model="model.column" ng-options="a for a in options.column" ng-change="refresh()"></select>
+    {{ options.column.length }} columns, {{ model.column.length }} selected
+  </div>
+
+  <div class="col-md-4 form-group">
+    <label>Row - <a href ng-click="clear('row')">clear</a></label>
+    <select class="form-control" multiple size="10" ng-model="model.row" ng-options="a for a in options.row" ng-change="refresh()"></select>
+    {{ options.row.length }} rows, {{ model.row.length }} selected
+  </div>
+</div>
+
+<div class="row">
+  <h3>Total {{ meta.length }} data length.</h3>
+</div>
+
+</form>
+<pre>
+  {{ model }}
+</pre>
