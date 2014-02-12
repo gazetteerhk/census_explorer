@@ -1,11 +1,11 @@
 'use strict';
 
 /*
- * Mappings for referencing between regions, districts, and areas.  Also includes lists of tables and columns.
+ * Mappings for referencing between regions, districts, and areas.
  * Basically a set of metadata
  */
 
-angular.module('frontendApp').factory('Mappings', [function() {
+angular.module('frontendApp').factory('GeoMappings', [function() {
   var svc = {};
   svc._data = {
     geoTree: {
@@ -84,6 +84,10 @@ angular.module('frontendApp').factory('Mappings', [function() {
 
   svc.getAllAreas = function() {
     return svc._data.areas;
+  };
+
+  svc.getAllDistricts = function() {
+    return svc._data.districts;
   };
 
 

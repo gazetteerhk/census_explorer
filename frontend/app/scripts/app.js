@@ -15,8 +15,8 @@ angular.module('frontendApp', [
       //   controller: 'MainCtrl'
       // })
       .when('/', {
-        templateUrl: 'views/query.html',
-        controller: 'QueryCtrl'
+        templateUrl: 'views/main.html',
+        controller: 'MainCtrl'
       })
       .when('/about', {
         templateUrl: 'views/about.html',
@@ -34,13 +34,13 @@ angular.module('frontendApp', [
         templateUrl: 'views/explore.html',
         controller: 'ExploreCtrl'
       })
-      .when('/map', {
-        templateUrl: 'views/map.html',
-        controller: 'MapCtrl'
+      .when('/choropleth', {
+        templateUrl: 'views/choropleth.html',
+        controller: 'ChoroplethCtrl'
       })
-      .when('/query', {
-        templateUrl: 'views/query.html',
-        controller: 'QueryCtrl'
+      .when('/medians', {
+        templateUrl: 'views/medians.html',
+        controller: 'MediansCtrl'
       })
       .otherwise({
         redirectTo: '/'
@@ -113,7 +113,6 @@ angular.module('frontendApp').factory('CensusAPI', ['$log', '$http', function($l
   };
 
   svc.Query = Query;
-//  svc.endpointURL = 'http://golden-shine-471.appspot.com/api';
 
   return svc;
 }]);

@@ -13,6 +13,8 @@
   <!-- bower:css -->
   <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" />
   <link rel="stylesheet" href="bower_components/components-font-awesome/css/font-awesome.css" />
+  <link rel="stylesheet" href="bower_components/leaflet-dist/leaflet.css" />
+  <link rel="stylesheet" href="bower_components/colorbrewer/colorbrewer.css" />
   <!-- endbower -->
   <!-- endbuild -->
   <!-- build:css({.tmp,app}) styles/main.css -->
@@ -85,22 +87,25 @@
     <script src="bower_components/leaflet-dist/leaflet.js"></script>
     <script src="bower_components/angular-leaflet-directive/dist/angular-leaflet-directive.js"></script>
     <script src="bower_components/topojson/topojson.js"></script>
+    <script src="bower_components/colorbrewer/colorbrewer.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
 
     <!-- build:js({.tmp,app}) scripts/scripts.js -->
     <script src="scripts/app.js"></script>
     <script src="scripts/services/GeoFiles.js"></script>
-    <script src="scripts/services/Mappings.js"></script>
+    <script src="scripts/services/GeoMappings.js"></script>
     <script src="scripts/services/AreaSelection.js"></script>
     <script src="scripts/directives/hkMap.js"></script>
+    <script src="scripts/directives/hkChoropleth.js"></script>
     <script src="scripts/controllers/main.js"></script>
     <script src="scripts/controllers/about.js"></script>
     <script src="scripts/controllers/getdata.js"></script>
     <script src="scripts/controllers/discover.js"></script>
     <script src="scripts/controllers/explore.js"></script>
     <script src="scripts/controllers/map.js"></script>
-    <script src="scripts/controllers/query.js"></script>
+    <script src="scripts/controllers/choropleth.js"></script>
+    <script src="scripts/controllers/medians.js"></script>
     <!-- endbuild -->
   </body>
   </html>
