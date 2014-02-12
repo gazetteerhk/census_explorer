@@ -180,17 +180,44 @@ describe("Services: CensusAPI", function() {
     var res = CensusAPI.sumBy(data, 'area');
     expect(res).toEqual(expectedRes);
 
-    /* No support for multi key sumBy yet
-    var expectedRes = [
-      {area: 'a01', row: 'foo', sum: 1},
-      {area: 'a01', row: 'bar', sum: 2},
-      {area: 'a02', row: 'bar', sum: 3},
-      {area: 'a02', row: 'baz', sum: 4},
-    ];
+    var expectedRes = {
+      'a01,foo': 1,
+      'a01,bar': 2,
+      'a02,bar': 3,
+      'a02,baz': 4
+    };
 
     var res = CensusAPI.sumBy(data, ['area', 'row']);
     expect(res).toEqual(expectedRes);
-    */
+  });
+
+  it('asPercentage changes values to percents', function() {
+     var data = [
+      {area: 'a01', value: 1, row: 'foo'},
+      {area: 'a01', value: 2, row: 'bar'},
+      {area: 'a02', value: 3, row: 'bar'},
+      {area: 'a02', value: 4, row: 'baz'}
+    ];
+
+    var expectedRes = [
+      {area: 'a01', value: 1/3, row: 'foo'},
+      {area: 'a01', value: 2/3, row: 'bar'},
+      {area: 'a02', value: 3/7, row: 'bar'},
+      {area: 'a02', value: 4/7, row: 'baz'}
+    ];
+
+    var res = CensusAPI.asPercentage(data, 'area');
+    expect(res).toEqual(expectedRes);
+
+    var expectedRes = [
+      {area: 'a01', value: 1, row: 'foo'},
+      {area: 'a01', value: 1, row: 'bar'},
+      {area: 'a02', value: 1, row: 'bar'},
+      {area: 'a02', value: 1, row: 'baz'}
+    ];
+
+    var res = CensusAPI.asPercentage(data, ['area', 'row']);
+    expect(res).toEqual(expectedRes);
   });
 
   it('uses comma separated query parameters', function() {
