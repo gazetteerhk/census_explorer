@@ -1,6 +1,7 @@
 'use strict';
 
 angular.module('frontendApp', [
+    'ngTable',
     'ngCookies',
     'ngResource',
     'ngSanitize',

@@ -21,7 +21,8 @@
     "components-font-awesome": "~4.0.3",
     "angular-leaflet-directive": "~0.7.3",
     "topojson": "~1.4.6",
-    "colorbrewer": "~1.0.0"
+    "colorbrewer": "~1.0.0",
+    "ng-table": "0.3.1"
   },
   "devDependencies": {
     "angular-mocks": "1.2.6",
