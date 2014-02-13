@@ -11,10 +11,13 @@ angular.module('frontendApp').controller('BrowserCtrl', ['$scope', 'CensusAPI', 
   $scope.refresh = function() {
     var q = new CensusAPI.Query($scope.model);
     q.addParam('return', 'options');
+    q.addParam('skip', 0);
+    q.addParam('count', 20);
 
     q.fetch().then(function(data) {
       $scope.options = data.options;
       $scope.meta = data.meta;
+      $scope.data = data.data;
     });
   };
 

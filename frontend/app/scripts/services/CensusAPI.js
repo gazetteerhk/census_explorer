@@ -21,7 +21,9 @@ angular.module('frontendApp').factory('CensusAPI', ['$log', '$http', '$q', funct
     groupby: {},
     aggregate: {},
     region: {},
-    district: {}
+    district: {},
+    skip: {},
+    count: {}
   };
 
   svc.joinData = function(data) {
