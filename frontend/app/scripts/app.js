@@ -10,7 +10,7 @@ angular.module('frontendApp', [
     'jm.i18next'
   ])
   .constant('serverPrefix', '/')
-  .config(function($i18nextProvider, serverPrefix) {
+  .config(['$i18nextProvider', 'serverPrefix', function($i18nextProvider, serverPrefix) {
 
 //    console.log('init translation');
 //    console.log($i18nextProvider);
@@ -27,8 +27,8 @@ angular.module('frontendApp', [
       // fallbackLng:false,
       resGetPath: serverPrefix + 'locale/__lng__/__ns__-translation.json'
     };
-  })
-  .config(function($routeProvider) {
+  }])
+  .config(['$routeProvider', function($routeProvider) {
     $routeProvider
       .when('/', {
         templateUrl: 'views/main.html',
@@ -69,8 +69,7 @@ angular.module('frontendApp', [
       .otherwise({
         redirectTo: '/'
       })
-  }).run(
-  function($i18next) {
+  }]).run([function() {
     //hack to load explicitly extra namespace
     window.i18n.loadNamespaces(['generated_ns'], function() { /* loaded */ });
-  });
+  }]);

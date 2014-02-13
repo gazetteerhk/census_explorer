@@ -32,7 +32,7 @@ angular.module('frontendApp').directive('hkMap', function() {
         leafletNode.attr('id', attrs.mapId);
       }
     },
-    controller: ['$scope', 'GeoFiles', '$attrs', 'AreaSelection', '$parse', 'leafletData', '$i18next',function($scope, GeoFiles, $attrs, AreaSelection, $parse, leafletData,$i18next) {
+    controller: ['$scope', 'GeoFiles', '$attrs', 'AreaSelection', '$parse', 'leafletData', function($scope, GeoFiles, $attrs, AreaSelection, $parse, leafletData) {
       // Default initializations
       $scope.defaults =  {
         scrollWheelZoom: true,
