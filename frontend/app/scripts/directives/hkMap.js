@@ -8,7 +8,8 @@
  *
  * @param {string} [height="300px"] Height of the map.
  * @param {class} class Use the class declaration to set width in Bootstrap column system.
- * @param {object} selectedItems Object that stores which elements in the map are selected
+ * @param {object} selectedAreas Object that stores which elements in the map are selected
+ * @params {} singleSelect If this attribute is present, then only a single district or area is allowed to be selected at once
  *
  */
 
@@ -31,12 +32,14 @@ angular.module('frontendApp').directive('hkMap', function() {
         leafletNode.attr('id', attrs.mapId);
       }
     },
-    controller: ['$scope', 'GeoFiles', '$attrs', 'AreaSelection', '$parse', 'leafletData', function($scope, GeoFiles, $attrs, AreaSelection, $parse, leafletData) {
+    controller: ['$scope', 'GeoFiles', '$attrs', 'AreaSelection', '$parse', 'leafletData', '$i18next',function($scope, GeoFiles, $attrs, AreaSelection, $parse, leafletData,$i18next) {
       // Default initializations
       $scope.defaults =  {
         scrollWheelZoom: true,
         maxZoom: 18
       };
+
+      $scope._singleSelect = _.has($attrs, 'singleSelect');
 
       // The zoom level after which areas are drawn
       var AREATHRESHOLD = 14;
@@ -97,14 +100,9 @@ angular.module('frontendApp').directive('hkMap', function() {
 
       // TODO: Add partially selected district styling
 
-      var _isArea = function(feature) {
-        // Checks if a feature is an area
-        return !_.isUndefined(feature.properties.CACODE);
-      };
-
       // Styler that styles a layer based on whether it is selected or not
       var featureStyler = function(feature) {
-        var code = feature.properties.CACODE || feature.properties.DCCODE;
+        var code = feature.properties.CODE;
         if ($scope.selectedAreas.isSelected(code)) {
           return $scope._selectedStyle;
         } else {
@@ -128,18 +126,21 @@ angular.module('frontendApp').directive('hkMap', function() {
         var layers = _.values(map._layers);
         _.forEach(layers, function(layer) {
           if (!_.isUndefined(layer.feature) &&
-            !_.isUndefined(layer.feature.properties) &&
-            _isArea(layer.feature)) {
+            !_.isUndefined(layer.feature.properties)) {
             layer.setStyle(featureStyler(layer.feature));
           }
+        });
+      };
+
+      var _redrawMap = function() {
+         $scope.getMap().then(function(map){
+          _applyStylesToMap(map);
         });
       };
       // So instead, use a listener.
       $scope.$on('redrawMap', function() {
         console.log('redrawing map');
-        $scope.getMap().then(function(map){
-          _applyStylesToMap(map);
-        });
+        _redrawMap();
       });
 
       // Handlers for interaction
@@ -168,22 +169,23 @@ angular.module('frontendApp').directive('hkMap', function() {
         $scope.hoveredFeature = undefined;
       };
 
-      var _isTriggeredByArea = function(event) {
-        // Checks if the event was sent by an area polygon
-        return !_.isUndefined(event.target.feature.properties.CACODE);
-      };
-
       var _getLayerCode = function(e) {
-        if (_isTriggeredByArea(e)) {
-          return e.target.feature.properties.CACODE;
-        } else {
-          return e.target.feature.properties.DCCODE;
-        }
+        return e.target.feature.properties.CODE;
       };
 
       var clickHandler = function(e) {
         // If the object is an area:
         var code = _getLayerCode(e);
+
+        // If single select is turned on, then clear map state before doing anything else
+        if ($scope._singleSelect === true) {
+          // We use redraw map instead of directly removing the style on the last selected layer
+          // Also clearing the state early handles a couple edge cases, mostly involving zooming in to areas from districts
+          // - select district -> zoom in -> click on already selected area
+          // - select district -> zoom in -> select area
+          $scope.selectedAreas.clearSelected();
+          _redrawMap();
+        }
 
         if ($scope.selectedAreas.isSelected(code)) {
           // If the object is already selected, unselect it
@@ -234,6 +236,6 @@ angular.module('frontendApp').directive('hkMap', function() {
 
     }],
     template: '<leaflet center="center" defaults="defaults" geojson="geojson"></leaflet>' +
-      '<div class="map-overlay" ng-show="hoveredFeature">{{ hoveredFeature }}</div><span>{{ center }}</span>'
+      '<div class="map-overlay" ng-show="hoveredFeature">{{ "area.code."+hoveredFeature | i18next}}</div>'
   }
 });
