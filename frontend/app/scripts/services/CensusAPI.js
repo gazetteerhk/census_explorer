@@ -104,7 +104,7 @@ angular.module('frontendApp').factory('CensusAPI', ['$log', '$http', '$q', funct
 
   svc.asPercentage = function(data, grouping) {
     /*
-     * Given a groups hash
+     * Given a data array
      * [
      *   {
      *     area: 'a01',
@@ -120,9 +120,11 @@ angular.module('frontendApp').factory('CensusAPI', ['$log', '$http', '$q', funct
      *
      * Returns a new array of data objects with value replaced as the percentage of the total within the grouping
      *
-     * The grouping is specified as a string, and the total is taken to be the sum of the values with the same key value
+     * The grouping is specified as a string or an array of strings, and the total is taken to be the sum of the values with the same key value
      * For example, if grouping were 'table', then the values from both objects in the array above would be added together
-     * to get the table total, then each value would be divided by the total to get the percentage
+     * to get the table total, then each value would be divided by the total to get the percentage.
+     *
+     * Providing an array of strings would get the totals for each combination of group values.
      */
     if (_.isString(grouping)) {
       grouping = [grouping];
