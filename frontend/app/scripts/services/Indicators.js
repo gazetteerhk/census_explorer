@@ -37,7 +37,7 @@ angular.module('frontendApp').factory('Indicators', [function() {
 
   queries.areaModeModifier = {
     groupby: 'area',
-    aggregate: 'mode',
+    aggregate: 'max',
     projector: ['value', 'row'],
     return: ['groups', 'options']
   };

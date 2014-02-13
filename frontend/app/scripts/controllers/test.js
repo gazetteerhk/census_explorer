@@ -1,20 +1,13 @@
 'use strict';
 
 angular.module('frontendApp')
-  .controller('TestCtrl', ['$scope', 'GeoMappings', '$http', 'CensusAPI', function ($scope, GeoMappings, $http, CensusAPI) {
+  .controller('TestCtrl', ['$scope', 'GeoMappings', '$http', 'CensusAPI', 'Indicators', function ($scope, GeoMappings, $http, CensusAPI, Indicators) {
 
     $scope.refresh = function(){
       console.log('indicator:');
       console.log($scope.selectedIndicator);
 
-      var defaultParams = {
-        projector: ['area', 'value', 'row'],
-        return: ['groups', 'options'],
-        groupby: 'area'
-      };
-
-      var query = new CensusAPI.Query(defaultParams);
-      query.addParam($scope.selectedIndicator.params);
+      var query = new CensusAPI.Query($scope.selectedIndicator.params);
 
       console.log("query filters:");
       console.log(query._filters);
@@ -74,19 +67,19 @@ angular.module('frontendApp')
 //      {name: 'Population of self-employed people', identifier: {table: 4, column: 'e61_both', row: 'a65_self-employed'}},
       {
         name: 'Median monthly income',
-        params: {table: 18, column: 'n118_households', aggregate: 'median'},
+        params: _.extend(_.clone(Indicators.queries.householdIncome, true), Indicators.queries.areaMedianModifier),
         config: _medianMonthlyIncomeConfig,
         parser: _medianMonthlyIncomeParser
       },
       {
         name: 'Most common monthly income',
-        params: {table: 18, column: 'n118_households', aggregate: 'max'},
+        params: _.extend(_.clone(Indicators.queries.householdIncome, true), Indicators.queries.areaModeModifier),
         config: _medianMonthlyIncomeConfig,
         parser: _medianMonthlyIncomeParser
       },
       {
         name: 'Median housing rental amount',
-        params: {table: 20, aggregate: 'median'},
+        params: _.extend(_.clone(Indicators.queries.householdRent, true), Indicators.queries.areaModeModifier),
         config: _medianMonthlyIncomeConfig,
         parser: _medianMonthlyIncomeParser
       }
