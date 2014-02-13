@@ -9,6 +9,19 @@ from log import logger
 import geo_naming
 import time
 
+def is_good_datapoint(region, district, area, table, row, column, value):
+    # Filter out null/none value.
+    # NOTE: 
+    #    * 0 is meaningful and we will keep it.
+    #    * 0 visually appears as '-' in original XLS file.
+    if (value == '') or ('none' in row):
+        return False
+    # Special treatment for tab0 because not all areas have 7 rows in table body
+    # See issue #35
+    if row in ['tab0_total', 'tab0_proportion']:
+        return False
+    return True
+
 def json_to_data_points(args):
     # datapoints:
     # (region, district, area, table, row, column, value)
@@ -22,12 +35,9 @@ def json_to_data_points(args):
         for j in range(len(raw['column_names'])):
             column = raw['column_names'][j]
             value = raw['data'][i][j]
-            # Filter out null/none value.
-            # NOTE: 
-            #    * 0 is meaningful and we will keep it.
-            #    * 0 visually appears as '-' in original XLS file.
-            if value != '' and (not 'none' in row):
-                datapoints.append((region, district, area, table, row, column, value))
+            dp = (region, district, area, table, row, column, value)
+            if is_good_datapoint(*dp):
+                datapoints.append(dp)
     logger.info('Add %s values from %s', len(datapoints), filename)
     return datapoints
 
