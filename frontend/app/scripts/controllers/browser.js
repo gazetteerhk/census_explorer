@@ -15,12 +15,12 @@ angular.module('frontendApp').controller('BrowserCtrl', ['$scope', 'CensusAPI', 
     q.fetch().then(function(data) {
       $scope.options = data.options;
       $scope.meta = data.meta;
-      console.log('data');
-      console.log(data);
+      //console.log('data');
+      //console.log(data);
 
       $scope.tableParams = new ngTableParams({
         page: 1,            // show first page
-        count: 10           // count per page
+        count: 5           // count per page
       }, {
         total: data.meta.length, // length of data
         getData: function($defer, params) {
