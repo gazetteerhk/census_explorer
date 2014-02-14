@@ -24,5 +24,12 @@ geo_naming.main()
 logger.info('Combine JSONs to single CSV')
 combine_json.main()
 
-logger.info('Convert translation dicts to i18next format')
-translation_for_i18next.main()
+# Data preparation pipeline is for general purpose.
+# The following generates translation maps for our frontend use,
+# and the output is under version control.
+# So it is removed from the pipeline.
+# 
+# Translation maintainer should manually execute it and commit new files.
+#
+#logger.info('Convert translation dicts to i18next format')
+#translation_for_i18next.main()
