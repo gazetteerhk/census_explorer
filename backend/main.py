@@ -43,10 +43,21 @@ def parse_argument(query_string):
     res = map(urllib.unquote_plus, query_string)
     return res
 
-def _project_dataframe(df, projectors):
+def get_arg_list(key):
+    value = request.args.get(key, None)
+    if value:
+        return value.split(',')
+    else:
+        return []
+
+def _project_dataframe(df, projectors, skip=0, count=-1):
     data = {}
     for p in projectors:
-        data[p] = list(df[p])
+        if count != -1:
+            _end = min((skip+count), len(df[p]))
+            data[p] = list(df[p][skip:_end])
+        else:
+            data[p] = list(df[p][skip:])
     return data
 
 # Aggregation functions: --------------
@@ -163,11 +174,11 @@ def api():
     # Filters:
     filters = ['region', 'district', 'area', 'table', 'row', 'column']
     # Projectors:
-    projectors = parse_argument(request.args.getlist('projector', None))
+    projectors = parse_argument(get_arg_list('projector'))
     if not projectors:
         projectors = ['value']
     # Functions:
-    ret_options = parse_argument(request.args.getlist('return', None))
+    ret_options = parse_argument(get_arg_list('return'))
     if not ret_options:
         #ret_options = ['data', 'groups', 'options']
         ret_options = []
@@ -176,13 +187,17 @@ def api():
     #NOTE: Can not parse_argument on it, or the str converts to a list
     aggregate = request.args.get('aggregate', None)
 
+    skip = int(request.args.get('skip', '0'))
+    count = int(request.args.get('count', '-1'))
+
     response = {'meta': {}}
+    response['meta']['request'] = {'skip': skip, 'count': count}
 
     # Filters
     df = df_census
     logger.info('start filtering. df len: %d', len(df))
     for f in filters:
-        fvals = parse_argument(request.args.getlist(f, None))
+        fvals = parse_argument(get_arg_list(f))
         if fvals:
             df = df[reduce(lambda a, b: a | (df[f] == b), fvals, 
                 pandas.Series([False] * len(df), index=df.index))]
@@ -197,7 +212,12 @@ def api():
         options[f] = list(df[f].unique())
 
     # Projectors
-    data = _project_dataframe(df, projectors)
+    data = _project_dataframe(df, projectors, skip, count)
+
+    response['meta']['response'] = {
+            'skip': skip,
+            'count': len(data.values()[0]),
+            }
 
     # Groupby and Aggregate
     groups = {}

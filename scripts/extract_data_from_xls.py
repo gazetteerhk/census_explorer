@@ -150,6 +150,8 @@ def extract_table(sheet, table, name, names, header, body, **kwargs):
     row2, col2 = cell_name_to_pos(body[1])
     row_names = [get_identifier(sheet, table, i, col1) for i in range(row1,row2+1)]
 
+    #logger.debug(str((sheet, table, name, names, header, body)))
+
     data = []
     for i in range(row1, row2 + 1):
         data.append([sheet.cell(i, j).value for j in range(col1 + 1, col2 + 1)])
@@ -369,6 +371,7 @@ def main():
     sh.rm('-rf', OUTPUT_PREFIX)
     sh.mkdir('-p', OUTPUT_PREFIX)
     files = [fn for fn in sh.ls(INPUT_PREFIX).split()]
+    files = [fn for fn in files if fn.endswith('.xlsx')]
 
     # Extract xls to JSON
     pool = multiprocessing.Pool()
