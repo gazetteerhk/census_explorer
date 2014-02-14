@@ -3,40 +3,47 @@
 // API browser
 angular.module('frontendApp').controller('BrowserCtrl', ['$scope', 'CensusAPI', 'ngTableParams', function($scope, CensusAPI, ngTableParams) {
   // Selected options
-  $scope.model = {};
+  $scope.model = {'skip': 0, 'count': 5};
   // Available options
   $scope.options = {};
 
   // Build the query from the model filters
   $scope.refresh = function() {
     var q = new CensusAPI.Query($scope.model);
-    q.addParam('return', 'options');
+    q.addParam('return', 'options,data');
+    q.addParam('projector', 'region,district,area,table,row,column,value');
+    // q.addParam('skip', '0');
+    // q.addParam('count', '5');
 
-    q.fetch().then(function(data) {
-      $scope.options = data.options;
-      $scope.meta = data.meta;
-      //console.log('data');
-      //console.log(data);
+    q.fetch().then(function(response) {
+      $scope.options = response.options;
+      $scope.meta = response.meta;
+      $scope.data = CensusAPI.joinData(response.data)
+      //console.log('response');
+      //console.log(response);
 
       $scope.tableParams = new ngTableParams({
         page: 1,            // show first page
         count: 5           // count per page
       }, {
-        total: data.meta.length, // length of data
+        total: response.meta.length, // length of data
         getData: function($defer, params) {
-          $scope.skip = (params.page() - 1) * params.count();
-          $scope.count = params.count();
+          $scope.model['skip'] = (params.page() - 1) * params.count();
+          $scope.model['count'] = params.count();
           var current_view_q = new CensusAPI.Query($scope.model);
           current_view_q.addParam('return', 'options,data');
           current_view_q.addParam('projector', 'region,district,area,table,row,column,value');
-          current_view_q.addParam('skip', $scope.skip);
-          current_view_q.addParam('count', $scope.count);
-          current_view_q.fetch().then(function(data){
-            $defer.resolve(CensusAPI.joinData(data.data));
+          current_view_q.addParam('skip', $scope.model['skip']);
+          current_view_q.addParam('count', $scope.model['count']);
+          current_view_q.fetch().then(function(response){
+            $scope.data = CensusAPI.joinData(response.data);
+            $defer.resolve($scope.data);
           })
         }
       });
 
+      $scope.tableParams.page(1);
+      //$scope.tableParams.reloadPages();
     });
   };
 

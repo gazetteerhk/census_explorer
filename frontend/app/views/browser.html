@@ -50,14 +50,16 @@
 </div>
 </form>
 
-<h2>Results
-  <small>{{meta.length}} data points in total</small>
+<h2>Results -
+  <small> Total {{meta.length}} data points, showing [{{ model.skip }}, {{ model.skip+model.count }})</small>
 </h2>
 
+<!-- <a ng-click="tableParams.page(1)">reload</a>
+ -->
 <!-- <table ng-table="tableParams" pagination-top template-pagination="custom/pager" class="table"> -->
 <!-- This is not in the ngTable version we are using: https://github.com/esvit/ng-table/issues/182 -->
-<table ng-table="tableParams" pagination-top template-pagination="custom/pager" class="table">
-  <tr ng-repeat="d in $data">
+<table ng-table="tableParams" template-pagination="custom/pager" class="table">
+  <tr ng-repeat="d in data">
    <td data-title="'Region'">
     {{d.region}}
   </td>
