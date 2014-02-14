@@ -12,19 +12,16 @@ angular.module('frontendApp', [
   ])
   .constant('serverPrefix', '/')
   .config(['$i18nextProvider', 'serverPrefix', function($i18nextProvider, serverPrefix) {
-
-//    console.log('init translation');
-//    console.log($i18nextProvider);
-//    console.log(serverPrefix);
     // window.i18n.loadNamespaces(['human_ns', 'generated_ns'], function() { /* loaded */ });
     //auto init , not necessary to call i18.init()
     $i18nextProvider.options = {
-      lng: 'en-US',
+      // lng: 'en-US', //removed to allow override by query string
       useCookie: false,
       useLocalStorage: false,
       fallbackLng: 'en-US',
       ns: 'human_ns',
       fallbackNS: ['generated_ns'],
+      load: 'current',
       // fallbackLng:false,
       resGetPath: serverPrefix + 'locale/__lng__/__ns__-translation.json'
     };
@@ -70,7 +67,8 @@ angular.module('frontendApp', [
       .otherwise({
         redirectTo: '/'
       })
-  }]).run([function() {
+  }]).run(['$i18next',function($i18next) {
     //hack to load explicitly extra namespace
+    //i18next deps is needed to ensure window.i18n get init first
     window.i18n.loadNamespaces(['generated_ns'], function() { /* loaded */ });
   }]);
