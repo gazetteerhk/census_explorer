@@ -30,11 +30,11 @@ def gen_one_language(sources, lang_code, fn_output):
     return d
 
 def main():
-    gen_one_language(sources, 'E', path.join(config.DIR_TRANSLATION, 'en_US', 'translation.json'))
-    gen_one_language(sources, 'E', path.join(config.DIR_TRANSLATION, 'dev', 'translation.json'))
-    gen_one_language(sources, 'S', path.join(config.DIR_TRANSLATION, 'zh_CN', 'translation.json'))
-    gen_one_language(sources, 'T', path.join(config.DIR_TRANSLATION, 'zh_HK', 'translation.json'))
-    gen_one_language(sources, 'T', path.join(config.DIR_TRANSLATION, 'zh_TW', 'translation.json'))
+    gen_one_language(sources, 'E', path.join(config.DIR_TRANSLATION, 'en_US', 'generated-translation.json'))
+    gen_one_language(sources, 'E', path.join(config.DIR_TRANSLATION, 'dev', 'generated-translation.json'))
+    gen_one_language(sources, 'S', path.join(config.DIR_TRANSLATION, 'zh_CN', 'generated-translation.json'))
+    gen_one_language(sources, 'T', path.join(config.DIR_TRANSLATION, 'zh_HK', 'generated-translation.json'))
+    gen_one_language(sources, 'T', path.join(config.DIR_TRANSLATION, 'zh_TW', 'generated-translation.json'))
 
 if __name__ == '__main__':
     main()
