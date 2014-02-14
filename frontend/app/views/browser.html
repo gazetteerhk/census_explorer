@@ -6,7 +6,7 @@
 
 <h2>Filters - 
   <small>
-    <a ng-click="clear()">Clear all filters</a>
+    <a href ng-click="clear()">Clear all filters</a>
   </small>
 </h2>
 
@@ -15,43 +15,43 @@
   <div class="col-md-2 form-group">
     <label>Area - <a href ng-click="clear('area')">clear</a></label>
     <select class="form-control" ng-model="model.area" ng-options="a for a in options.area" ng-change="refresh()"></select>
-    {{ options.area.length }} areas, {{ model.area.length }} selected
+    {{ options.area.length }} areas
   </div>
 
   <div class="col-md-2 form-group">
     <label>District - <a href ng-click="clear('district')">clear</a></label>
     <select class="form-control" ng-model="model.district" ng-options="a for a in options.district" ng-change="refresh()"></select>
-    {{ options.district.length }} districts, {{ model.district.length }} selected
+    {{ options.district.length }} districts
   </div>
 
   <div class="col-md-2 form-group">
     <label>Region - <a href ng-click="clear('region')">clear</a></label>
     <select class="form-control" ng-model="model.region" ng-options="a for a in options.region" ng-change="refresh()"></select>
-    {{ options.region.length }} regions, {{ model.region.length }} selected
+    {{ options.region.length }} regions
   </div>
 
   <div class="col-md-2 form-group">
     <label>Table - <a href ng-click="clear('table')">clear</a></label>
     <select class="form-control" ng-model="model.table" ng-options="a for a in options.table" ng-change="refresh()"></select>
-    {{ options.table.length }} tables, {{ model.table.length }} selected
+    {{ options.table.length }} tables
   </div>
 
   <div class="col-md-2 form-group">
     <label>Column - <a href ng-click="clear('column')">clear</a></label>
     <select class="form-control" ng-model="model.column" ng-options="a for a in options.column" ng-change="refresh()"></select>
-    {{ options.column.length }} columns, {{ model.column.length }} selected
+    {{ options.column.length }} columns
   </div>
 
   <div class="col-md-2 form-group">
     <label>Row - <a href ng-click="clear('row')">clear</a></label>
     <select class="form-control" ng-model="model.row" ng-options="a for a in options.row" ng-change="refresh()"></select>
-    {{ options.row.length }} rows, {{ model.row.length }} selected
+    {{ options.row.length }} rows
   </div>
 </div>
 </form>
 
 <h2>Results -
-  <small> Total {{meta.length}} data points, showing [{{ model.skip }}, {{ model.skip+model.count }})</small>
+  <small> Total {{meta.length}} data points, showing {{ model.skip+1 }} - {{ model.skip+model.count }}</small>
 </h2>
 
 <!-- <a ng-click="tableParams.page(1)">reload</a>

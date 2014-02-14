@@ -3,7 +3,8 @@
 // API browser
 angular.module('frontendApp').controller('BrowserCtrl', ['$scope', 'CensusAPI', 'ngTableParams', function($scope, CensusAPI, ngTableParams) {
   // Selected options
-  $scope.model = {'skip': 0, 'count': 5};
+  var _defaultModel = {skip: 0, count: 5};
+  $scope.model = _.clone(_defaultModel);
   // Available options
   $scope.options = {};
 
@@ -17,8 +18,11 @@ angular.module('frontendApp').controller('BrowserCtrl', ['$scope', 'CensusAPI', 
 
     q.fetch().then(function(response) {
       $scope.options = response.options;
+      // Sort the areas and regions
+      $scope.options.area = _.sortBy($scope.options.area);
+      $scope.options.district = _.sortBy($scope.options.district);
       $scope.meta = response.meta;
-      $scope.data = CensusAPI.joinData(response.data)
+      $scope.data = CensusAPI.joinData(response.data);
       //console.log('response');
       //console.log(response);
 
@@ -50,7 +54,7 @@ angular.module('frontendApp').controller('BrowserCtrl', ['$scope', 'CensusAPI', 
   // Clear all selections, or the selection for a single model field
   $scope.clear = function(field) {
     if (_.isUndefined(field)) {
-      $scope.model = {};
+      $scope.model = _.clone(_defaultModel);
     } else {
       delete $scope.model[field];
     }
