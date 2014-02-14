@@ -4,6 +4,10 @@
   </div>
 </div>
 
+<div>
+  Translate by locale? <input type="checkbox" name="translateByLocale" ng-model="translateByLocale">
+</div>
+
 <h2>Filters - 
   <small>
     <a href ng-click="clear()">Clear all filters</a>
@@ -14,37 +18,37 @@
 <div class="row">
   <div class="col-md-2 form-group">
     <label>Area - <a href ng-click="clear('area')">clear</a></label>
-    <select class="form-control" ng-model="model.area" ng-options="a for a in options.area" ng-change="refresh()"></select>
+    <select class="form-control" ng-model="model.area" ng-options="a | translateString:translateByLocale:'area' for a in options.area" ng-change="refresh()"></select>
     {{ options.area.length }} areas
   </div>
 
   <div class="col-md-2 form-group">
     <label>District - <a href ng-click="clear('district')">clear</a></label>
-    <select class="form-control" ng-model="model.district" ng-options="a for a in options.district" ng-change="refresh()"></select>
+    <select class="form-control" ng-model="model.district" ng-options="a | translateString:translateByLocale:'district' for a in options.district" ng-change="refresh()"></select>
     {{ options.district.length }} districts
   </div>
 
   <div class="col-md-2 form-group">
     <label>Region - <a href ng-click="clear('region')">clear</a></label>
-    <select class="form-control" ng-model="model.region" ng-options="a for a in options.region" ng-change="refresh()"></select>
+    <select class="form-control" ng-model="model.region" ng-options="a | translateString:translateByLocale:'region' for a in options.region" ng-change="refresh()"></select>
     {{ options.region.length }} regions
   </div>
 
   <div class="col-md-2 form-group">
     <label>Table - <a href ng-click="clear('table')">clear</a></label>
-    <select class="form-control" ng-model="model.table" ng-options="a for a in options.table" ng-change="refresh()"></select>
+    <select class="form-control" ng-model="model.table" ng-options="a | translateString:translateByLocale:'table' for a in options.table" ng-change="refresh()"></select>
     {{ options.table.length }} tables
   </div>
 
   <div class="col-md-2 form-group">
     <label>Column - <a href ng-click="clear('column')">clear</a></label>
-    <select class="form-control" ng-model="model.column" ng-options="a for a in options.column" ng-change="refresh()"></select>
+    <select class="form-control" ng-model="model.column" ng-options="a | translateString:translateByLocale:'column' for a in options.column" ng-change="refresh()"></select>
     {{ options.column.length }} columns
   </div>
 
   <div class="col-md-2 form-group">
     <label>Row - <a href ng-click="clear('row')">clear</a></label>
-    <select class="form-control" ng-model="model.row" ng-options="a for a in options.row" ng-change="refresh()"></select>
+    <select class="form-control" ng-model="model.row" ng-options="a | translateString:translateByLocale:'row' for a in options.row" ng-change="refresh()"></select>
     {{ options.row.length }} rows
   </div>
 </div>
@@ -54,9 +58,6 @@
   <small> Total {{meta.length}} data points, showing {{ model.skip+1 }} - {{ model.skip+model.count }}</small>
 </h2>
 
-<div>
-  Translate by locale? <input type="checkbox" name="translate_by_locale" ng-model="translate_by_locale">
-</div>
 
 <!-- <a ng-click="tableParams.page(1)">reload</a>
  -->
@@ -64,58 +65,28 @@
 <!-- This is not in the ngTable version we are using: https://github.com/esvit/ng-table/issues/182 -->
 <table ng-table="tableParams" template-pagination="custom/pager" class="table">
   <tr ng-repeat="d in data">
-   <td data-title="'Region'">
-    <span ng-if='translate_by_locale'>
-      {{'region.' + d.region | i18next}}
-    </span>
-    <span ng-if='!translate_by_locale'>
-      {{d.region}}
-    </span>
+  <td data-title="'Region'">
+    {{d.region | translateString:translateByLocale:'region'}}
   </td>
   <td data-title="'District'">
-    <span ng-if='translate_by_locale'>
-      {{'district.' + d.district | i18next}}
-    </span>
-    <span ng-if='!translate_by_locale'>
-      {{d.district}}
-    </span>  
+    {{d.district | translateString:translateByLocale:'district'}}
   </td>
   <td data-title="'Area'">
-    <span ng-if='translate_by_locale'>
-      {{'area.' + d.area | i18next}}
-    </span>
-    <span ng-if='!translate_by_locale'>
-      {{d.area}}
-    </span>  
+    {{d.area | translateString:translateByLocale:'area'}}
   </td>
   <td data-title="'Table'">
-    <span ng-if='translate_by_locale'>
-      {{'table.' + d.table | i18next}}
-    </span>
-    <span ng-if='!translate_by_locale'>
-      {{d.table}}
-    </span>  
+    {{d.table | translateString:translateByLocale:'table'}}
   </td>
   <td data-title="'Row'">
-    <span ng-if='translate_by_locale'>
-      {{'row.' + d.row | i18next}}
-    </span>
-    <span ng-if='!translate_by_locale'>
-      {{d.row}}
-    </span>  
+    {{d.row | translateString:translateByLocale:'row'}}
   </td>
   <td data-title="'Column'">
-    <span ng-if='translate_by_locale'>
-      {{'column.' + d.column | i18next}}
-    </span>
-    <span ng-if='!translate_by_locale'>
-      {{d.column}}
-    </span>  
+    {{d.column | translateString:translateByLocale:'column'}}
   </td>
   <td data-title="'Value'">
     {{d.value}}
   </td>
-</tr>
+  </tr>
 </table>
 
     <script type="text/ng-template" id="custom/pager">

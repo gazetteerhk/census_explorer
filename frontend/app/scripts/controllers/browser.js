@@ -64,3 +64,14 @@ angular.module('frontendApp').controller('BrowserCtrl', ['$scope', 'CensusAPI', 
   $scope.refresh();
 
 }]);
+
+angular.module('frontendApp').filter('translateString', function(){
+  return function(input, translateByLocale, prefix){
+    if (translateByLocale){
+      //return 'tran:' + prefix + '.' + input;
+      return i18n.t(prefix  + '.' + input);
+    } else {
+      return input;
+    } 
+  }
+});
