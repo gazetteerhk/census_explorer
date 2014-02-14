@@ -50,16 +50,32 @@
 
 <h2>Results</h2>
 
-    <table ng-table="tableParams" template-pagination="custom/pager" class="table">
-        <tr ng-repeat="d in $data">
-            <td data-title="'Area'">
-                {{d.area}}
-            </td>
-            <td data-title="'Value'">
-                {{d.value}}
-            </td>
-        </tr>
-    </table>
+<table ng-table="tableParams" template-pagination="custom/pager" class="table">
+  <tr ng-repeat="d in $data">
+   <td data-title="'Region'">
+    {{d.region}}
+  </td>
+  <td data-title="'District'">
+    {{d.district}}
+  </td>
+  <td data-title="'Area'">
+    {{d.area}}
+  </td>
+  <td data-title="'Table'">
+    {{d.table}}
+  </td>
+  <td data-title="'Row'">
+    {{d.row}}
+  </td>
+  <td data-title="'Column'">
+    {{d.column}}
+  </td>
+  <td data-title="'Value'">
+    {{d.value}}
+  </td>
+</tr>
+</table>
+
     <script type="text/ng-template" id="custom/pager">
         <ul class="pager ng-cloak">
           <li ng-repeat="page in pages"
