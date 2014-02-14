@@ -4,54 +4,129 @@
   </div>
 </div>
 
-<button ng-click="clear()" class="btn btn-danger">Clear all filters</button>
+<h2>Filters - 
+  <small>
+    <a href ng-click="clear()">Clear all filters</a>
+  </small>
+</h2>
 
 <form>
 <div class="row">
-  <div class="col-md-4 form-group">
+  <div class="col-md-2 form-group">
     <label>Area - <a href ng-click="clear('area')">clear</a></label>
-    <select class="form-control" multiple size="10" ng-model="model.area" ng-options="a for a in options.area" ng-change="refresh()"></select>
-    {{ options.area.length }} areas, {{ model.area.length }} selected
+    <select class="form-control" ng-model="model.area" ng-options="a for a in options.area" ng-change="refresh()"></select>
+    {{ options.area.length }} areas
   </div>
 
-  <div class="col-md-4 form-group">
+  <div class="col-md-2 form-group">
     <label>District - <a href ng-click="clear('district')">clear</a></label>
-    <select class="form-control" multiple size="10" ng-model="model.district" ng-options="a for a in options.district" ng-change="refresh()"></select>
-    {{ options.district.length }} districts, {{ model.district.length }} selected
+    <select class="form-control" ng-model="model.district" ng-options="a for a in options.district" ng-change="refresh()"></select>
+    {{ options.district.length }} districts
   </div>
 
-  <div class="col-md-4 form-group">
+  <div class="col-md-2 form-group">
     <label>Region - <a href ng-click="clear('region')">clear</a></label>
-    <select class="form-control" multiple size="10" ng-model="model.region" ng-options="a for a in options.region" ng-change="refresh()"></select>
-    {{ options.region.length }} regions, {{ model.region.length }} selected
+    <select class="form-control" ng-model="model.region" ng-options="a for a in options.region" ng-change="refresh()"></select>
+    {{ options.region.length }} regions
   </div>
-</div>
 
-<div class="row">
-  <div class="col-md-4 form-group">
+  <div class="col-md-2 form-group">
     <label>Table - <a href ng-click="clear('table')">clear</a></label>
-    <select class="form-control" multiple size="10" ng-model="model.table" ng-options="a for a in options.table" ng-change="refresh()"></select>
-    {{ options.table.length }} tables, {{ model.table.length }} selected
+    <select class="form-control" ng-model="model.table" ng-options="a for a in options.table" ng-change="refresh()"></select>
+    {{ options.table.length }} tables
   </div>
 
-  <div class="col-md-4 form-group">
+  <div class="col-md-2 form-group">
     <label>Column - <a href ng-click="clear('column')">clear</a></label>
-    <select class="form-control" multiple size="10" ng-model="model.column" ng-options="a for a in options.column" ng-change="refresh()"></select>
-    {{ options.column.length }} columns, {{ model.column.length }} selected
+    <select class="form-control" ng-model="model.column" ng-options="a for a in options.column" ng-change="refresh()"></select>
+    {{ options.column.length }} columns
   </div>
 
-  <div class="col-md-4 form-group">
+  <div class="col-md-2 form-group">
     <label>Row - <a href ng-click="clear('row')">clear</a></label>
-    <select class="form-control" multiple size="10" ng-model="model.row" ng-options="a for a in options.row" ng-change="refresh()"></select>
-    {{ options.row.length }} rows, {{ model.row.length }} selected
+    <select class="form-control" ng-model="model.row" ng-options="a for a in options.row" ng-change="refresh()"></select>
+    {{ options.row.length }} rows
   </div>
 </div>
-
-<div class="row">
-  <h3>Total {{ meta.length }} data length.</h3>
-</div>
-
 </form>
+
+<h2>Results -
+  <small> Total {{meta.length}} data points, showing {{ model.skip+1 }} - {{ model.skip+model.count }}</small>
+</h2>
+
+<!-- <a ng-click="tableParams.page(1)">reload</a>
+ -->
+<!-- <table ng-table="tableParams" pagination-top template-pagination="custom/pager" class="table"> -->
+<!-- This is not in the ngTable version we are using: https://github.com/esvit/ng-table/issues/182 -->
+<table ng-table="tableParams" template-pagination="custom/pager" class="table">
+  <tr ng-repeat="d in data">
+   <td data-title="'Region'">
+    {{d.region}}
+  </td>
+  <td data-title="'District'">
+    {{d.district}}
+  </td>
+  <td data-title="'Area'">
+    {{d.area}}
+  </td>
+  <td data-title="'Table'">
+    {{d.table}}
+  </td>
+  <td data-title="'Row'">
+    {{d.row}}
+  </td>
+  <td data-title="'Column'">
+    {{d.column}}
+  </td>
+  <td data-title="'Value'">
+    {{d.value}}
+  </td>
+</tr>
+</table>
+
+    <script type="text/ng-template" id="custom/pager">
+        <ul class="pager ng-cloak">
+          <li ng-repeat="page in pages"
+                ng-class="{'disabled': !page.active, 'previous': page.type == 'prev', 'next': page.type == 'next'}"
+                ng-show="page.type == 'prev' || page.type == 'next'" ng-switch="page.type">
+            <a ng-switch-when="prev" ng-click="params.page(page.number)" href="">&laquo; Previous</a>
+            <a ng-switch-when="next" ng-click="params.page(page.number)" href="">Next &raquo;</a>
+          </li>
+            <li>
+            <div class="btn-group">
+            <button type="button" ng-class="{'active':params.count() == 5}" ng-click="params.count(10)" class="btn btn-default">5</button>
+            <button type="button" ng-class="{'active':params.count() == 10}" ng-click="params.count(10)" class="btn btn-default">10</button>
+            <button type="button" ng-class="{'active':params.count() == 25}" ng-click="params.count(25)" class="btn btn-default">25</button>
+            <button type="button" ng-class="{'active':params.count() == 50}" ng-click="params.count(50)" class="btn btn-default">50</button>
+            <button type="button" ng-class="{'active':params.count() == 100}" ng-click="params.count(100)" class="btn btn-default">100</button>
+            </div>
+            </li>
+        </ul>
+    </script>
+
+<h2>For Developers</h2>
+
+A typical App may look like this:
+
+<pre>
+angular.module('frontendApp').controller('MyAppCtrl', ['$scope', 'CensusAPI', function($scope, CensusAPI){
+
+    var q = new CensusAPI.Query({{model}});
+    q.addParam('return', 'data');
+
+    q.fetch().then(function(response) {
+      // Use response.data
+      // You may want to CensusAPI.joinData(response.data)
+    }
+    ...
+</pre>
+
+<h2>Debug section</h2>
+Model:
 <pre>
   {{ model }}
+</pre>
+Meta:
+<pre>
+  {{ meta }}
 </pre>
