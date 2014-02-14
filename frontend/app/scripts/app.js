@@ -11,7 +11,8 @@ angular.module('frontendApp', [
     'jm.i18next'
   ])
   .constant('serverPrefix', '/')
-  .config(['$i18nextProvider', 'serverPrefix', function($i18nextProvider, serverPrefix) {
+  .constant('translationPrefix', '/')
+  .config(['$i18nextProvider', 'translationPrefix', function($i18nextProvider, translationPrefix) {
     // window.i18n.loadNamespaces(['human_ns', 'generated_ns'], function() { /* loaded */ });
     //auto init , not necessary to call i18.init()
     $i18nextProvider.options = {
@@ -19,11 +20,11 @@ angular.module('frontendApp', [
       useCookie: false,
       useLocalStorage: false,
       fallbackLng: 'en-US',
-      ns: 'human_ns',
-      fallbackNS: ['generated_ns'],
+      ns: 'generated_ns', //human_ns',
+      fallbackNS: ['human_ns'], //['generated_ns'],
       load: 'current',
       // fallbackLng:false,
-      resGetPath: serverPrefix + 'locale/__lng__/__ns__-translation.json'
+      resGetPath: translationPrefix + 'locale/__lng__/__ns__-translation.json'
     };
   }])
   .config(['$routeProvider', function($routeProvider) {

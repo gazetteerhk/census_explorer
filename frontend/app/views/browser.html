@@ -54,6 +54,10 @@
   <small> Total {{meta.length}} data points, showing {{ model.skip+1 }} - {{ model.skip+model.count }}</small>
 </h2>
 
+<div>
+  Translate by locale? <input type="checkbox" name="translate_by_locale" ng-model="translate_by_locale">
+</div>
+
 <!-- <a ng-click="tableParams.page(1)">reload</a>
  -->
 <!-- <table ng-table="tableParams" pagination-top template-pagination="custom/pager" class="table"> -->
@@ -61,22 +65,52 @@
 <table ng-table="tableParams" template-pagination="custom/pager" class="table">
   <tr ng-repeat="d in data">
    <td data-title="'Region'">
-    {{d.region}}
+    <span ng-if='translate_by_locale'>
+      {{'region.' + d.region | i18next}}
+    </span>
+    <span ng-if='!translate_by_locale'>
+      {{d.region}}
+    </span>
   </td>
   <td data-title="'District'">
-    {{d.district}}
+    <span ng-if='translate_by_locale'>
+      {{'district.' + d.district | i18next}}
+    </span>
+    <span ng-if='!translate_by_locale'>
+      {{d.district}}
+    </span>  
   </td>
   <td data-title="'Area'">
-    {{d.area}}
+    <span ng-if='translate_by_locale'>
+      {{'area.' + d.area | i18next}}
+    </span>
+    <span ng-if='!translate_by_locale'>
+      {{d.area}}
+    </span>  
   </td>
   <td data-title="'Table'">
-    {{d.table}}
+    <span ng-if='translate_by_locale'>
+      {{'table.' + d.table | i18next}}
+    </span>
+    <span ng-if='!translate_by_locale'>
+      {{d.table}}
+    </span>  
   </td>
   <td data-title="'Row'">
-    {{d.row}}
+    <span ng-if='translate_by_locale'>
+      {{'row.' + d.row | i18next}}
+    </span>
+    <span ng-if='!translate_by_locale'>
+      {{d.row}}
+    </span>  
   </td>
   <td data-title="'Column'">
-    {{d.column}}
+    <span ng-if='translate_by_locale'>
+      {{'column.' + d.column | i18next}}
+    </span>
+    <span ng-if='!translate_by_locale'>
+      {{d.column}}
+    </span>  
   </td>
   <td data-title="'Value'">
     {{d.value}}
