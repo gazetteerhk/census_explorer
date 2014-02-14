@@ -28,6 +28,7 @@ module.exports = function(config) {
       'app/bower_components/leaflet-dist/leaflet.js',
       'app/bower_components/angular-leaflet-directive/dist/angular-leaflet-directive.js',
       'app/bower_components/topojson/topojson.js',
+      'app/bower_components/i18next/release/i18next-1.7.1.js',
       'app/scripts/*.js',
       'app/scripts/**/*.js',
       'test/mock/**/*.js',
