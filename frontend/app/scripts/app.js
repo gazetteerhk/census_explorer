@@ -8,7 +8,9 @@ angular.module('frontendApp', [
     'ngRoute',
     'ngAnimate',
     'leaflet-directive',
-    'jm.i18next'
+    'jm.i18next',
+    'ajoslin.promise-tracker',
+    'cgBusy'
   ])
   .constant('serverPrefix', '/')
   .config(['$i18nextProvider', 'serverPrefix', function($i18nextProvider, serverPrefix) {
@@ -67,7 +69,7 @@ angular.module('frontendApp', [
       .otherwise({
         redirectTo: '/'
       })
-  }]).run(['$i18next',function($i18next) {
+  }]).run(['$i18next', function($i18next) {
     //hack to load explicitly extra namespace
     //i18next deps is needed to ensure window.i18n get init first
     window.i18n.loadNamespaces(['generated_ns'], function() { /* loaded */ });
