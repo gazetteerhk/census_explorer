@@ -39,6 +39,17 @@ angular.module('frontendApp').directive('hkMap', function() {
         maxZoom: 18
       };
 
+      $scope.layers = {
+        baselayers: {
+          googleRoadMap: {
+            name: 'Google Streets',
+            layerType: 'ROADMAP',
+            type: 'google'
+          }
+        }
+      };
+
+
       $scope._singleSelect = _.has($attrs, 'singleSelect');
 
       // The zoom level after which areas are drawn
@@ -235,7 +246,7 @@ angular.module('frontendApp').directive('hkMap', function() {
       });
 
     }],
-    template: '<leaflet center="center" defaults="defaults" geojson="geojson"></leaflet>' +
+    template: '<leaflet center="center" defaults="defaults" geojson="geojson" layers="layers"></leaflet>' +
       '<div class="map-overlay" ng-show="hoveredFeature">{{ "area.code."+hoveredFeature | i18next}}</div>'
   }
 });
