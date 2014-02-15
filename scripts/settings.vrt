@@ -1,0 +1,8 @@
+<OGRVRTDataSource>       
+    <OGRVRTLayer name="combine">
+        <SrcDataSource>combine.csv</SrcDataSource>
+        <GeometryType>wkbPoint</GeometryType>
+        <LayerSRS>EPSG:2326</LayerSRS>
+        <GeometryField encoding="PointFromColumns" x="EASTING" y="NORTHING"/>
+    </OGRVRTLayer>    
+</OGRVRTDataSource>

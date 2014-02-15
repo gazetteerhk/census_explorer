@@ -1,8 +1,13 @@
 # -*- coding: utf8 -*-
 # Requirement:
-#   a folder "data" which contains all the public facility csv files
-#   - xlwt : for writing xls file
-#   - chardet: for determine the file encoding
+#   1) a folder "data" which contains all the public facility csv files
+#   2) Environment Variables graphically in Windows
+#       add a system variable: GDAL_DATA and the value is C:\Program Files (x86)\QGIS Dufour\share\gdal
+#   Reference: http://stackoverflow.com/questions/14444310/how-to-set-the-gdal-data-environment-variable-to-point-to-the-directory-containi
+#   3) library
+#      - xlwt : for writing xls file 
+#      - chardet: for determine the file encoding
+#
 # Note: 
 #   the current CSV is in encoding utf-16-le, need to decode as utf-8
 #
@@ -14,10 +19,9 @@
 # 2. No English Address for all the country Park
 # 3. Wrong extraction for Tsz Lok Community Residents' Association
 #   This is due to there are the tab is appears in the English name field,
-#   Solution: manually update LIBRARY_LCSD_20131213.csv, row# 187
-#  
-# After obtain the csv file
-# 1) use qgis to generate the geojson file
+#   Solution: call fixedCSV()
+  
+
 
 import os
 import csv
@@ -29,8 +33,11 @@ from os.path import isfile, join
 import xlwt 
 import chardet
 
+import json
+import subprocess 
+
 #columns we want to extract
-wantedCols = [
+WANTEDCOLS = [
 '"ENGLISH CATEGORY"',
 '"中文類別"',
 '"ENGLISH NAME"',
@@ -44,6 +51,16 @@ wantedCols = [
 '"OPENING HOURS"',
 '"EMAIL ADDRESS"',            
 '"WEBSITE"'] 
+
+OGR2OGR_PATH = '"C:/Program Files (x86)/QGIS Dufour/bin/ogr2ogr.exe"'
+# the setting file for ogr2ogr command
+PATH_TO_VRT_FILE = "C:/tmp/test/settings.vrt" # must be full path
+# the GeoJSON file  which contains constituency area information
+HK_CA_POLYGON_FILE = 'HKConstituencyArea.json'
+
+OUTPUT_FILENAME = "pub_facility.geojson"
+OUTPUT_WITH_CACODE_FILENAME = "pub_facility_with_CACODE.geojson"
+
 
 #reference: http://stackoverflow.com/questions/9177820/python-utf-16-csv-reader
 class Recoder(object):
@@ -185,8 +202,29 @@ def extractColumns(row):
 
     return cols
 
+#fix CSV file - fix the entry about LIBRARY_LCSD_20131213.csv
+def fixCSV():
+    newlines = []
+    base_path = os.path.abspath("./data")
+    originalText = "Tsz Lok Community Residents' Association\t\t\t\t\t\t\tTsz Lok Community Residents' Association"
+    replacementText = "Tsz Lok Community Residents' Association"
+    
+    #get file LIBRARY_LCSD_20131213.csv
+    filepath = base_path + "\LIBRARY_LCSD_20131213.csv"    
+    
+    infile = codecs.open(filepath,'r', encoding='utf-16-le')    
+    for line in infile:        
+        if originalText in line:            
+            newlines.append(line.replace(originalText,replacementText))
+        else:
+            newlines.append(line)
+    infile.close()
 
-#combineCSV_as_xls_file(outfn) - based on the wantedCols, extract the corrsponding data and combine all the data into a single excel file
+    outfile = codecs.open(filepath, 'w', encoding='utf-16-le')
+    outfile.writelines(newlines)
+    outfile.close()
+
+#combineCSV_as_xls_file(outfn) - based on the WANTEDCOLS, extract the corrsponding data and combine all the data into a single excel file
 #parameter
 #   outfn - output excel file name, e.g. combine.xls
 def combineCSV_as_xls_file(outfn):    
@@ -200,7 +238,7 @@ def combineCSV_as_xls_file(outfn):
 
     #prepare the header
     colNum = 0
-    for data in wantedCols:
+    for data in WANTEDCOLS:
         udata = unicode(data.decode('UTF-8'))
         sheet.write(rowNum, colNum, udata.replace('"',"")) 
         colNum = colNum + 1
@@ -214,7 +252,7 @@ def combineCSV_as_xls_file(outfn):
 
         #get the file name without extension
         filename, _ = os.path.splitext(filepath)
-        print filename
+        #print filename
         #open the csv file   
         with open(refFile_path,'rb') as f:
             #decode file first
@@ -228,7 +266,7 @@ def combineCSV_as_xls_file(outfn):
             #colIdx = []
             colIdx = {}
             for col in columnName:                
-                if (col in wantedCols):                                        
+                if (col in WANTEDCOLS):                                        
                     colIdx[col] = columnName.index(col)                     
             
             
@@ -239,7 +277,7 @@ def combineCSV_as_xls_file(outfn):
 
                     #get the correspondind wanted columns and save to csv file
                     colNum = 0 #reset
-                    for key in wantedCols:
+                    for key in WANTEDCOLS:
                         #get the index                        
                         idx = colIdx[key]    
 
@@ -253,7 +291,7 @@ def combineCSV_as_xls_file(outfn):
                     rowNum = rowNum+1
     workbook.save(outfn) 
 
-#combineCSV_as_csv_file(outfn) - based on the wantedCols, extract the corrsponding data and combine all the data into a single csv file
+#combineCSV_as_csv_file(outfn) - based on the WANTEDCOLS, extract the corrsponding data and combine all the data into a single csv file
 #parameter
 #   outfn - output csv file name, e.g. combine.csv
 def combineCSV_as_csv_file(outfn):    
@@ -267,7 +305,7 @@ def combineCSV_as_csv_file(outfn):
 
     #write the header        
     header = []
-    for data in wantedCols:                   
+    for data in WANTEDCOLS:                   
         header.append(data[1:-1]) #remove leading and tailing double quote
     
     csvWriter.writerow(header)
@@ -279,7 +317,7 @@ def combineCSV_as_csv_file(outfn):
 
         #get the file name without extension
         filename, _ = os.path.splitext(filepath)
-        print filename
+        #print filename
         #open the csv file   
         with open(refFile_path,'rb') as f:
             #decode file first
@@ -292,7 +330,7 @@ def combineCSV_as_csv_file(outfn):
             #get the index about which column we should extract            
             colIdx = {}
             for col in columnName:                
-                if (col in wantedCols):                                        
+                if (col in WANTEDCOLS):                                        
                     colIdx[col] = columnName.index(col)                     
             
             
@@ -303,7 +341,7 @@ def combineCSV_as_csv_file(outfn):
 
                     #get the correspondind wanted columns and save to csv file
                     rowData = []                    
-                    for key in wantedCols:
+                    for key in WANTEDCOLS:
                         #get the index                        
                         idx = colIdx[key]    
 
@@ -317,6 +355,150 @@ def combineCSV_as_csv_file(outfn):
               
 
     ff.close()    
+
+# pnpoly(coords, point) - check the point in polygon
+# parameter
+#   coords - list of [x, y] coordinates
+#   point - [x, y] coordinates
+#reference: http://stackoverflow.com/questions/217578/point-in-polygon-aka-hit-test
+def pnpoly(coords, point):
+    nvert = len(coords)
+    vertx = []
+    verty = []
+    for element in coords:
+        vertx.append(element[0])
+        verty.append(element[1])
+    vertx.append(vertx[0])
+    verty.append(verty[0])
+    testx = point[0]
+    testy = point[1]
+    
+    j=nvert-1
+    c = False
+    for i in range(nvert):
+        if (((verty[i]>testy) != (verty[j]>testy)) and (testx < (vertx[j]-vertx[i]) * (testy-verty[i]) / (verty[j]-verty[i]) + vertx[i]) ):
+            c = not c
+        j=i
+
+    return c
+
+
+# addCACODEProperty(polygonJSONfn) - scan through the GeoJSON file, 
+#   for each public facility location, check it belongs to which constituency area (CA)
+#   and then create a new property "CACODE" and store the corrsponding location
+#   (e.g. Post Offices, Oi Man Post Office located at CA G22)
+#   Also, this function will remove irrevlant properties about EASTING and NORTHING
+# parameter
+#   polygonJSONfn - the GeoJSON file name which contains constituency area information
+#   pubFacilityJSONfn - the GeoJSON file name which contains public facility information
+#   outputfn - output file name
+def addCACODEProperty(polygonJSONfn, pubFacilityJSONfn, outputfn):
+    #read json file
+    json_data = open(polygonJSONfn)
+    data = json.load(json_data)
+    json_data.close()
+
+    CACoords = {}
+
+    # for each features
+    numOfFeatures = len(data['features'])
+    for i in range(numOfFeatures):
+        #get coordinates
+        ca = data['features'][i]['properties']['CACODE']    
+        coords =  data['features'][i]['geometry']['coordinates'][0] 
+        CACoords[ca] = coords   
+
+    #print "prepared the CACoords dict!"
+
+    pub_facility_json_data = open(pubFacilityJSONfn)
+    pub_facility_data = json.load(pub_facility_json_data)
+    pub_facility_json_data.close()
+
+    numOfPubFacility = len(pub_facility_data['features'])
+
+    #for each public facility, create placeholder
+    #  remove EASTING and NORTHING
+    for i in range(numOfPubFacility):
+        pub_facility_data['features'][i]['properties']['CACODE']    = "-"
+        del pub_facility_data['features'][i]['properties']['EASTING']
+        del pub_facility_data['features'][i]['properties']['NORTHING']
+
+    #for each CA
+    print "Please wait for a while... It takes some time..."
+    for ca, coords in CACoords.items():
+        #print ca
+        #form polygon
+        #polygon = Polygon(*coords)
+        #for each public facility   
+        for i in range(numOfPubFacility):
+            #if there is no CACODE, do the checking             
+            if pub_facility_data['features'][i]['properties']['CACODE'] == "-":
+                location = pub_facility_data['features'][i]['geometry']['coordinates']
+                #point = Point(location)
+                #check if it is in or out           
+                #if polygon.encloses_point(point):
+                #   print pub_facility_data['features'][i]['properties']['ENGLISH CATEGORY']                                                
+                #   print pub_facility_data['features'][i]['properties']['ENGLISH NAME']                                                
+
+                if pnpoly(coords, location):                
+                    pub_facility_data['features'][i]['properties']['CACODE'] = ca   
+                    #print pub_facility_data['features'][i]['properties']['ENGLISH CATEGORY']                                               
+                    #print pub_facility_data['features'][i]['properties']['ENGLISH NAME']   
+        
+
+
+    # output the file in utf-8, but maintain the Chinese characters
+    s = json.dumps(pub_facility_data, indent=2, ensure_ascii=False)
+    open(outputfn, 'w+').write(s.encode('utf-8'))
+
+# randomCheck(polygonJSONfn, pubFacilityJSONfn) - random select a polygon and then look for the which pubFacility belongs to it
+#   polygonJSONfn - the GeoJSON file name which contains constituency area information
+#   pubFacilityJSONfn - the GeoJSON file name which contains public facility information
+# Requirement:  sympy 
+# Note: long processing time...
+# checked
+#  Total number of public facility in C21 : 15
+def randomCheck(polygonJSONfn, pubFacilityJSONfn):  
+    from sympy import Polygon
+    from sympy.geometry import Point
+    import random
+    totalMatch = 0
+    #read json file
+    json_data = open(polygonJSONfn)
+    data = json.load(json_data)
+    json_data.close()
+
+    CACoords = {}
+
+    # for each features
+    numOfFeatures = len(data['features'])
+    #get a random number
+    idx = random.randint(0, numOfFeatures-1)
+
+    ca = data['features'][idx]['properties']['CACODE']  
+    #print ca
+    coords =  data['features'][idx]['geometry']['coordinates'][0]
+    #form polygon
+    polygon = Polygon(*coords)
+
+    pub_facility_json_data = open(pubFacilityJSONfn)
+    pub_facility_data = json.load(pub_facility_json_data)
+    pub_facility_json_data.close()
+
+    numOfPubFacility = len(pub_facility_data['features'])
+    print "Please wait for a while... It takes some time..."
+    #for each public facility   
+    for i in range(numOfPubFacility):       
+        location = pub_facility_data['features'][i]['geometry']['coordinates']
+        point = Point(location)
+        #check if it is in or out           
+        if polygon.encloses_point(point):
+            print pub_facility_data['features'][i]['properties']['ENGLISH CATEGORY'], 
+            print pub_facility_data['features'][i]['properties']['ENGLISH NAME']                                                
+            totalMatch = totalMatch + 1
+
+
+    print "Total number of public facility in ", ca, ":", totalMatch
     
 
 if __name__ == "__main__":
@@ -326,9 +508,27 @@ if __name__ == "__main__":
     #check the difference column amony all csv files
     #check_for_differences()    
 
+    #fix csv file()
+    fixCSV()
+    print "Fix CSV - DONE!"
+
     #combine csv files
     #combineCSV_as_xls_file('combine.xls')
 
     #combine csv files and save as single csv file
     combineCSV_as_csv_file('combine.csv')
-    print "done!"    
+    print "Combine files as single csv file  - DONE!"
+
+    #call ogr2ogr command
+        
+    commandLine = OGR2OGR_PATH + " -f GeoJSON " + OUTPUT_FILENAME + " -s_srs EPSG:2326 " + PATH_TO_VRT_FILE + " -t_srs EPSG:4326"
+    proc = subprocess.Popen(commandLine)  
+    proc.wait() #wait until it finish
+    print "Export GeoJSON in WRS84  - DONE!"  
+
+
+    addCACODEProperty(HK_CA_POLYGON_FILE, OUTPUT_FILENAME, OUTPUT_WITH_CACODE_FILENAME)
+    print "Add CACODEProperty to GeoJSON! - DONE!"    
+    
+    #randomCheck('HKConstituencyArea.json', 'pub_facility.geojson')
+    
