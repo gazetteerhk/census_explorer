@@ -48,6 +48,16 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
         maxZoom: 18
       };
 
+      $scope.layers = {
+        baselayers: {
+          googleRoadMap: {
+            name: 'Google Streets',
+            layerType: 'ROADMAP',
+            type: 'google'
+          }
+        }
+      };
+
       // Default map configuration
       var _defaultConfig = {
         colors: colorbrewer.Blues[5],  // Colors to use for the scale
@@ -198,7 +208,7 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
       $scope._defaultStyle = {
         color: "#2b8cbe",
         fillOpacity: 0,
-        weight: 2
+        weight: 0
       };
 
       // Styler that styles a layer based on whether it is selected or not
@@ -230,6 +240,7 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
       var mouseoverHandler = function(e) {
         var layer = e.target;
         var code = _getLayerCode(e);
+        layer.setStyle({weight: 3});
         if (!L.Browser.ie && !L.Browser.opera) {
           layer.bringToFront();
         }
@@ -241,6 +252,7 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
         // Can't use resetStyle because we don't have access to the GeoJSON object
         var layer = e.target;
         var code = _getLayerCode(e);
+        layer.setStyle({weight: 0});
 
         $scope.hoveredFeature = undefined;
       };
@@ -291,7 +303,7 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
         });
       });
     }],
-    template: '<leaflet center="center" defaults="defaults" geojson="geojson"></leaflet>' +
+    template: '<leaflet center="center" defaults="defaults" geojson="geojson" layers="layers"></leaflet>' +
       '<div class="map-overlay" ng-show="hoveredFeature">{{ hoveredFeature }} - {{ _getValueFromArea(hoveredFeature) }}</div>' +
       '<div class="map-legend"></div>'
   };
