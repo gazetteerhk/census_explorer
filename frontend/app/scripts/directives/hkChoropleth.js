@@ -208,7 +208,7 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
       $scope._defaultStyle = {
         color: "#2b8cbe",
         fillOpacity: 0,
-        weight: 2
+        weight: 0
       };
 
       // Styler that styles a layer based on whether it is selected or not
@@ -240,6 +240,7 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
       var mouseoverHandler = function(e) {
         var layer = e.target;
         var code = _getLayerCode(e);
+        layer.setStyle({weight: 3});
         if (!L.Browser.ie && !L.Browser.opera) {
           layer.bringToFront();
         }
@@ -251,6 +252,7 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
         // Can't use resetStyle because we don't have access to the GeoJSON object
         var layer = e.target;
         var code = _getLayerCode(e);
+        layer.setStyle({weight: 0});
 
         $scope.hoveredFeature = undefined;
       };
