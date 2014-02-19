@@ -25,3 +25,18 @@ Different names:
 
 There are three versions of **Canonical name**: english, simplified, traditional.
 They also have corresponding translation maps.
+
+## Dependencies
+
+### Python libraries
+
+Those are included in `/requirements.txt`.
+
+### GDAL
+
+http://trac.osgeo.org/gdal/wiki/DownloadingGdalBinaries
+
+### topojson
+
+`npm install -g topojson`
+
