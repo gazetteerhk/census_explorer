@@ -75,7 +75,6 @@ angular.module('frontendApp', [
       load: 'current',
       resGetPath: translationPrefix + 'locale/__lng__/__ns__-translation.json',
       getAsync: false  // We'll block, since the translation files are pretty critical
-    }, function() {
     });
   }]);
 
