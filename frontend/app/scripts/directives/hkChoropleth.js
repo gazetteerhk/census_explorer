@@ -191,7 +191,7 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
         if (_.isUndefined($scope._colorScale.invertExtent)) {
           // Ordinal scale
           var textFunc =  function(d) {
-            return $scope._colorScale.domain()[d];
+            return i18n.t($scope._mapConfig.valueVar + '.' + $scope._colorScale.domain()[d]);
           };
         } else {
           var textFunc = function(d) {
@@ -251,7 +251,9 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
 
         var prefix = _isArea(e.target.feature) ? "area." : "district.";
         $scope.hoveredFeature = prefix + code.toLowerCase();
-        $scope.hoveredFeatureCode = code.toLowerCase();
+        if (!_.isUndefined($scope._mapConfig)) {
+          $scope.hoveredFeatureValue = i18n.t($scope._mapConfig.valueVar + '.' + $scope._getValueFromArea(code.toLowerCase()));
+        }
       };
 
       var resetStyle = function(e) {
@@ -311,7 +313,7 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
       });
     }],
     template: '<leaflet center="center" defaults="defaults" geojson="geojson" layers="layers"></leaflet>' +
-      '<div class="map-overlay" ng-show="hoveredFeature">{{ hoveredFeature | translate }} - {{ _getValueFromArea(hoveredFeatureCode) }}</div>' +
+      '<div class="map-overlay" ng-show="hoveredFeature">{{ hoveredFeature | translate }} - {{ hoveredFeatureValue }}</div>' +
       '<div class="map-legend"></div>'
   };
 });
