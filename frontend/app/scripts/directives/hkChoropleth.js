@@ -249,8 +249,9 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
           layer.bringToFront();
         }
 
-        var prefix = _isArea(e.target.feature) ? "area.code." : "district.code.";
+        var prefix = _isArea(e.target.feature) ? "area." : "district.";
         $scope.hoveredFeature = prefix + code.toLowerCase();
+        $scope.hoveredFeatureCode = code.toLowerCase();
       };
 
       var resetStyle = function(e) {
@@ -260,6 +261,7 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
         layer.setStyle({weight: 0});
 
         $scope.hoveredFeature = undefined;
+        $scope.hoveredFeatureCode = undefined;
       };
 
       var _getLayerCode = function(e) {
@@ -309,7 +311,7 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
       });
     }],
     template: '<leaflet center="center" defaults="defaults" geojson="geojson" layers="layers"></leaflet>' +
-      '<div class="map-overlay" ng-show="hoveredFeature">{{ hoveredFeature | translate }} - {{ _getValueFromArea(hoveredFeature) }}</div>' +
+      '<div class="map-overlay" ng-show="hoveredFeature">{{ hoveredFeature | translate }} - {{ _getValueFromArea(hoveredFeatureCode) }}</div>' +
       '<div class="map-legend"></div>'
   };
 });
