@@ -77,15 +77,20 @@ angular.module('frontendApp', [
   }]);
 
 angular.module('frontendApp').filter('translate', function(){
-  return function(input, prefix){
+  return function(input, prefix, translate){
     if (_.isUndefined(input)) {
       return;
     }
 
-    if (_.isUndefined(prefix)) {
-      return i18n.t(input);
+    // if the translate toggle is not provided, then we should translate by default
+    if (translate === false) {
+      return input;
     } else {
-      return i18n.t(prefix  + '.' + input);
+      if (_.isUndefined(prefix) || _.isNull(prefix)) {
+        return i18n.t(input);
+      } else {
+        return i18n.t(prefix  + '.' + input);
+      }
     }
   }
 });
