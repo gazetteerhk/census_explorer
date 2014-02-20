@@ -71,6 +71,12 @@ angular.module('frontendApp').factory('CensusAPI', ['$log', '$http', '$q', funct
      *   a02: {data hash object}
      * }
      *
+     * Get:
+     * [
+     *   {data object, groupName: a01},
+     *   {data object, groupName: a02}
+     * ]
+     *
      * Calling joinGroup(data) will unpack and concatenate the data hashes using joinData
      * If groupName is provided, then the grouping key will be added to each element of the data hash
      */

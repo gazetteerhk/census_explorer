@@ -18,17 +18,58 @@ angular.module('frontendApp')
      * Median / mode income related indicators
      */
 
+    var _medianParserFactory = function(cfgObject) {
+      return function(data) {
+        var d = CensusAPI.joinGroups(data.groups, 'area');
+        var scale = d3.scale.ordinal().domain(data.options.row).range(d3.range(data.options.row.length));
+        cfgObject.scale = scale;
+        return d;
+      };
+    };
+
     // 14 categories total
     var _medianMonthlyIncomeColors = _.clone(colorbrewer.Reds['7']).reverse().concat(colorbrewer.Greens['7']);
     var _medianMonthlyIncomeConfig = {
       colors: _medianMonthlyIncomeColors,
       valueVar: 'row'
     };
-    var _medianMonthlyIncomeParser = function(data) {
-      var d = CensusAPI.joinGroups(data.groups, 'area');
-      var scale = d3.scale.ordinal().domain(data.options.row).range(d3.range(14));
-      _medianMonthlyIncomeConfig.scale = scale;
-      return d;
+
+    var _medianHouseholdSizeConfig = {
+      colors: colorbrewer.Blues[6],
+      valueVar: 'row'
+    };
+
+    var _medianAgeConfig = {
+      colors: _.clone(colorbrewer.Reds['9']).reverse().concat(colorbrewer.Greens['9']),
+      valueVar: 'row'
+    };
+
+    var _pctUnder15Config = {
+      valueVar: 'value'
+    };
+    var _pctParser = function(data) {
+      var d = CensusAPI.asPercentage(CensusAPI.joinData(data.data), 'area');
+      console.log(d);
+      var areaHash = {};
+      // now we have to sum together the rows are are interested in
+      var rows = [
+        'h7_0',
+        'h8_5',
+        'h9_10'
+      ];
+
+      // Not sure why this doens't work
+      _.forEach(d, function(datum) {
+        if (_.contains(rows, datum.row)) {
+          if (_.isUndefined(areaHash[datum.area])) {
+            areaHash[datum.area] = 0;
+          }
+          areaHash[datum.area] += datum.value;
+        }
+      });
+
+      console.log(areaHash);
+//      return d;
     };
 
     $scope.indicators = [
@@ -45,17 +86,18 @@ angular.module('frontendApp')
         config: null,
         parser: null
       },
+      // Not very interesting
       {
         name: 'Median age of the population',
-        params: null,
-        config: null,
-        parser: null
+        params: _.extend(_.clone(Indicators.queries.age, true), Indicators.queries.areaMedianModifier),
+        config: _medianAgeConfig,
+        parser: _medianParserFactory(_medianAgeConfig)
       },
       {
         name: '% of population under 15',
-        params: null,
-        config: null,
-        parser: null
+        params: _.clone(Indicators.queries.age, true),
+        config: _pctUnder15Config,
+        parser: _pctParser
       },
       {
         name: '% of population over 65',
@@ -85,9 +127,9 @@ angular.module('frontendApp')
       },
       {
         name: 'Median household size',
-        params: null,
-        config: null,
-        parser: null
+        params: _.extend(_.clone(Indicators.queries.householdSize, true), Indicators.queries.areaMedianModifier),
+        config: _medianHouseholdSizeConfig,
+        parser: _medianParserFactory(_medianHouseholdSizeConfig)
       },
       {
         name: '% of households in public rental housing',
@@ -111,7 +153,7 @@ angular.module('frontendApp')
         name: 'Median monthly household rent payment',
         params: _.extend(_.clone(Indicators.queries.householdRent, true), Indicators.queries.areaModeModifier),
         config: _medianMonthlyIncomeConfig,
-        parser: _medianMonthlyIncomeParser
+        parser: _medianParserFactory(_medianMonthlyIncomeConfig)
       },
       {
         name: 'Median monthly household mortgage payment',
@@ -143,7 +185,7 @@ angular.module('frontendApp')
         name: 'Median monthly household income',
         params: _.extend(_.clone(Indicators.queries.householdIncome, true), Indicators.queries.areaMedianModifier),
         config: _medianMonthlyIncomeConfig,
-        parser: _medianMonthlyIncomeParser
+        parser: _medianParserFactory(_medianMonthlyIncomeConfig)
       },
       {
         name: '% of households making less than HK$25,000 per month (HK median is $23,000)',
@@ -155,7 +197,7 @@ angular.module('frontendApp')
         name: 'Most common monthly income',
         params: _.extend(_.clone(Indicators.queries.householdIncome, true), Indicators.queries.areaModeModifier),
         config: _medianMonthlyIncomeConfig,
-        parser: _medianMonthlyIncomeParser
+        parser: _medianParserFactory(_medianMonthlyIncomeConfig)
       },
       {
         name: 'Most common occupation for men',

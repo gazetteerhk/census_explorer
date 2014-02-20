@@ -125,14 +125,6 @@ angular.module('frontendApp').factory('Indicators', [function() {
     return: ['data', 'options']
   };
 
-  queries.householdSizeMedian = {
-    table: 7,
-    aggregate: 'median',
-    projector: ['area', 'value', 'row'],
-    return: ['groups', 'options'],
-    groupby: 'area'
-  };
-
   queries.householdHousingType = {
     table: 8,
     column: 'd146_households',
