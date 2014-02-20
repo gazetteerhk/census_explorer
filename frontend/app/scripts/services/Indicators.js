@@ -42,6 +42,13 @@ angular.module('frontendApp').factory('Indicators', [function() {
     return: ['groups', 'options']
   };
 
+  queries.ethnicity = {
+    table: 0,
+    column: 'tab0_both',
+    projector: ['area', 'value', 'row'],
+    return: ['data', 'options']
+  };
+
   queries.maritalStatus = {
     table: 2,
     column: 'e28_both',

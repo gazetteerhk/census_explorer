@@ -143,7 +143,12 @@ angular.module('frontendApp').factory('CensusAPI', ['$log', '$http', '$q', funct
     _.map(data, function(d) {
       var key = _.map(grouping, function(g) {return d[g];}).join(',');
       var newDatum = _.clone(d, true);
-      newDatum.value = newDatum.value / agg[key];
+      // Avoid divide by 0
+      if (agg[key] === 0 ){
+        newDatum.value = 0;
+      } else {
+        newDatum.value = newDatum.value / agg[key];
+      }
       res.push(newDatum);
     });
 

@@ -102,22 +102,36 @@ angular.module('frontendApp')
       },
       {
         name: '% of population over 65',
-        params: null,
-        config: null,
-        parser: null
+        params: _.clone(Indicators.queries.age, true),
+        config: _valueConfig,
+        parser: _pctParserFactory(['h20_65', 'h21_70', 'h22_75', 'h23_80', 'h24_85'])
       },
       // Ethnicity
       {
         name: '% of population that is non-Chinese',
-        params: null,
-        config: null,
-        parser: null
+        params: _.clone(Indicators.queries.ethnicity, true),
+        config: _valueConfig,
+        parser: _pctParserFactory([
+          "tab0_indonesian",
+          "tab0_white",
+          "tab0_others",
+          "tab0_filipino",
+          "tab0_korean",
+          "tab0_indian",
+          "tab0_japanese",
+          "tab0_pakistani",
+          "tab0_thai",
+          "tab0_nepalese",
+          "tab0_black",
+          "tab0_sri-lankan",
+          "tab0_vietnamese"
+        ])
       },
       {
         name: '% of population that is Indonesian or Filipino',
-        params: null,
-        config: null,
-        parser: null
+        params: _.clone(Indicators.queries.ethnicity, true),
+        config: _valueConfig,
+        parser: _pctParserFactory(['tab0_filipino', 'tab0_indonesian'])
       },
       // Family and housing
       {
