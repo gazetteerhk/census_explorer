@@ -35,9 +35,9 @@
           <ul class="nav navbar-nav navbar-right navbar-collapse">
          <!--    <li><a ng-href="/#/discover">Discover</a></li>
             <li><a ng-href="/#/explore">Explore</a></li> -->
-            <li><a ng-href="#/query">{{'menu.sample' | i18next}}</a></li>
+            <li><a ng-href="#/query">{{'menu.sample' | translate }}</a></li>
             <li><a ng-href="#/getdata">Data</a></li>
-            <li><a ng-href="#/about">{{'menu.about' | i18next}}</a></li>
+            <li><a ng-href="#/about">{{'menu.about' | translate}}</a></li>
           </ul>
         </div>
       </div>
@@ -70,6 +70,7 @@
     Or, grunt build will change this index.html
     -->
 
+    <script src="http://maps.google.com/maps/api/js?v=3.2&sensor=false"></script>
 
     <!-- build:js scripts/vendor.js -->
     <!-- bower:js -->
@@ -90,6 +91,7 @@
     <script src="bower_components/ng-i18next/dist/ng-i18next.js"></script>
     <script src="bower_components/leaflet-dist/leaflet.js"></script>
     <script src="bower_components/angular-leaflet-directive/dist/angular-leaflet-directive.js"></script>
+    <script src="bower_components/leaflet-plugins/layer/tile/Google.js"></script>
     <script src="bower_components/topojson/topojson.js"></script>
     <script src="bower_components/colorbrewer/colorbrewer.js"></script>
     <script src="bower_components/ng-table/ng-table.js"></script>
