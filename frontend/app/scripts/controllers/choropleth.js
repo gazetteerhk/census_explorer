@@ -95,21 +95,21 @@ angular.module('frontendApp')
       },
       {
         name: '% of population under 15',
-        params: _.clone(Indicators.queries.age, true),
+        params: Indicators.queries.age,
         config: _valueConfig,
         parser: _pctParserFactory(['h7_0', 'h8_5', 'h9_10'])
 
       },
       {
         name: '% of population over 65',
-        params: _.clone(Indicators.queries.age, true),
+        params: Indicators.queries.age,
         config: _valueConfig,
         parser: _pctParserFactory(['h20_65', 'h21_70', 'h22_75', 'h23_80', 'h24_85'])
       },
       // Ethnicity
       {
         name: '% of population that is non-Chinese',
-        params: _.clone(Indicators.queries.ethnicity, true),
+        params: Indicators.queries.ethnicity,
         config: _valueConfig,
         parser: _pctParserFactory([
           "tab0_indonesian",
@@ -129,16 +129,16 @@ angular.module('frontendApp')
       },
       {
         name: '% of population that is Indonesian or Filipino',
-        params: _.clone(Indicators.queries.ethnicity, true),
+        params: Indicators.queries.ethnicity,
         config: _valueConfig,
         parser: _pctParserFactory(['tab0_filipino', 'tab0_indonesian'])
       },
       // Family and housing
       {
         name: '% of population that is divorced or separated',
-        params: null,
-        config: null,
-        parser: null
+        params: Indicators.queries.maritalStatus,
+        config: _valueConfig,
+        parser: _pctParserFactory(['a32_divorced', 'a33_separated'])
       },
       {
         name: 'Median household size',
@@ -148,21 +148,21 @@ angular.module('frontendApp')
       },
       {
         name: '% of households in public rental housing',
-        params: null,
-        config: null,
-        parser: null
+        params: _.clone(Indicators.queries.householdHousingType),
+        config: _valueConfig,
+        parser: _pctParserFactory(['a147_public'])
       },
       {
         name: '% of households that own their home',
-        params: null,
-        config: null,
-        parser: null
+        params: Indicators.queries.housingTenure,
+        config: _valueConfig,
+        parser: _pctParserFactory(['a156_with', 'a157_without'])
       },
       {
         name: '% of households renting their home',
-        params: null,
-        config: null,
-        parser: null
+        params: Indicators.queries.housingTenure,
+        config: _valueConfig,
+        parser: _pctParserFactory(['a158_sole', 'a159_co-tenantmain'])
       },
       {
         name: 'Median monthly household rent payment',
