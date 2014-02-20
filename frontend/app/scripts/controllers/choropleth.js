@@ -44,32 +44,32 @@ angular.module('frontendApp')
       valueVar: 'row'
     };
 
-    var _pctUnder15Config = {
+    // Generic configuration for value indicators
+    // Color scale is handled by hkChoropleth
+    var _valueConfig = {
       valueVar: 'value'
     };
-    var _pctParser = function(data) {
-      var d = CensusAPI.asPercentage(CensusAPI.joinData(data.data), 'area');
-      console.log(d);
-      var areaHash = {};
-      // now we have to sum together the rows are are interested in
-      var rows = [
-        'h7_0',
-        'h8_5',
-        'h9_10'
-      ];
 
-      // Not sure why this doens't work
-      _.forEach(d, function(datum) {
-        if (_.contains(rows, datum.row)) {
-          if (_.isUndefined(areaHash[datum.area])) {
-            areaHash[datum.area] = 0;
+    var _pctParserFactory = function(rowsToAggregate) {
+      return function(data) {
+        var d = CensusAPI.asPercentage(CensusAPI.joinData(data.data), 'area');
+        var areaHash = {};
+        var rows = rowsToAggregate;
+        _.forEach(d, function(datum) {
+          if (_.contains(rows, datum.row)) {
+            if (_.isUndefined(areaHash[datum.area])) {
+              areaHash[datum.area] = 0;
+            }
+            areaHash[datum.area] += datum.value;
           }
-          areaHash[datum.area] += datum.value;
-        }
-      });
+        });
 
-      console.log(areaHash);
-//      return d;
+        var res = [];
+        _.forOwn(areaHash, function(v, k) {
+          res.push({area: k, value: (v * 100)});
+        });
+        return res;
+      };
     };
 
     $scope.indicators = [
@@ -96,8 +96,9 @@ angular.module('frontendApp')
       {
         name: '% of population under 15',
         params: _.clone(Indicators.queries.age, true),
-        config: _pctUnder15Config,
-        parser: _pctParser
+        config: _valueConfig,
+        parser: _pctParserFactory(['h7_0', 'h8_5', 'h9_10'])
+
       },
       {
         name: '% of population over 65',
