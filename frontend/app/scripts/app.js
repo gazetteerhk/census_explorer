@@ -78,6 +78,10 @@ angular.module('frontendApp', [
 
 angular.module('frontendApp').filter('translate', function(){
   return function(input, prefix){
+    if (_.isUndefined(input)) {
+      return;
+    }
+
     if (_.isUndefined(prefix)) {
       return i18n.t(input);
     } else {

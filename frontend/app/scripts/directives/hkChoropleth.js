@@ -234,6 +234,10 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
         });
       };
 
+      var _isArea = function(f) {
+        return !_.isUndefined(f.properties.CA);
+      };
+
       // Handlers for interaction
       // TODO: Some visual cue that the layer is moused over, but also needs to take into
       // account that the weight may be overridden by a user provided value in the mapConfig
@@ -245,7 +249,8 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
           layer.bringToFront();
         }
 
-        $scope.hoveredFeature = code;
+        var prefix = _isArea(e.target.feature) ? "area.code." : "district.code.";
+        $scope.hoveredFeature = prefix + code.toLowerCase();
       };
 
       var resetStyle = function(e) {
@@ -304,7 +309,7 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
       });
     }],
     template: '<leaflet center="center" defaults="defaults" geojson="geojson" layers="layers"></leaflet>' +
-      '<div class="map-overlay" ng-show="hoveredFeature">{{ hoveredFeature }} - {{ _getValueFromArea(hoveredFeature) }}</div>' +
+      '<div class="map-overlay" ng-show="hoveredFeature">{{ hoveredFeature | translate }} - {{ _getValueFromArea(hoveredFeature) }}</div>' +
       '<div class="map-legend"></div>'
   };
 });
