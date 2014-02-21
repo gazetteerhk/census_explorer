@@ -6,7 +6,9 @@
 </div>
 
 <div class="row">
-  <div class="col-md-12"><button class="btn btn-danger" ng-click="run()">Run benchmarks</button></div>
+  <div class="col-md-3"><button class="btn btn-danger" ng-click="run()">Run benchmarks</button></div>
+  <div class="col-md-3"><button class="btn btn-danger" ng-click="runSequential()">Run in sequence</button></div>
+  <div class="col-md-3"><button class="btn btn-warning" ng-click="canceler.resolve()" ng-show="canceler">Cancel</button></div>
 </div>
 
 <div class="row" ng-show="results.length > 0">

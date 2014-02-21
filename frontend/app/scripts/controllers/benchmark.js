@@ -4,24 +4,25 @@ angular.module('frontendApp').controller('BenchmarkCtrl', ['$scope', 'CensusAPI'
 
   $scope.run = function() {
     $scope.isRunning = true;
+    $scope.canceler = $q.defer();
+    $scope.results.length = 0;
 
     var startTime, counter, endTime, q;
     counter = 0;
     startTime = Date.now();
-
     $scope.allRequests = [];
 
     _.forOwn(Indicators.queries, function(v, k) {
       var thisStart = Date.now();
       console.log('Indicator: ' + k);
       q = new CensusAPI.Query(v);
-      var promise = q.fetch().then(function(res) {
+      var promise = q.fetch({timeout: $scope.canceler.promise}).then(function(res) {
         var thisEnd = Date.now() - thisStart;
         console.log("Got response in " + (thisEnd) + "ms");
         console.log(res);
+        counter += 1;
         $scope.results.push({indicator: k, time: thisEnd});
       });
-      counter += 1;
 
       $scope.allRequests.push(promise);
     });
@@ -32,4 +33,41 @@ angular.module('frontendApp').controller('BenchmarkCtrl', ['$scope', 'CensusAPI'
       console.log("Avg " + (endTime / counter) + " per request");
     });
   };
+
+  $scope.runSequential = function() {
+    // run all the queries, but sequentially (e.g. next query is not started until the first one finishes)
+    $scope.results.length = 0;
+    $scope.isRunning = true;
+    $scope.canceler = $q.defer();
+
+    var startTime, counter, endTime, q;
+    counter = 0;
+    startTime = Date.now();
+    var def = $q.defer();
+    $scope.requestSequence = def.promise;
+
+    _.forOwn(Indicators.queries, function(v, k) {
+      var requestGetter = function() {
+        var nextDefer = $q.defer();
+        var thisStart = Date.now();
+        console.log('Indicator: ' + k);
+        q = new CensusAPI.Query(v);
+        var promise = q.fetch({timeout: $scope.canceler.promise}).then(function(res) {
+          var thisEnd = Date.now() - thisStart;
+          console.log("Got response in " + (thisEnd) + "ms");
+          console.log(res);
+          $scope.results.push({indicator: k, time: thisEnd});
+          counter += 1;
+          nextDefer.resolve();
+        });
+
+        return nextDefer.promise;
+      };
+
+      $scope.requestSequence = $scope.requestSequence.then(requestGetter);
+    });
+
+    def.resolve();
+  };
+
 }]);

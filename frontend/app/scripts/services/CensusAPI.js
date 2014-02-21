@@ -203,9 +203,15 @@ angular.module('frontendApp').factory('CensusAPI', ['$log', '$http', '$q', funct
     });
   };
 
-  Query.prototype.fetch = function() {
+  Query.prototype.fetch = function(getParams) {
     /*
      * Sends the request to the API with the provided filters
+     *
+     * Arguments:
+     * ----------
+     * getParams: hash
+     *  Additional parameters that should be added to the $http.get options
+     *  Useful for setting things like timeouts
      *
      * Returns:
      * --------
@@ -213,7 +219,12 @@ angular.module('frontendApp').factory('CensusAPI', ['$log', '$http', '$q', funct
      */
 
     var deferred = $q.defer();
-    $http.get(svc.endpointURL, {params: _prepFilters(this._filters), cache: true, tracker: 'globalTracker'}).then(function(res) {
+    var params = {params: _prepFilters(this._filters), cache: true, tracker: 'globalTracker'};
+    if (!_.isUndefined(getParams)) {
+      _.merge(params, getParams);
+    }
+
+    $http.get(svc.endpointURL, params).then(function(res) {
       deferred.resolve(res.data);
     });
 
