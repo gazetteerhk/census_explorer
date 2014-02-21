@@ -14,6 +14,40 @@ angular.module('frontendApp')
       });
     };
 
+    var _genderRatioParams = {
+      table: 12,
+      column: ['l6_male', 'm6_female'],
+      projector: ['area', 'value', 'row', 'column'],
+      return: ['data', 'options']
+    };
+
+    var _genderRatioParser = function(data) {
+      var d = CensusAPI.sumBy(CensusAPI.joinData(data.data), ['area', 'column']);
+      // d is {area,column: sum, ...}, unpack into male and female hashes {area: value, ...}
+      console.log(d);
+      var resMale = {};
+      var resFemale = {};
+
+      _.forOwn(d, function(v, k) {
+        var key = k.split(',');
+        if (key[1] === 'l6_male') {
+          resMale[key[0]] = v;
+        } else if (key[1] === 'm6_female') {
+          resFemale[key[0]] = v;
+        }
+      });
+      console.log(resMale);
+      console.log(resFemale);
+
+      var res = [];
+
+      _.forOwn(resMale, function(v, k) {
+        res.push({area: k, value: (v / resFemale[k]) * 1000});
+      });
+      console.log(res);
+      return res;
+    };
+
     /*
      * Median / mode income related indicators
      */
@@ -28,7 +62,7 @@ angular.module('frontendApp')
     };
 
     // 14 categories total
-    var _medianMonthlyIncomeColors = _.clone(colorbrewer.Reds['7']).reverse().concat(colorbrewer.Greens['7']);
+    var _medianMonthlyIncomeColors = _.clone(colorbrewer.Reds[7]).reverse().concat(colorbrewer.Greens[7]);
     var _medianMonthlyIncomeConfig = {
       colors: _medianMonthlyIncomeColors,
       valueVar: 'row'
@@ -40,7 +74,22 @@ angular.module('frontendApp')
     };
 
     var _medianAgeConfig = {
-      colors: _.clone(colorbrewer.Reds['9']).reverse().concat(colorbrewer.Greens['9']),
+      colors: _.clone(colorbrewer.Reds[9]).reverse().concat(colorbrewer.Greens[9]),
+      valueVar: 'row'
+    };
+
+    var _modeEduAttainmentConfig = {
+      colors: colorbrewer.Greens[7],
+      valueVar: 'row'
+    };
+
+    var _modeOccupationConfig = {
+      colors: colorbrewer.Paired[9],
+      valueVar: 'row'
+    };
+
+    var _modeIndustryConfig = {
+      colors: colorbrewer.Paired[11],
       valueVar: 'row'
     };
 
@@ -73,18 +122,12 @@ angular.module('frontendApp')
     };
 
     $scope.indicators = [
-      {
-        name: '',
-        params: null,
-        config: null,
-        parser: null
-      },
       // Gender / Age
       {
-        name: 'Male to female ratio',
-        params: null,
-        config: null,
-        parser: null
+        name: 'Male to female ratio (1000s)',
+        params: _genderRatioParams,
+        config: _valueConfig,
+        parser: _genderRatioParser
       },
       // Not very interesting
       {
@@ -166,34 +209,34 @@ angular.module('frontendApp')
       },
       {
         name: 'Median monthly household rent payment',
-        params: _.extend(_.clone(Indicators.queries.householdRent, true), Indicators.queries.areaModeModifier),
+        params: _.extend(_.clone(Indicators.queries.householdRent, true), Indicators.queries.areaMedianModifier),
         config: _medianMonthlyIncomeConfig,
         parser: _medianParserFactory(_medianMonthlyIncomeConfig)
       },
       {
         name: 'Median monthly household mortgage payment',
-        params: null,
-        config: null,
-        parser: null
+        params: _.extend(_.clone(Indicators.queries.householdMortgage, true), Indicators.queries.areaMedianModifier),
+        config: _medianMonthlyIncomeConfig,
+        parser: _medianParserFactory(_medianMonthlyIncomeConfig)
       },
       // Education
       {
         name: 'Most common level of education',
-        params: null,
-        config: null,
-        parser: null
+        params: _.extend(_.clone(Indicators.queries.educationalAttainment, true), Indicators.queries.areaModeModifier),
+        config: _modeEduAttainmentConfig,
+        parser: _medianParserFactory(_modeEduAttainmentConfig)
       },
       {
         name: '% of population with a post-secondary education',
-        params: null,
-        config: null,
-        parser: null
+        params: Indicators.queries.educationalAttainment,
+        config: _valueConfig,
+        parser: _pctParserFactory(['a51_diplomacertificate', 'a52_sub-degree', 'a53_degree'])
       },
       {
-        name: '% of students tha travel to another district for school',
-        params: null,
-        config: null,
-        parser: null
+        name: '% of students that travel to another district for school',
+        params: Indicators.queries.placeOfStudy,
+        config: _valueConfig,
+        parser: _pctParserFactory(['h44_hong', 'h45_kowloon', 'h46_new', 'h47_other'])
       },
       // Income and work
       {
@@ -204,9 +247,16 @@ angular.module('frontendApp')
       },
       {
         name: '% of households making less than HK$25,000 per month (HK median is $23,000)',
-        params: null,
-        config: null,
-        parser: null
+        params: Indicators.queries.householdIncome,
+        config: _valueConfig,
+        parser: _pctParserFactory(['h119_<',
+                                   'h120_2000',
+                                   'h121_4000',
+                                   'h122_6000',
+                                   'h123_8000',
+                                   'h124_10000',
+                                   'h125_15000',
+                                   'h126_20000'])
       },
       {
         name: 'Most common monthly income',
@@ -216,40 +266,40 @@ angular.module('frontendApp')
       },
       {
         name: 'Most common occupation for men',
-        params: null,
-        config: null,
-        parser: null
+        params: _.extend(_.clone(Indicators.queries.occupationMale, true), Indicators.queries.areaModeModifier),
+        config: _modeOccupationConfig,
+        parser: _medianParserFactory(_modeOccupationConfig)
       },
       {
         name: 'Most common occupation for women',
-        params: null,
-        config: null,
-        parser: null
+        params: _.extend(_.clone(Indicators.queries.occupationFemale, true), Indicators.queries.areaModeModifier),
+        config: _modeOccupationConfig,
+        parser: _medianParserFactory(_modeOccupationConfig)
       },
       {
         name: 'Most common industry for men',
-        params: null,
-        config: null,
-        parser: null
+        params: _.extend(_.clone(Indicators.queries.industryMale, true), Indicators.queries.areaModeModifier),
+        config: _modeIndustryConfig,
+        parser: _medianParserFactory(_modeIndustryConfig)
       },
       {
         name: 'Most common industry for women',
-        params: null,
-        config: null,
-        parser: null
+        params: _.extend(_.clone(Indicators.queries.industryFemale, true), Indicators.queries.areaModeModifier),
+        config: _modeIndustryConfig,
+        parser: _medianParserFactory(_modeIndustryConfig)
       },
       {
         name: '% of workers that travel to another district for work',
-        params: null,
-        config: null,
-        parser: null
+        params: Indicators.queries.placeOfWork,
+        config: _valueConfig,
+        parser: _pctParserFactory(['h64_hong', 'h65_kowloon', 'h66_new', 'h67_other', 'h68_no', 'h70_places'])
       },
       // Misc
       {
         name: 'Residence stability (% of population that lived in the same area 5 years ago)',
-        params: null,
-        config: null,
-        parser: null
+        params: Indicators.queries.migration,
+        config: _valueConfig,
+        parser: _pctParserFactory(['a191_moved', 'a192_remained'])
       },
     ];
 

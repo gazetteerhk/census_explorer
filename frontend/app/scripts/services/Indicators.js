@@ -108,14 +108,14 @@ angular.module('frontendApp').factory('Indicators', [function() {
 
   queries.monthlyIncomeMale = {
     table: 5,
-    column: 'c77_both',
+    column: 'c77_male',
     projector: ['area', 'value', 'row'],
     return: ['data', 'options']
   };
 
   queries.monthlyIncomeFemale = {
     table: 5,
-    column: 'd77_both',
+    column: 'd77_female',
     projector: ['area', 'value', 'row'],
     return: ['data', 'options']
   };
@@ -181,14 +181,14 @@ angular.module('frontendApp').factory('Indicators', [function() {
 
   queries.ageMale = {
     table: 12,
-    column: 'l6_both',
+    column: 'l6_male',
     projector: ['area', 'value', 'row'],
     return: ['data', 'options']
   };
 
   queries.ageFemale = {
     table: 12,
-    column: 'm6_both',
+    column: 'm6_female',
     projector: ['area', 'value', 'row'],
     return: ['data', 'options']
   };
