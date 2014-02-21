@@ -52,6 +52,10 @@ angular.module('frontendApp', [
         templateUrl: 'views/browser.html',
         controller: 'BrowserCtrl'
       })
+      .when('/benchmark', {
+        templateUrl: 'views/benchmark.html',
+        controller: 'BenchmarkCtrl'
+      })
       .otherwise({
         redirectTo: '/'
       })

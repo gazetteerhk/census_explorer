@@ -1,0 +1,34 @@
+<div class="row">
+  <div class="col-md-12">
+    <h3>Backend benchmarking</h3>
+    <p>This page will repeatedly send requests to the backend server and report how long it takes for the request to return.  For development use only!</p>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12"><button class="btn btn-danger" ng-click="run()">Run benchmarks</button></div>
+</div>
+
+<div class="row" ng-show="results.length > 0">
+  <div class="col-md-12">
+    <h3>Results</h3>
+    <div class="row">
+      <div class="col-md-6">
+        <table class="table table-condensed table-striped">
+          <thead>
+          <tr>
+            <th>Indicator</th>
+            <th>Response time</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr ng-repeat="r in results">
+            <td>{{ r.indicator }}</td>
+            <td>{{ r.time }}</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
