@@ -75,6 +75,15 @@ module.exports = function (grunt) {
           ]
         }
       },
+      dev: {
+        options: {
+          base: [
+            '.tmp',
+            '<%= yeoman.app %>'
+          ],
+          livereload: false
+        }
+      },
       test: {
         options: {
           port: 9001,
@@ -360,7 +369,7 @@ module.exports = function (grunt) {
 //      'bower-install',
       'concurrent:server',
       'autoprefixer',
-      'connect:livereload',
+      'connect:dev',
       'watch'
     ]);
   });
