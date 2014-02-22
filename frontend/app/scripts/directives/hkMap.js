@@ -32,12 +32,23 @@ angular.module('frontendApp').directive('hkMap', function() {
         leafletNode.attr('id', attrs.mapId);
       }
     },
-    controller: ['$scope', 'GeoFiles', '$attrs', 'AreaSelection', '$parse', 'leafletData', '$i18next',function($scope, GeoFiles, $attrs, AreaSelection, $parse, leafletData,$i18next) {
+    controller: ['$scope', 'GeoFiles', '$attrs', 'AreaSelection', '$parse', 'leafletData', function($scope, GeoFiles, $attrs, AreaSelection, $parse, leafletData) {
       // Default initializations
       $scope.defaults =  {
         scrollWheelZoom: true,
         maxZoom: 18
       };
+
+      $scope.layers = {
+        baselayers: {
+          googleRoadMap: {
+            name: 'Google Streets',
+            layerType: 'ROADMAP',
+            type: 'google'
+          }
+        }
+      };
+
 
       $scope._singleSelect = _.has($attrs, 'singleSelect');
 
@@ -235,7 +246,7 @@ angular.module('frontendApp').directive('hkMap', function() {
       });
 
     }],
-    template: '<leaflet center="center" defaults="defaults" geojson="geojson"></leaflet>' +
+    template: '<leaflet center="center" defaults="defaults" geojson="geojson" layers="layers"></leaflet>' +
       '<div class="map-overlay" ng-show="hoveredFeature">{{ "area.code."+hoveredFeature | i18next}}</div>'
   }
 });

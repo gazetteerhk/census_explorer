@@ -213,7 +213,7 @@ angular.module('frontendApp').factory('CensusAPI', ['$log', '$http', '$q', funct
      */
 
     var deferred = $q.defer();
-    $http.get(svc.endpointURL, {params: _prepFilters(this._filters), cache: true}).then(function(res) {
+    $http.get(svc.endpointURL, {params: _prepFilters(this._filters), cache: true, tracker: 'globalTracker'}).then(function(res) {
       deferred.resolve(res.data);
     });
 

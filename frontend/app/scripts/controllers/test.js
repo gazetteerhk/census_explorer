@@ -1,7 +1,8 @@
 'use strict';
 
 angular.module('frontendApp')
-  .controller('TestCtrl', ['$scope', 'GeoMappings', '$http', 'CensusAPI', 'Indicators', function ($scope, GeoMappings, $http, CensusAPI, Indicators) {
+  .controller('TestCtrl', ['$scope', 'GeoMappings', '$http', 'CensusAPI', 'Indicators', 'promiseTracker',
+                           function ($scope, GeoMappings, $http, CensusAPI, Indicators, promiseTracker) {
 
     $scope.refresh = function(){
       console.log('indicator:');
@@ -12,7 +13,7 @@ angular.module('frontendApp')
       console.log("query filters:");
       console.log(query._filters);
 
-      query.fetch().then(function(response) {
+      var promise = query.fetch().then(function(response) {
         console.log('response:');
         console.log(response);
         var d = $scope.selectedIndicator.parser(response);

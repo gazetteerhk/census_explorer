@@ -1,7 +1,12 @@
 # -*- coding: utf-8 -*-
 
+from collections import defaultdict
+from log import logger
+
+ERRATA = defaultdict(dict)
+
 # Language order follows original table, to reduce typos
-ERRATA = {
+ERRATA.update({
         'c43_under': {
             'T': '十五歲以下',
             'S': '十五岁以下',
@@ -47,4 +52,19 @@ ERRATA = {
             'S': '居于租住居所的家庭住户数目',
             'E': 'Domestic Households Renting the Accommodation They Occupy',
             },
-}
+})
+
+logger.info('len of ERRATA: %d', len(ERRATA))
+
+import pandas
+df = pandas.io.parsers.read_csv('https://docs.google.com/spreadsheet/pub?key=0Asi0lKkzNhjsdENOYnVKaXE0RFR2VC1BOVcwM1lMZkE&output=csv')
+
+for i, row in df.iterrows():
+    identifier = row['identifier']
+    language = row['language']
+    canonical_name = row['canonical_name']
+    remove = row['remove']
+    if (not identifier.endswith('none')) and canonical_name and (remove != 'REMOVE ROW'):
+        ERRATA[identifier][language] = canonical_name
+
+logger.info('len of ERRATA: %d', len(ERRATA))
