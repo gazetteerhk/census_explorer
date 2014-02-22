@@ -1,23 +1,27 @@
 <div class="row">
   <div class="col-md-12">
-    <h1>The Common Person</h1>
+    <h1>Area Profiles</h1>
   </div>
   <div class="col-md-12">
-    <h3>What is the profile of the median citizen in each of Hong Kong's areas?</h3>
+    <h3>Get a quick summary of the key characteristics of Hong Kong's neighborhoods</h3>
   </div>
 </div>
 
 <div class="row">
   <hk-map height="500px" class="col-md-6" single-select selected-areas="selection"></hk-map>
   <div class="col-md-6" ng-hide="selection.hasSelection()">
-    <h3>Choose an area on the left to get started</h3>
+    <h3>Choose an area on the left to get started.  Zoom in for more granular areas.</h3>
   </div>
   <div ng-show="selection.hasSelection()">
-    <div class="col-md-3">
-      <h3 class="text-center">Male</h3>
-    </div>
-    <div class="col-md-3">
-      <h3 class="text-center">Female</h3>
-    </div>
+    <h3>Population table (age) bars two sided bars</h3>
+    <h3>Ethnic breakdown (male / female) - double stacked bar</h3>
+    <h3>Marital status (male /female) - double stacked bar</h3>
+    <h3>Educational attainment - pie/donut</h3>
+    <h3>Occupation (male / female) - two sided bars</h3>
+    <h3>Industry (male /female) - two sided bars</h3>
+    <h3>Income (male / female) - two sided bars</h3>
+    <h3>Household income - pie / donut</h3>
+    <h3>Household rental - pie / donut</h3>
+    <h3>Housing type (household) - pie / donut</h3>
   </div>
 </div>
