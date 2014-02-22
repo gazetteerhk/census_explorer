@@ -41,7 +41,7 @@ angular.module('frontendApp', [
         controller: 'ChoroplethCtrl'
       })
       .when('/medians', {
-        templateUrl: 'views/medians.html',
+        templateUrl: 'views/profiles.html',
         controller: 'MediansCtrl'
       })
       .when('/browser', {
