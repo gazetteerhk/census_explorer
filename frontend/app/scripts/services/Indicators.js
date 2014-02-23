@@ -45,6 +45,22 @@ angular.module('frontendApp').factory('Indicators', [function() {
     'h24_85'
   ];
 
+  ordering.income = [
+    'a102_unpaid',
+    'a78_<',
+    'a80_2000',
+    'a82_4000',
+    'a84_6000',
+    'a86_8000',
+    'a88_10000',
+    'a90_15000',
+    'a92_20000',
+    'a94_25000',
+    'a96_30000',
+    'a98_40000',
+    'a100_>='
+  ];
+
   svc.ordering = ordering;
 
   /*

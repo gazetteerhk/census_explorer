@@ -58,8 +58,6 @@ angular.module('frontendApp')
 
       query.fetch().then(function(res) {
         $scope._rawResponse = res;
-        console.log("Response");
-        console.log(res);
         $scope._queryData = CensusAPI.joinData(res.data);
         $scope.redrawCharts();
       });
@@ -69,6 +67,9 @@ angular.module('frontendApp')
       $scope._drawAge();
       $scope._drawEthnicity();
       $scope._drawLanguage();
+      $scope._drawOccupation();
+      $scope._drawIndustry();
+      $scope._drawIncome();
     };
 
     var _clearChart = function(selector) {
@@ -85,28 +86,16 @@ angular.module('frontendApp')
       var elemSelector = "#profile-age";
       _clearChart(elemSelector);
 
-      // Get the data
-      // Should be in the form [{row: ageGroup, male: malePopulation, female: femalePopulation}]
-      var ageHash = {};
-      _.forEach($scope._queryData, function(val) {
-        if (val.column === 'l6_male') {
-          if (_.isUndefined(ageHash[val.row])) {
-            ageHash[val.row] = {male: 0, female: 0};
-          }
-          ageHash[val.row].male -= val.value; // Male is on the left side, so negative
-        } else if (val.column === 'm6_female') {
-          if (_.isUndefined(ageHash[val.row])) {
-            ageHash[val.row] = {male: 0, female: 0};
-          }
-          ageHash[val.row].female += val.value;
-        }
-      });
+      var filters = ['l6_male', 'm6_female'];
+      var filtered = _.filter($scope._queryData, function(val) {return (filters.indexOf(val.column) > -1);});
+      var grouped = CensusAPI.sumBy(filtered, ['row', 'column']);  //  Need this to handle district aggregates
 
       var data = [];
-      _.forOwn(ageHash, function(val, row) {
-        var transRow = i18n.t('row.' + row);
-        data.push({'Age Group': transRow, Gender: 'Female', Population: val.female});
-        data.push({'Age Group': transRow, Gender: 'Male', Population: val.male});
+      _.forOwn(grouped, function(val, key) {
+        var split = key.split(',');
+        data.push({"Age Group": i18n.t('row.' + split[0]),
+          Gender: i18n.t('column.' + split[1]),
+          Population: split[1] === 'l6_male' ? (-1 * val) : val});
       });
 
       // Make the chart
@@ -118,7 +107,7 @@ angular.module('frontendApp')
       y.addOrderRule(_.map(Indicators.ordering.ageGroup, function(k) {return i18n.t('row.' + k);}), true);
       chart.addSeries('Gender', dimple.plot.bar);
       chart.addLegend("75%", "77%", "30%", "10%");
-      chart.draw();
+      chart.draw(1000);
       _addChartToCache(elemSelector, svg, chart);
     };
 
@@ -127,7 +116,8 @@ angular.module('frontendApp')
       _clearChart(elemSelector);
 
       // Filter out the data we want
-      var filtered = _.filter($scope._queryData, function(val) {return (['tab0_male', 'tab0_female'].indexOf(val.column) > -1);})
+      var filters = ['tab0_male', 'tab0_female'];
+      var filtered = _.filter($scope._queryData, function(val) {return (filters.indexOf(val.column) > -1);});
       var grouped = CensusAPI.sumBy(filtered, ['row', 'column']);  //  Need this to handle district aggregates
       // Grouped is {row,column: value}
       // Reshape the grouped aggregate to a data array
@@ -144,7 +134,7 @@ angular.module('frontendApp')
       chart.addPctAxis('y', 'Population');
       chart.addSeries('Ethnicity', dimple.plot.bar);
 //      chart.addLegend(0, 0, "100%", "10%");
-      chart.draw();
+      chart.draw(1000);
       _addChartToCache(elemSelector, svg, chart);
     };
 
@@ -166,7 +156,95 @@ angular.module('frontendApp')
       chart.addPctAxis('y', 'Population');
       chart.addSeries('Language', dimple.plot.bar);
 //      chart.addLegend(0, 0, "100%", "10%");
-      chart.draw();
+      chart.draw(1000);
       _addChartToCache(elemSelector, svg, chart);
     };
+
+    $scope._drawOccupation = function() {
+      var elemSelector = "#profile-occupation";
+       _clearChart(elemSelector);
+
+      var filters = [
+        'l81_male',
+        'm81_female',
+      ];
+      var filtered = _.filter($scope._queryData, function(val) {return filters.indexOf(val.column) > -1;});
+      var grouped = CensusAPI.sumBy(filtered, ['row', 'column']);
+      var data = [];
+      _.forOwn(grouped, function(val, key) {
+        var split = key.split(',');
+        data.push({Occupation: i18n.t('row.' + split[0]), 'Gender': i18n.t('column.' + split[1]), Population: val});
+      });
+
+      var svg = dimple.newSvg(elemSelector, undefined, 150);
+      var chart = new dimple.chart(svg, data);
+      chart.setBounds(65, 10, 490, 90);
+      chart.addCategoryAxis('y', 'Gender');
+      chart.addPctAxis('x', 'Population');
+      chart.addSeries('Occupation', dimple.plot.bar);
+//      chart.addLegend(0, 0, "100%", 20);
+      chart.draw(1000);
+      _addChartToCache(elemSelector, svg, chart);
+    };
+
+    $scope._drawIndustry = function() {
+      var elemSelector = "#profile-industry";
+      _clearChart(elemSelector);
+
+      var filters = [
+        'l95_male',
+        'm95_female',
+      ];
+      var filtered = _.filter($scope._queryData, function(val) {return filters.indexOf(val.column) > -1;});
+      var grouped = CensusAPI.sumBy(filtered, ['row', 'column']);
+      var data = [];
+      _.forOwn(grouped, function(val, key) {
+        var split = key.split(',');
+        data.push({Industry: i18n.t('row.' + split[0]), 'Gender': i18n.t('column.' + split[1]), Population: val});
+      });
+
+      var svg = dimple.newSvg(elemSelector, undefined, 150);
+      var chart = new dimple.chart(svg, data);
+      chart.setBounds(65, 10, 490, 90);
+      chart.addCategoryAxis('y', 'Gender');
+      chart.addPctAxis('x', 'Population');
+      chart.addSeries('Industry', dimple.plot.bar);
+//      chart.addLegend(0, 0, "100%", 20);
+      chart.draw(1000);
+      _addChartToCache(elemSelector, svg, chart);
+    };
+
+    $scope._drawIncome = function() {
+      var elemSelector = "#profile-income";
+      _clearChart(elemSelector);
+
+      var filters = [
+        'c77_male',
+        'd77_female'
+      ];
+      var filtered = _.filter($scope._queryData, function(val) {return (filters.indexOf(val.column) > -1);});
+      var grouped = CensusAPI.sumBy(filtered, ['row', 'column']);  //  Need this to handle district aggregates
+
+      var data = [];
+      _.forOwn(grouped, function(val, key) {
+        var split = key.split(',');
+        data.push({Income: i18n.t('row.' + split[0]),
+          Gender: i18n.t('column.' + split[1]),
+          Population: split[1] === 'c77_male' ? (-1 * val) : val});
+      });
+
+      // Make the chart
+      var svg = dimple.newSvg(elemSelector, undefined, 350);
+      var chart = new dimple.chart(svg, data);
+      chart.setBounds(120, 0, 400, "85%");
+      chart.addMeasureAxis('x', 'Population');
+      var y = chart.addCategoryAxis('y', 'Income');
+      y.addOrderRule(_.map(Indicators.ordering.income, function(k) {return i18n.t('row.' + k);}), true);
+      chart.addSeries('Gender', dimple.plot.bar);
+      chart.addLegend("75%", 10, "30%", "10%");
+      chart.draw(1000);
+      _addChartToCache(elemSelector, svg, chart);
+    };
+
+
 }]);
