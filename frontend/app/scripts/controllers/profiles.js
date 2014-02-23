@@ -30,6 +30,10 @@ angular.module('frontendApp')
     };
 
     $scope.$watch('selection', function() {
+      if($scope.selection.selectedAreas().length == 0) {
+        return;
+      }
+
       var query = new CensusAPI.Query(baseQuery);
 
       // Add the selected area to the filter
@@ -51,6 +55,7 @@ angular.module('frontendApp')
     $scope._drawAge = function() {
       var elemSelector = "#profile-age";
       // clear the div
+      // TODO: this is not properly clearing the div
       if (!_.isUndefined($scope._charts[elemSelector])) {
         d3.select($scope._charts[elemSelector].svg).remove();
       }
@@ -75,15 +80,18 @@ angular.module('frontendApp')
       var data = [];
       _.forOwn(ageHash, function(val, row) {
         var transRow = i18n.t('row.' + row);
-        data.push({row: transRow, gender: 'Male', value: val.male});
-        data.push({row: transRow, gender: 'Female', value: val.female});
+        data.push({'Age Group': transRow, Gender: 'Female', Population: val.female});
+        data.push({'Age Group': transRow, Gender: 'Male', Population: val.male});
       });
 
+      // TODO: fix chart bounds - labels are out of the bounds
       var svg = dimple.newSvg(elemSelector, undefined, 300);
       var chart = new dimple.chart(svg, data);
-      chart.addMeasureAxis('x', 'value');
-      chart.addCategoryAxis('y', 'row');
-      chart.addSeries('gender', dimple.plot.bar);
+      chart.addMeasureAxis('x', 'Population');
+      // TODO fix ordering -- cannot be done automatically
+      var y = chart.addCategoryAxis('y', 'Age Group');
+      y.addOrderRule('Age Group');
+      chart.addSeries('Gender', dimple.plot.bar);
       chart.draw();
       $scope._charts[elemSelector] = {svg: svg, chart: chart};
     };
