@@ -12,16 +12,41 @@
   <div class="col-md-6" ng-hide="selection.hasSelection()">
     <h3>Choose an area on the left to get started.  Zoom in for more granular areas.</h3>
   </div>
-  <div ng-show="selection.hasSelection()">
-    <h3>Population table (age) bars two sided bars</h3>
+  <div ng-show="selection.hasSelection()" class="col-md-6">
+    <div class="row">
+      <div class="col-md-12" id="profile-population">
+        <h3>Population table (age) bars two sided bars</h3>
+      </div>
+    </div>
     <h3>Ethnic breakdown (male / female) - double stacked bar</h3>
     <h3>Marital status (male /female) - double stacked bar</h3>
     <h3>Educational attainment - pie/donut</h3>
-    <h3>Occupation (male / female) - two sided bars</h3>
-    <h3>Industry (male /female) - two sided bars</h3>
-    <h3>Income (male / female) - two sided bars</h3>
-    <h3>Household income - pie / donut</h3>
-    <h3>Household rental - pie / donut</h3>
-    <h3>Housing type (household) - pie / donut</h3>
+    <div class="row">
+      <div class="col-md-2">
+        <h3>Occupation (male / female) - two sided bars</h3>
+      </div>
+      <div class="col-md-2">
+        <h3>Industry (male /female) - two sided bars</h3>
+      </div>
+      </div>
+    <div class="row">
+      <div class="col-md-3">
+        <h3>Income (male / female) - two sided bars</h3>
+      </div>
+      <div class="col-md-3">
+        <h3>Income (male / female) - two sided bars</h3>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-2">
+        <h3>Housing type (household) - pie / donut</h3>
+      </div>
+      <div class="col-md-2">
+        <h3>Household rental - pie / donut</h3>
+      </div>
+      <div class="col-md-2">
+        <h3>Household income - pie / donut</h3>
+      </div>
+    </div>
   </div>
 </div>
