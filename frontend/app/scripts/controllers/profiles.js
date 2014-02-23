@@ -36,8 +36,20 @@ angular.module('frontendApp')
 
       var query = new CensusAPI.Query(baseQuery);
 
+      var areas = $scope.selection.selectedAreas();
+
+      // Get the name of the area to display
+      if (areas.length > 1) {
+        // Selected a district
+        var districtCode = areas[0][0];
+        $scope.selectionName = i18n.t('district.' + districtCode);
+      } else {
+        // Selected an area
+        $scope.selectionName = i18n.t('area.' + areas[0]);
+      }
+
       // Add the selected area to the filter
-      query.addParam('area', $scope.selection.selectedAreas());
+      query.addParam('area', areas);
 
       query.fetch().then(function(res) {
         $scope._rawResponse = res;
@@ -55,9 +67,8 @@ angular.module('frontendApp')
     $scope._drawAge = function() {
       var elemSelector = "#profile-age";
       // clear the div
-      // TODO: this is not properly clearing the div
       if (!_.isUndefined($scope._charts[elemSelector])) {
-        d3.select($scope._charts[elemSelector].svg).remove();
+        $scope._charts[elemSelector].svg.remove();
       }
 
       // Get the data
@@ -84,14 +95,33 @@ angular.module('frontendApp')
         data.push({'Age Group': transRow, Gender: 'Male', Population: val.male});
       });
 
-      // TODO: fix chart bounds - labels are out of the bounds
       var svg = dimple.newSvg(elemSelector, undefined, 300);
       var chart = new dimple.chart(svg, data);
+      chart.setBounds("13%", 0, "85%", "85%");
       chart.addMeasureAxis('x', 'Population');
-      // TODO fix ordering -- cannot be done automatically
       var y = chart.addCategoryAxis('y', 'Age Group');
-      y.addOrderRule('Age Group');
+      y.addOrderRule(_.map([
+        'h7_0',
+        'h8_5',
+        'h9_10',
+        'h10_15',
+        'h11_20',
+        'h12_25',
+        'h13_30',
+        'h14_35',
+        'h15_40',
+        'h16_45',
+        'h17_50',
+        'h18_55',
+        'h19_60',
+        'h20_65',
+        'h21_70',
+        'h22_75',
+        'h23_80',
+        'h24_85'
+      ], function(k) {return i18n.t('row.' + k);}), true);
       chart.addSeries('Gender', dimple.plot.bar);
+      chart.addLegend("75%", "77%", "30%", "10%");
       chart.draw();
       $scope._charts[elemSelector] = {svg: svg, chart: chart};
     };

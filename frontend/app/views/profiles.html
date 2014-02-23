@@ -8,14 +8,21 @@
 </div>
 
 <div class="row">
-  <hk-map height="500px" class="col-md-6" single-select selected-areas="selection"></hk-map>
-  <div class="col-md-6" ng-hide="selection.hasSelection()">
-    <h3>Choose an area on the left to get started.  Zoom in for more granular areas.</h3>
+  <hk-map height="500px" class="col-md-12" single-select selected-areas="selection"></hk-map>
+</div>
+<div class="row">
+  <div class="col-md-12 text-center" ng-hide="selection.hasSelection()">
+    <h3>Choose an area above to get started.  Zoom in for more granular areas.</h3>
   </div>
-  <div ng-show="selection.hasSelection()" class="col-md-6">
+  <div ng-show="selection.hasSelection()" class="col-md-12" cg-busy="'globalTracker'">
     <div class="row">
-      <div class="col-md-12" id="profile-age">
-        <h3>Population table (age) bars two sided bars</h3>
+      <div class="col-md-12">
+        <h3>Profile for {{ selectionName }}</h3>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-6" id="profile-age">
+        <h4>Age groups</h4>
       </div>
     </div>
     <h3>Ethnic breakdown (male / female) - double stacked bar</h3>
@@ -28,7 +35,7 @@
       <div class="col-md-2">
         <h3>Industry (male /female) - two sided bars</h3>
       </div>
-      </div>
+    </div>
     <div class="row">
       <div class="col-md-3">
         <h3>Income (male / female) - two sided bars</h3>
