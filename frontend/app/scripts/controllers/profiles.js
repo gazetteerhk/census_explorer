@@ -18,6 +18,8 @@ angular.module('frontendApp')
         // Ethnicity
         'tab0_male',
         'tab0_female',
+        // Language
+        'e18_both',
         // Occupation
         'l81_male',
         'm81_female',
@@ -66,6 +68,7 @@ angular.module('frontendApp')
     $scope.redrawCharts = function() {
       $scope._drawAge();
       $scope._drawEthnicity();
+      $scope._drawLanguage();
     };
 
     var _clearChart = function(selector) {
@@ -125,7 +128,7 @@ angular.module('frontendApp')
 
       // Filter out the data we want
       var filtered = _.filter($scope._queryData, function(val) {return (['tab0_male', 'tab0_female'].indexOf(val.column) > -1);})
-      var grouped = CensusAPI.sumBy(filtered, ['row', 'column']);
+      var grouped = CensusAPI.sumBy(filtered, ['row', 'column']);  //  Need this to handle district aggregates
       // Grouped is {row,column: value}
       // Reshape the grouped aggregate to a data array
       var data = [];
@@ -136,11 +139,33 @@ angular.module('frontendApp')
 
       var svg = dimple.newSvg(elemSelector, undefined, 300);
       var chart = new dimple.chart(svg, data);
-      chart.setBounds("13%", "20%", "85%", "66%");
+      chart.setBounds(65, 15, "70%", "81%");
       chart.addCategoryAxis('x', ['Gender']);
       chart.addPctAxis('y', 'Population');
       chart.addSeries('Ethnicity', dimple.plot.bar);
-      chart.addLegend(0, 0, "100%", "10%");
+//      chart.addLegend(0, 0, "100%", "10%");
+      chart.draw();
+      _addChartToCache(elemSelector, svg, chart);
+    };
+
+    $scope._drawLanguage = function() {
+      var elemSelector = "#profile-language";
+      _clearChart(elemSelector);
+
+      var filtered = _.filter($scope._queryData, function(val) {return val.column === "e18_both";});
+      var grouped = CensusAPI.sumBy(filtered, ['row']);
+      var data = [];
+      _.forOwn(grouped, function(val, key) {
+        data.push({Language: i18n.t('row.' + key), 'All people': '', Population: val});
+      });
+
+      var svg = dimple.newSvg(elemSelector, undefined, 300);
+      var chart = new dimple.chart(svg, data);
+      chart.setBounds(65, 15, "70%", "81%");
+      chart.addCategoryAxis('x', 'All People');
+      chart.addPctAxis('y', 'Population');
+      chart.addSeries('Language', dimple.plot.bar);
+//      chart.addLegend(0, 0, "100%", "10%");
       chart.draw();
       _addChartToCache(elemSelector, svg, chart);
     };
