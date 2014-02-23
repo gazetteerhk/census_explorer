@@ -19,6 +19,33 @@ angular.module('frontendApp').factory('Indicators', [function() {
    * Parsers are callables that are given an API data object, and return a list of data objects that can be use by charts
    */
 
+  /*
+   * Ordering
+   */
+  var ordering = {};
+
+  ordering.ageGroup = [
+    'h7_0',
+    'h8_5',
+    'h9_10',
+    'h10_15',
+    'h11_20',
+    'h12_25',
+    'h13_30',
+    'h14_35',
+    'h15_40',
+    'h16_45',
+    'h17_50',
+    'h18_55',
+    'h19_60',
+    'h20_65',
+    'h21_70',
+    'h22_75',
+    'h23_80',
+    'h24_85'
+  ];
+
+  svc.ordering = ordering;
 
   /*
    * Query Parameters

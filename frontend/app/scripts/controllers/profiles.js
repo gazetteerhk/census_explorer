@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('frontendApp')
-  .controller('ProfilesCtrl', ['$scope', 'AreaSelection', 'CensusAPI', function($scope, AreaSelection, CensusAPI) {
+  .controller('ProfilesCtrl', ['$scope', 'AreaSelection', 'CensusAPI', 'Indicators', function($scope, AreaSelection, CensusAPI, Indicators) {
     $scope.selection = AreaSelection.getModel();
 
     // Storage for svg and chart elements
@@ -15,15 +15,18 @@ angular.module('frontendApp')
         // Age
         'l6_male',
         'm6_female',
+        // Ethnicity
+        'tab0_male',
+        'tab0_female',
         // Occupation
         'l81_male',
         'm81_female',
         // Industry
         'l95_male',
         'm95_female',
-        // Individaul monthly income
+        // Individual monthly income
         'c77_male',
-        'd77_female',
+        'd77_female'
       ],
       projector: ['value', 'row', 'column'],
       return: ['data', 'options']
@@ -62,14 +65,22 @@ angular.module('frontendApp')
 
     $scope.redrawCharts = function() {
       $scope._drawAge();
+      $scope._drawEthnicity();
+    };
+
+    var _clearChart = function(selector) {
+      if (!_.isUndefined($scope._charts[selector])) {
+        $scope._charts[selector].svg.remove();
+      }
+    };
+
+    var _addChartToCache = function(selector, svg, chart) {
+      $scope._charts[selector] = {svg: svg, chart: chart};
     };
 
     $scope._drawAge = function() {
       var elemSelector = "#profile-age";
-      // clear the div
-      if (!_.isUndefined($scope._charts[elemSelector])) {
-        $scope._charts[elemSelector].svg.remove();
-      }
+      _clearChart(elemSelector);
 
       // Get the data
       // Should be in the form [{row: ageGroup, male: malePopulation, female: femalePopulation}]
@@ -95,34 +106,42 @@ angular.module('frontendApp')
         data.push({'Age Group': transRow, Gender: 'Male', Population: val.male});
       });
 
+      // Make the chart
       var svg = dimple.newSvg(elemSelector, undefined, 300);
       var chart = new dimple.chart(svg, data);
       chart.setBounds("13%", 0, "85%", "85%");
       chart.addMeasureAxis('x', 'Population');
       var y = chart.addCategoryAxis('y', 'Age Group');
-      y.addOrderRule(_.map([
-        'h7_0',
-        'h8_5',
-        'h9_10',
-        'h10_15',
-        'h11_20',
-        'h12_25',
-        'h13_30',
-        'h14_35',
-        'h15_40',
-        'h16_45',
-        'h17_50',
-        'h18_55',
-        'h19_60',
-        'h20_65',
-        'h21_70',
-        'h22_75',
-        'h23_80',
-        'h24_85'
-      ], function(k) {return i18n.t('row.' + k);}), true);
+      y.addOrderRule(_.map(Indicators.ordering.ageGroup, function(k) {return i18n.t('row.' + k);}), true);
       chart.addSeries('Gender', dimple.plot.bar);
       chart.addLegend("75%", "77%", "30%", "10%");
       chart.draw();
-      $scope._charts[elemSelector] = {svg: svg, chart: chart};
+      _addChartToCache(elemSelector, svg, chart);
+    };
+
+    $scope._drawEthnicity = function() {
+      var elemSelector = "#profile-ethnicity";
+      _clearChart(elemSelector);
+
+      // Filter out the data we want
+      var filtered = _.filter($scope._queryData, function(val) {return (['tab0_male', 'tab0_female'].indexOf(val.column) > -1);})
+      var grouped = CensusAPI.sumBy(filtered, ['row', 'column']);
+      // Grouped is {row,column: value}
+      // Reshape the grouped aggregate to a data array
+      var data = [];
+      _.forOwn(grouped, function(val, key) {
+        var split = key.split(',');
+        data.push({Ethnicity: i18n.t('row.' + split[0]), Gender: i18n.t('column.' + split[1]), Population: val});
+      });
+
+      var svg = dimple.newSvg(elemSelector, undefined, 300);
+      var chart = new dimple.chart(svg, data);
+      chart.setBounds("13%", "20%", "85%", "66%");
+      chart.addCategoryAxis('x', ['Gender']);
+      chart.addPctAxis('y', 'Population');
+      chart.addSeries('Ethnicity', dimple.plot.bar);
+      chart.addLegend(0, 0, "100%", "10%");
+      chart.draw();
+      _addChartToCache(elemSelector, svg, chart);
     };
 }]);
