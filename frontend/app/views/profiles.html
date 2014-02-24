@@ -1,0 +1,54 @@
+<div class="container">
+<div class="row">
+  <div class="col-md-12">
+    <h1>Area Profiles</h1>
+  </div>
+  <div class="col-md-12">
+    <h3>Get a quick summary of the key characteristics of Hong Kong's neighborhoods</h3>
+  </div>
+</div>
+
+<div class="row">
+  <hk-map height="500px" class="col-md-12" single-select selected-areas="selection"></hk-map>
+</div>
+<div class="row">
+  <div class="col-md-12 text-center" ng-hide="selection.hasSelection()">
+    <h3>Choose an area above to get started.  Zoom in for more granular areas.</h3>
+  </div>
+  <div ng-show="selection.hasSelection()" class="col-md-12" cg-busy="'globalTracker'" id="profile-charts">
+    <div class="row">
+      <div class="col-md-12">
+        <h3>Profile for {{ selectionName }}</h3>
+      </div>
+    </div>
+    <div class="row chart-row">
+      <div class="col-md-6" id="profile-age">
+        <h4>Age groups</h4>
+      </div>
+      <div class="col-md-3" id="profile-ethnicity">
+        <h4>Ethnicity</h4>
+      </div>
+      <div class="col-md-3" id="profile-language">
+        <h4>Language</h4>
+      </div>
+    </div>
+    <div class="row chart-row">
+      <div class="col-md-6">
+        <div class="row">
+          <div class="col-md-12" id="profile-occupation">
+            <h4>Occupation</h4>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12" id="profile-industry">
+            <h4>Industry</h4>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6" id="profile-income">
+        <h4>Income</h4>
+      </div>
+    </div>
+  </div>
+</div>
+</div>

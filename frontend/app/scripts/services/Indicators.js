@@ -19,6 +19,49 @@ angular.module('frontendApp').factory('Indicators', [function() {
    * Parsers are callables that are given an API data object, and return a list of data objects that can be use by charts
    */
 
+  /*
+   * Ordering
+   */
+  var ordering = {};
+
+  ordering.ageGroup = [
+    'h7_0',
+    'h8_5',
+    'h9_10',
+    'h10_15',
+    'h11_20',
+    'h12_25',
+    'h13_30',
+    'h14_35',
+    'h15_40',
+    'h16_45',
+    'h17_50',
+    'h18_55',
+    'h19_60',
+    'h20_65',
+    'h21_70',
+    'h22_75',
+    'h23_80',
+    'h24_85'
+  ];
+
+  ordering.income = [
+    'a102_unpaid',
+    'a78_<',
+    'a80_2000',
+    'a82_4000',
+    'a84_6000',
+    'a86_8000',
+    'a88_10000',
+    'a90_15000',
+    'a92_20000',
+    'a94_25000',
+    'a96_30000',
+    'a98_40000',
+    'a100_>='
+  ];
+
+  svc.ordering = ordering;
 
   /*
    * Query Parameters
@@ -40,6 +83,13 @@ angular.module('frontendApp').factory('Indicators', [function() {
     aggregate: 'max',
     projector: ['value', 'row'],
     return: ['groups', 'options']
+  };
+
+  queries.ethnicity = {
+    table: 0,
+    column: 'tab0_both',
+    projector: ['area', 'value', 'row'],
+    return: ['data', 'options']
   };
 
   queries.maritalStatus = {
@@ -101,14 +151,14 @@ angular.module('frontendApp').factory('Indicators', [function() {
 
   queries.monthlyIncomeMale = {
     table: 5,
-    column: 'c77_both',
+    column: 'c77_male',
     projector: ['area', 'value', 'row'],
     return: ['data', 'options']
   };
 
   queries.monthlyIncomeFemale = {
     table: 5,
-    column: 'd77_both',
+    column: 'd77_female',
     projector: ['area', 'value', 'row'],
     return: ['data', 'options']
   };
@@ -123,14 +173,6 @@ angular.module('frontendApp').factory('Indicators', [function() {
     table: 7,
     projector: ['area', 'value', 'row'],
     return: ['data', 'options']
-  };
-
-  queries.householdSizeMedian = {
-    table: 7,
-    aggregate: 'median',
-    projector: ['area', 'value', 'row'],
-    return: ['groups', 'options'],
-    groupby: 'area'
   };
 
   queries.householdHousingType = {
@@ -182,14 +224,14 @@ angular.module('frontendApp').factory('Indicators', [function() {
 
   queries.ageMale = {
     table: 12,
-    column: 'l6_both',
+    column: 'l6_male',
     projector: ['area', 'value', 'row'],
     return: ['data', 'options']
   };
 
   queries.ageFemale = {
     table: 12,
-    column: 'm6_both',
+    column: 'm6_female',
     projector: ['area', 'value', 'row'],
     return: ['data', 'options']
   };

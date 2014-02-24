@@ -20,33 +20,17 @@ angular.module('frontendApp', [
         templateUrl: 'views/main.html',
         controller: 'MainCtrl'
       })
-      .when('/test', {
-        templateUrl: 'views/test.html',
-        controller: 'TestCtrl'
-      })
       .when('/about', {
         templateUrl: 'views/about.html',
         controller: 'AboutCtrl'
-      })
-      .when('/getdata', {
-        templateUrl: 'views/getdata.html',
-        controller: 'GetDataCtrl'
-      })
-      .when('/discover', {
-        templateUrl: 'views/discover.html',
-        controller: 'DiscoverCtrl'
-      })
-      .when('/explore', {
-        templateUrl: 'views/explore.html',
-        controller: 'ExploreCtrl'
       })
       .when('/choropleth', {
         templateUrl: 'views/choropleth.html',
         controller: 'ChoroplethCtrl'
       })
-      .when('/medians', {
-        templateUrl: 'views/medians.html',
-        controller: 'MediansCtrl'
+      .when('/profiles', {
+        templateUrl: 'views/profiles.html',
+        controller: 'ProfilesCtrl'
       })
       .when('/browser', {
         templateUrl: 'views/browser.html',
@@ -81,11 +65,20 @@ angular.module('frontendApp', [
   }]);
 
 angular.module('frontendApp').filter('translate', function(){
-  return function(input, prefix){
-    if (_.isUndefined(prefix)) {
-      return i18n.t(input);
+  return function(input, prefix, translate){
+    if (_.isUndefined(input)) {
+      return;
+    }
+
+    // if the translate toggle is not provided, then we should translate by default
+    if (translate === false) {
+      return input;
     } else {
-      return i18n.t(prefix  + '.' + input);
+      if (_.isUndefined(prefix) || _.isNull(prefix)) {
+        return i18n.t(input);
+      } else {
+        return i18n.t(prefix  + '.' + input);
+      }
     }
   }
 });

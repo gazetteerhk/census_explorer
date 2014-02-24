@@ -1,3 +1,5 @@
+<div class="container">
+
 <div class="row">
   <div class="col-md-12">
     <h1>API Browser</h1>
@@ -48,13 +50,17 @@
     {{ options.row.length }} rows
   </div>
 </div>
+<div class="row">
+  <div class="col-md-12 form-group">
+    <input type="checkbox" ng-model="showCodes">
+    <label>Show codes instead of humanized values</label>
+  </div>
+</div>
 </form>
 
 <h2>Results -
   <small> Total {{meta.length}} data points, showing {{ model.skip+1 }} - {{ model.skip+model.count }}</small>
 </h2>
-
-  {{ 'sample' | translate:'menu' }}
 
 <!-- <a ng-click="tableParams.page(1)">reload</a>
  -->
@@ -63,22 +69,22 @@
 <table ng-table="tableParams" template-pagination="custom/pager" class="table" cg-busy="'globalTracker'">
   <tr ng-repeat="d in data">
   <td data-title="'Region'">
-    {{d.region | translate:'region'}}
+    {{d.region | translate:'region':!showCodes}}
   </td>
   <td data-title="'District'">
-    {{d.district | translate:'district'}}
+    {{d.district | translate:'district':!showCodes}}
   </td>
   <td data-title="'Area'">
-    {{d.area | translate:'area'}}
+    {{d.area | translate:'area':!showCodes}}
   </td>
   <td data-title="'Table'">
-    {{d.table | translate:'table'}}
+    {{d.table | translate:'table':!showCodes}}
   </td>
   <td data-title="'Row'">
-    {{d.row | translate:'row'}}
+    {{d.row | translate:'row':!showCodes}}
   </td>
   <td data-title="'Column'">
-    {{d.column | translate:'column'}}
+    {{d.column | translate:'column':!showCodes}}
   </td>
   <td data-title="'Value'">
     {{d.value}}
@@ -132,3 +138,5 @@ Meta:
 <pre>
   {{ meta }}
 </pre>
+
+</div>

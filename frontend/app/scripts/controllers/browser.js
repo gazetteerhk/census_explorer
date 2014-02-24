@@ -2,6 +2,9 @@
 
 // API browser
 angular.module('frontendApp').controller('BrowserCtrl', ['$scope', 'CensusAPI', 'ngTableParams', function($scope, CensusAPI, ngTableParams) {
+  // Toggle for showing API codes
+  $scope.showCodes = false;
+
   // Selected options
   var _defaultModel = {skip: 0, count: 5};
   $scope.model = _.clone(_defaultModel);

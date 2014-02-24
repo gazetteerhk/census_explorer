@@ -60,7 +60,7 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
 
       // Default map configuration
       var _defaultConfig = {
-        colors: colorbrewer.Blues[5],  // Colors to use for the scale
+        colors: colorbrewer.Reds[5],  // Colors to use for the scale
         scale: null,  // a d3 scale object, if none is provided, then we'll quantize the data into buckets
         valueVar: 'value',  // The name of the property in each data object that should be plotted
         style: {
@@ -191,7 +191,7 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
         if (_.isUndefined($scope._colorScale.invertExtent)) {
           // Ordinal scale
           var textFunc =  function(d) {
-            return $scope._colorScale.domain()[d];
+            return i18n.t($scope._mapConfig.valueVar + '.' + $scope._colorScale.domain()[d]);
           };
         } else {
           var textFunc = function(d) {
@@ -234,9 +234,11 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
         });
       };
 
+      var _isArea = function(f) {
+        return !_.isUndefined(f.properties.CA);
+      };
+
       // Handlers for interaction
-      // TODO: Some visual cue that the layer is moused over, but also needs to take into
-      // account that the weight may be overridden by a user provided value in the mapConfig
       var mouseoverHandler = function(e) {
         var layer = e.target;
         var code = _getLayerCode(e);
@@ -245,7 +247,18 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
           layer.bringToFront();
         }
 
-        $scope.hoveredFeature = code;
+        var prefix = _isArea(e.target.feature) ? "area." : "district.";
+        $scope.hoveredFeature = prefix + code.toLowerCase();
+        if (!_.isUndefined($scope._mapConfig)) {
+          if (!_.isUndefined($scope._colorScale.invertExtent)) {
+            // Heuristic for continuous scales (actually quantized scales)
+            var formatter = d3.format("0f");
+            $scope.hoveredFeatureValue = formatter($scope._getValueFromArea(code.toLowerCase()));
+          } else {
+            // If invertExtent doesn't exist, then we're dealing with a categorical scale
+            $scope.hoveredFeatureValue = i18n.t($scope._mapConfig.valueVar + '.' + $scope._getValueFromArea(code.toLowerCase()));
+          }
+        }
       };
 
       var resetStyle = function(e) {
@@ -255,6 +268,7 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
         layer.setStyle({weight: 0});
 
         $scope.hoveredFeature = undefined;
+        $scope.hoveredFeatureCode = undefined;
       };
 
       var _getLayerCode = function(e) {
@@ -304,7 +318,7 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
       });
     }],
     template: '<leaflet center="center" defaults="defaults" geojson="geojson" layers="layers"></leaflet>' +
-      '<div class="map-overlay" ng-show="hoveredFeature">{{ hoveredFeature }} - {{ _getValueFromArea(hoveredFeature) }}</div>' +
+      '<div class="map-overlay" ng-show="hoveredFeature">{{ hoveredFeature | translate }} - {{ hoveredFeatureValue }}</div>' +
       '<div class="map-legend"></div>'
   };
 });

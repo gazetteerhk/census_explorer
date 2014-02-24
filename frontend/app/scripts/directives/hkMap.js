@@ -154,6 +154,10 @@ angular.module('frontendApp').directive('hkMap', function() {
         _redrawMap();
       });
 
+      var _isArea = function(f) {
+        return !_.isUndefined(f.properties.CA);
+      };
+
       // Handlers for interaction
       var mouseoverHandler = function(e) {
         var layer = e.target;
@@ -166,7 +170,8 @@ angular.module('frontendApp').directive('hkMap', function() {
           }
         }
 
-        $scope.hoveredFeature = code;
+        var prefix = _isArea(e.target.feature) ? "area." : "district.";
+        $scope.hoveredFeature = prefix + code.toLowerCase();
       };
 
       var resetStyle = function(e) {
@@ -247,6 +252,6 @@ angular.module('frontendApp').directive('hkMap', function() {
 
     }],
     template: '<leaflet center="center" defaults="defaults" geojson="geojson" layers="layers"></leaflet>' +
-      '<div class="map-overlay" ng-show="hoveredFeature">{{ "area.code."+hoveredFeature | i18next}}</div>'
+      '<div class="map-overlay" ng-show="hoveredFeature">{{ hoveredFeature | translate }}</div>'
   }
 });
