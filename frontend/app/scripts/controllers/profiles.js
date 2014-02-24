@@ -56,15 +56,19 @@ angular.module('frontendApp')
       // Add the selected area to the filter
       query.addParam('area', areas);
 
-      query.fetch().then(function(res) {
-        $scope._rawResponse = res;
-        $scope._queryData = CensusAPI.joinData(res.data);
-        $scope.redrawCharts();
-      });
+      // Delay fetching so that the scrolling finishes first
+      // Hurts response time on first query, but helps animation on later queries
+      $timeout(function() {
+        query.fetch().then(function(res) {
+          $scope._rawResponse = res;
+          $scope._queryData = CensusAPI.joinData(res.data);
+          $scope.redrawCharts();
+        });
+      }, 300);
 
       // Scroll to the results section
       // Must delay this so that the section can show
-      $timeout(function() {$('body').animate({scrollTop: $('#profile-charts').offset().top}, 'slow')}, 250);
+      $timeout(function() {$('body').animate({scrollTop: $('#profile-charts').offset().top}, 'slow')}, 100);
 
     }, true);
 
