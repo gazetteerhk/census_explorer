@@ -10,7 +10,9 @@ angular.module('frontendApp', [
     'leaflet-directive',
     'jm.i18next',
     'ajoslin.promise-tracker',
-    'cgBusy'
+    'cgBusy',
+    'angulartics',
+    'angulartics.google.analytics'
   ])
   .config(['$routeProvider', function($routeProvider) {
     $routeProvider
