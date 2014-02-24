@@ -109,14 +109,14 @@ body {
 .jumbotron {
   text-align: center;
   border-bottom: 1px solid #e5e5e5;
-  height: 450px;
+  height: 400px;
   margin-top: -20px;
   background: url('../images/jumbotron.jpg') no-repeat center center;
   /* image from http://commons.wikimedia.org/wiki/File:Hong_Kong_at_night.jpg */
 }
 
 .jumbotron h1 {
-  margin-top: 300px;
+  margin-top: 260px;
   color: #fff;
 }
 
