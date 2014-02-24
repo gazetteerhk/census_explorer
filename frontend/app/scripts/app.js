@@ -12,8 +12,6 @@ angular.module('frontendApp', [
     'ajoslin.promise-tracker',
     'cgBusy'
   ])
-  .constant('serverPrefix', '/')
-  .constant('translationPrefix', '/')
   .config(['$routeProvider', function($routeProvider) {
     $routeProvider
       .when('/', {
@@ -39,7 +37,7 @@ angular.module('frontendApp', [
       .otherwise({
         redirectTo: '/'
       })
-  }]).run(['translationPrefix', function(translationPrefix) {
+  }]).run([function() {
     // We'll manually load the translation namespaces, because the config block
     // Appears to have some bugs in how it requests namespace files.
     // Specifically, having both the ns key and the fallbackNS key causes files to be requested
@@ -59,7 +57,7 @@ angular.module('frontendApp', [
       // But is required to have automatic fallback
       fallbackNS: ['human_ns', 'generated_ns'],
       load: 'current',
-      resGetPath: translationPrefix + 'locale/__lng__/__ns__-translation.json',
+      resGetPath: 'locale/__lng__/__ns__-translation.json',
       getAsync: false  // We'll block, since the translation files are pretty critical
     });
   }]);
