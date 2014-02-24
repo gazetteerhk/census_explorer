@@ -1,31 +1,41 @@
 <div class="jumbotron">
   <div class="container text-center">
-    <h1></h1>
+    <h1>Explore Hong Kong through Data</h1>
   </div>
 </div>
 
 <div class="container">
   <div class="row">
-    
-  </div>
-  <div class="row">
-    <div class="col-md-4 text-center">
-      <h3>Neighborhood Profiles</h3>
-      <img src="../images/profiles.jpg" class="img-thumbnail"/>
-    </div>
-    <div class="col-md-4 text-center">
-      <h3>Data Mapper</h3>
-      <img src="../images/mapper.jpg" class="img-thumbnail"/>
-    </div>
-    <div class="col-md-4 text-center">
-      <h3>API Browser</h3>
-      <img src="../images/browser.jpg" class="img-thumbnail"/>
+    <div class="col-md-8 col-md-offset-2 text-center">
+      <h1>Gazetteer makes geographical data about Hong Kong's diverse neighboorhoods accessible and easy to use.</h1>
+      <br />
+      <p>
+        We're collecting and standardizing numerous datasets and making them available to everyone -- journalists, researchers, developers,
+        and anyone curious about the city around us.
+      </p>
+      <p>Check out one of our apps below, or get the data directly from our free API.</p>
+      <br />
     </div>
   </div>
 
   <div class="row">
-    <div class="col-md-12">
-      Want to contribute?  <a href="https://github.com/gazetteerhk/census_explorer">Check us out on Github.</a>
-    </div>
+    <a ng-href="#/profiles">
+      <div class="col-md-4 text-center">
+        <h3>Neighborhood Profiles</h3>
+        <img src="../images/profiles.jpg" class="img-thumbnail"/>
+      </div>
+    </a>
+    <a ng-href="#/choropleth">
+      <div class="col-md-4 text-center">
+        <h3>Data Mapper</h3>
+        <img src="../images/mapper.jpg" class="img-thumbnail"/>
+      </div>
+    </a>
+    <a ng-href="#/browser">
+      <div class="col-md-4 text-center">
+        <h3>API Browser</h3>
+        <img src="../images/browser.jpg" class="img-thumbnail"/>
+      </div>
+    </a>
   </div>
 </div>
