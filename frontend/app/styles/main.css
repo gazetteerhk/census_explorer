@@ -108,7 +108,15 @@ body {
 .jumbotron {
   text-align: center;
   border-bottom: 1px solid #e5e5e5;
+  height: 450px;
+  margin-top: -20px;
+  background: url('../images/jumbotron.jpg') no-repeat center center;
 }
+
+.jumbotron h1 {
+  color: #fff;
+}
+
 .jumbotron .btn {
   font-size: 21px;
   padding: 14px 24px;
