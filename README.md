@@ -2,6 +2,8 @@
 
 Explore Hong Kong's neighborhoods through data
 
+[![](https://raw.github.com/gazetteerhk/census_explorer/master/misc/screen-gazeteer.jpg)](http://gazetteer.hk/)
+
 ## Usage
 
 ### Data Preparation
