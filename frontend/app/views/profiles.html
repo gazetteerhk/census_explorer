@@ -14,13 +14,13 @@
   <div class="col-md-12 text-center" ng-hide="selection.hasSelection()">
     <h3>Choose an area above to get started.  Zoom in for more granular areas.</h3>
   </div>
-  <div ng-show="selection.hasSelection()" class="col-md-12" cg-busy="'globalTracker'">
+  <div ng-show="selection.hasSelection()" class="col-md-12" cg-busy="'globalTracker'" id="profile-charts">
     <div class="row">
       <div class="col-md-12">
         <h3>Profile for {{ selectionName }}</h3>
       </div>
     </div>
-    <div class="row">
+    <div class="row chart-row">
       <div class="col-md-6" id="profile-age">
         <h4>Age groups</h4>
       </div>
@@ -31,7 +31,7 @@
         <h4>Language</h4>
       </div>
     </div>
-    <div class="row">
+    <div class="row chart-row">
       <div class="col-md-6">
         <div class="row">
           <div class="col-md-12" id="profile-occupation">
@@ -48,7 +48,7 @@
         <h4>Income</h4>
       </div>
     </div>
-    <div class="row">
+    <div class="row chart-row">
       <div class="col-md-2">
         <h3>Housing type (household) - pie / donut</h3>
       </div>

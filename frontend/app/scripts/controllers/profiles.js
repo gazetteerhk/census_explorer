@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('frontendApp')
-  .controller('ProfilesCtrl', ['$scope', 'AreaSelection', 'CensusAPI', 'Indicators', function($scope, AreaSelection, CensusAPI, Indicators) {
+  .controller('ProfilesCtrl', ['$scope', 'AreaSelection', 'CensusAPI', 'Indicators', '$timeout', function($scope, AreaSelection, CensusAPI, Indicators, $timeout) {
     $scope.selection = AreaSelection.getModel();
 
     // Storage for svg and chart elements
@@ -61,6 +61,11 @@ angular.module('frontendApp')
         $scope._queryData = CensusAPI.joinData(res.data);
         $scope.redrawCharts();
       });
+
+      // Scroll to the results section
+      // Must delay this so that the section can show
+      $timeout(function() {$('body').animate({scrollTop: $('#profile-charts').offset().top}, 'slow')}, 250);
+
     }, true);
 
     $scope.redrawCharts = function() {

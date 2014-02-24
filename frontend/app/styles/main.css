@@ -165,3 +165,7 @@ body {
 .key-label {
   font-size: 0.8em;
 }
+
+#profile-charts .chart-row {
+  height: 300px;
+}
