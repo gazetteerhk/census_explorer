@@ -9,7 +9,9 @@ Explore Hong Kong's neighborhoods through data
 Go to `/scripts` dir and run `python data_preparation.py`.
 This script will download original xlsx files, extract cleaned data to JSON, generate translation mappping, and generate combined CSV files.
 
-## Backend
+All the data files are under `/scripts/data` dir.
+
+### Backend
 
    - Python
    - Flask
@@ -21,7 +23,7 @@ Run:
    * `python main.py` directly to start the backend API server.
    * `python debug.py` for the DEBUG version.
 
-## Frontend
+### Frontend
 
    - Node.js
    - Grunt
@@ -37,7 +39,20 @@ Run:
 
 Usage:
 
-   - `grunt serve` will start the local http server at port 9000 in `app`.  Note that by default the host is 0.0.0.0 to allow connections from outside the server, if you use a VM or a remote server.
-   - `grunt test` will run frontend tests.
-   - `grunt build` will execute the build process.  Running `grunt serve:dist` will run the build process and start the server within `dist`.  If you are deploying, it is not necessary to run this as the deploy process will build as well.
+   - `grunt serve`: Start the local http server at port 9000 in `app`.
+   By default the host is `0.0.0.0` to allow connections from outside the server.
+   - `grunt test`: Run frontend tests.
+   - `grunt build`: Execute the build process.  
+   - `grunt serve:dist` will run the build process and start the server within `dist`.
    - `grunt deploy` will build and deploy the site to Github pages.
+
+## Contribution
+
+If you have bug report, feature request or anything to discuss,
+[create an issue](https://github.com/gazetteerhk/census_explorer/issues/new) in our project repo.
+
+For code contributions, please fork, modify and send Pull Request.
+
+## License
+
+**TODO**
