@@ -10,7 +10,8 @@
 import config
 import json
 import os
-from scripts import geo_naming
+import geo_naming
+from log import logger
 
 
 def get_geojson_objects():
@@ -49,6 +50,21 @@ def create_translation(features):
                 u'T': f['properties'][CHINESE_CATEGORY_KEY]
             }
     return res
+
+
+def append_row_translations(features):
+    # Need to add to translation-row.json for each category
+    with open(os.path.join(config.DIR_DATA_CLEAN_JSON, 'translation-row.json'), 'rb') as f:
+        row_translations = json.loads(f.read())
+    new_translation = create_translation(features)
+    for k, v in new_translation.items():
+        if k not in row_translations:
+            row_translations[k] = v
+        else:
+            logger.info("{} already in translation table".format(k))
+    with open(os.path.join(config.DIR_DATA_CLEAN_JSON, 'translation-row.json'), 'wb') as f:
+        f.write(json.dumps(row_translations))
+    # For the table and the column, we'll just read from the human generated translations
 
 
 def create_aggregate_datapoints(features):
