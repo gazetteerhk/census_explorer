@@ -12,6 +12,8 @@ import json
 import os
 import geo_naming
 from log import logger
+import pandas as pd
+from combine_json import translate_datapoints
 
 
 def get_geojson_objects():
@@ -41,30 +43,58 @@ def create_translation(features):
         # Some first words are repeated, so we have to increment a counter for each category
         if eng_name not in seen_categories:
             split = eng_name.split(' ')
-            feat_id = u'f{}_{}'.format(counter, split[0].lower())
+            feat_id = u'f{}_{}'.format(counter, ''.join(e for e in split[0].lower() if e.isalnum())) # strip special chars
             counter += 1
             seen_categories.add(eng_name)
             res[feat_id] = {
-                u'C': f['properties'][CHINESE_CATEGORY_KEY],  # Shortcut here, just use traditional for simplified
+                u'S': f['properties'][CHINESE_CATEGORY_KEY],  # Shortcut here, just use traditional for simplified
                 u'E': eng_name,
                 u'T': f['properties'][CHINESE_CATEGORY_KEY]
             }
     return res
 
 
-def append_row_translations(features):
+def append_row_translations(features, force=False):
     # Need to add to translation-row.json for each category
     with open(os.path.join(config.DIR_DATA_CLEAN_JSON, 'translation-row.json'), 'rb') as f:
         row_translations = json.loads(f.read())
     new_translation = create_translation(features)
     for k, v in new_translation.items():
-        if k not in row_translations:
+        if k not in row_translations or force:
             row_translations[k] = v
         else:
             logger.info("{} already in translation table".format(k))
     with open(os.path.join(config.DIR_DATA_CLEAN_JSON, 'translation-row.json'), 'wb') as f:
         f.write(json.dumps(row_translations))
-    # For the table and the column, we'll just read from the human generated translations
+
+    # only need to add a single row for the tables and columns
+    # We need to add these here for the translated, combined CSV files
+    with open(os.path.join(config.DIR_DATA_CLEAN_JSON, 'translation-table.json'), 'rb') as f:
+        table_translations = json.loads(f.read())
+    if u'100' not in table_translations or force:
+        table_translations[u'100'] = {
+            u'S': u'\u516c\u5171\u8bbe\u65bd',
+            u'E': u'Public Facilities',
+            u'T': u'\u516c\u5171\u8a2d\u65bd'
+        }
+    else:
+        logger.info("Table translation already in translation table")
+    with open(os.path.join(config.DIR_DATA_CLEAN_JSON, 'translation-table.json'), 'wb') as f:
+        f.write(json.dumps(table_translations))
+
+    # Column translation
+    with open(os.path.join(config.DIR_DATA_CLEAN_JSON, 'translation-column.json'), 'rb') as f:
+        column_translation = json.loads(f.read())
+    if u'n_facilities' not in table_translations or force:
+        table_translations[u'n_facilities'] = {
+            u'S': u'\u6570\u76ee',
+            u'E': u'No. of Facilities',
+            u'T': u'\u6578\u76ee'
+        }
+    else:
+        logger.info("Column translation already in translation table")
+    with open(os.path.join(config.DIR_DATA_CLEAN_JSON, 'translation-column.json'), 'wb') as f:
+        f.write(json.dumps(table_translations))
 
 
 def create_aggregate_datapoints(features):
@@ -104,6 +134,29 @@ def create_aggregate_datapoints(features):
     return dps
 
 
+def append_new_datapoints(features):
+    dps = create_aggregate_datapoints(features)
+    # We'll just append directly to the CSVs
+    logger.info('Total %d data points', len(dps))
+    df = pd.DataFrame(dps, columns = 'region district area table row column value'.split())
+
+    logger.info('Appending datapoints to CSV')
+    df.to_csv(os.path.join(config.DIR_DATA_COMBINED, 'census.csv'), encoding='utf-8', index=False, mode='ab', header=False)
+
+    logger.info('Write english datapoints to CSV')
+    translate_datapoints(df, 'E').to_csv(os.path.join(config.DIR_DATA_COMBINED, 'census-e.csv'), encoding='utf-8', index=False, mode='ab', header=False)
+    logger.info('Write simplified datapoints to CSV')
+    translate_datapoints(df, 'S').to_csv(os.path.join(config.DIR_DATA_COMBINED, 'census-s.csv'), encoding='utf-8', index=False, mode='ab', header=False)
+    logger.info('Write traditional datapoints to CSV')
+    translate_datapoints(df, 'T').to_csv(os.path.join(config.DIR_DATA_COMBINED, 'census-t.csv'), encoding='utf-8', index=False, mode='ab', header=False)
+
+
+def main():
+    features = get_geojson_objects()
+    logger.info("Appending translations to translation JSONs")
+    append_row_translations(features)
+    logger.info("Appending datapoints to CSVs")
+    append_new_datapoints(features)
 
 
 """

@@ -6,6 +6,7 @@ import download_constituency_area_data
 import extract_data_from_xls
 import geo_naming
 import combine_json
+import public_facilities
 import translation_for_i18next
 
 sh.mkdir('-p', config.DIR_DATA_PREFIX)
@@ -23,6 +24,9 @@ geo_naming.main()
 
 logger.info('Combine JSONs to single CSV')
 combine_json.main()
+
+logger.info('Appending public facility data')
+public_facilities.main()
 
 # Data preparation pipeline is for general purpose.
 # The following generates translation maps for our frontend use,
