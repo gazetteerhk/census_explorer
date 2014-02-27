@@ -4,12 +4,25 @@ angular.module('frontendApp')
   .controller('ChoroplethCtrl', ['$scope', 'CensusAPI', 'Indicators', function ($scope, CensusAPI, Indicators) {
 
 
-    $scope.refresh = function(){
-      var query = new CensusAPI.Query($scope.selectedIndicator.params);
+    $scope.refresh = function(type){
+      var model;
+      switch(type){
+        case 'indicator': 
+          model = $scope.selectedIndicator;
+          break;
+        case 'facility':
+          model = $scope.selectedFacility;
+          break;
+        default:
+          console.log('unrecognized type: ' + type);
+          return;
+      }
+
+      var query = new CensusAPI.Query(model.params);
 
       var promise = query.fetch().then(function(response) {
-        var d = $scope.selectedIndicator.parser(response);
-        $scope.mapConfig = $scope.selectedIndicator.config;
+        var d = model.parser(response);
+        $scope.mapConfig = model.config;
         $scope.areaData = d;
       });
     };
@@ -322,6 +335,7 @@ angular.module('frontendApp')
       }
     ];
 
+    $scope.facilities = [];
     var query = new CensusAPI.Query({
       "table":"100",
       "column":"n_facilities",
@@ -329,7 +343,7 @@ angular.module('frontendApp')
     })
     var promise = query.fetch().then(function(response){
       _.map(response.options.row, function(value){
-        $scope.indicators.push({
+        $scope.facilities.push({
           name: 'Public Facility:' + i18n.t('row.' + value),
           params: {"table":"100","column":"n_facilities","row":value,"return":"data","projector": "area,row,value"},
           config: _valueConfig,

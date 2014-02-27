@@ -1,14 +1,28 @@
 <div class="container">
 
-<h1>Map the Census Data</h1>
+<h1>Hong Kong Data Map</h1>
 
 <h4>To begin, select a feature to overlay on the map</h4>
 
 <div class="row">
+  
   <form class="form-inline">
     <div class="col-md-4">
       <div class="form-group">
-        <select class="form-control" ng-model="selectedIndicator" ng-options="i as i.name for i in indicators" ng-change="refresh()"></select>
+      	Indicators from Census 2011: 
+        <select class="form-control" ng-model="selectedIndicator" ng-options="i as i.name for i in indicators" ng-change="refresh('indicator')"></select>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div class="row">
+ 
+  <form class="form-inline">
+    <div class="col-md-4">
+      <div class="form-group">
+      	Public facilities:
+        <select class="form-control" ng-model="selectedFacility" ng-options="i as i.name for i in facilities" ng-change="refresh('facility')"></select>
       </div>
     </div>
   </form>
