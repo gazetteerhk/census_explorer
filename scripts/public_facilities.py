@@ -163,3 +163,7 @@ def main():
 with open(os.path.join(config.DIR_DATA_CLEAN_JSON, 'translation-row.json'), 'w') as outfile:
     json.dump(translate_dict_row, outfile)
 """
+
+if __name__ == '__main__':
+    main()
+
