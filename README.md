@@ -11,6 +11,9 @@ Explore Hong Kong's neighborhoods through data
 Go to `/scripts` dir and run `python data_preparation.py`.
 This script will download original xlsx files, extract cleaned data to JSON, generate translation mappping, and generate combined CSV files.
 
+You can also generate translation files with this script by uncommenting a few lines, but this should not be necessary, as
+the files are included in the repo under `/frontend/locale`
+
 All the data files are under `/scripts/data` dir.
 
 ### Backend
@@ -46,7 +49,10 @@ Usage:
    - `grunt test`: Run frontend tests.
    - `grunt build`: Execute the build process.  
    - `grunt serve:dist` will run the build process and start the server within `dist`.
-   - `grunt deploy` will build and deploy the site to Github pages.
+   - `grunt deploy` will build and deploy the site to GitHub pages.
+
+By default, the API will hit our servers.  If you want it to query from your local development server, you must change
+the endpoint in `frontend/app/scripts/services/CensusAPI.js`
 
 ## Contribution
 
@@ -57,4 +63,4 @@ For code contributions, please fork, modify and send Pull Request.
 
 ## License
 
-**TODO**
+See `LICENSE`
