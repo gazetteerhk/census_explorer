@@ -48,6 +48,10 @@ angular.module('frontendApp')
       return res;
     };
 
+    var _identityParser = function(response){
+      return CensusAPI.joinData(response.data);
+    }
+
     /*
      * Median / mode income related indicators
      */
@@ -307,20 +311,14 @@ angular.module('frontendApp')
       {
         name: '# of Government Wifi Premises)',
         params: {"table":"100","column":"n_facilities","row":"f39_govwifi","return":"data","projector": "area,row,value"},
-        config: {
-          colors: colorbrewer.Reds[5],
-          valueVar: "value"
-        },
-        parser: function(response){
-          console.log(response);
-          var d = CensusAPI.joinData(response.data);
-          console.log(d);
-          // _.map(d, function(value, key){
-          //   console.log('value');
-          //   console.log(value);
-          // });
-          return d;
-        } // identity
+        config: _valueConfig,
+        parser: _identityParser
+      },
+      {
+        name: '# of International Primary School)',
+        params: {"table":"100","column":"n_facilities","row":"f46_international","return":"data","projector": "area,row,value"},
+        config: _valueConfig,
+        parser: _identityParser
       },
     ];
 
