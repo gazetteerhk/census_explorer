@@ -85,8 +85,8 @@ def append_row_translations(features, force=False):
     # Column translation
     with open(os.path.join(config.DIR_DATA_CLEAN_JSON, 'translation-column.json'), 'rb') as f:
         column_translation = json.loads(f.read())
-    if u'n_facilities' not in table_translations or force:
-        table_translations[u'n_facilities'] = {
+    if u'n_facilities' not in column_translation or force:
+        column_translation[u'n_facilities'] = {
             u'S': u'\u6570\u76ee',
             u'E': u'No. of Facilities',
             u'T': u'\u6578\u76ee'
@@ -94,7 +94,7 @@ def append_row_translations(features, force=False):
     else:
         logger.info("Column translation already in translation table")
     with open(os.path.join(config.DIR_DATA_CLEAN_JSON, 'translation-column.json'), 'wb') as f:
-        f.write(json.dumps(table_translations))
+        f.write(json.dumps(column_translation))
 
 
 def create_aggregate_datapoints(features):
