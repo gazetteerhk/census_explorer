@@ -319,8 +319,24 @@ angular.module('frontendApp')
         params: {"table":"100","column":"n_facilities","row":"f46_international","return":"data","projector": "area,row,value"},
         config: _valueConfig,
         parser: _identityParser
-      },
+      }
     ];
+
+    var query = new CensusAPI.Query({
+      "table":"100",
+      "column":"n_facilities",
+      "return":"options"
+    })
+    var promise = query.fetch().then(function(response){
+      _.map(response.options.row, function(value){
+        $scope.indicators.push({
+          name: 'Public Facility:' + i18n.t('row.' + value),
+          params: {"table":"100","column":"n_facilities","row":value,"return":"data","projector": "area,row,value"},
+          config: _valueConfig,
+          parser: _identityParser
+        }); 
+      });
+    });
 
     $scope.mapLevel = 'ca';
     $scope.theData = $scope.areaData;
