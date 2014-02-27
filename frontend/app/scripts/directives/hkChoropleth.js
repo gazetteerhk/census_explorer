@@ -219,7 +219,18 @@ angular.module('frontendApp').directive('hkChoropleth', function() {
         if (!_.isUndefined($scope._mapConfig.style)) {
           _.extend(style, $scope._mapConfig.style);
         }
-        style.fillColor = $scope._colors[$scope._colorScale($scope._getValueFromArea(code))];
+        //console.log('value of area:');
+        //console.log($scope._getValueFromArea(code));
+        //console.log($scope._colors[$scope._colorScale($scope._getValueFromArea(code))]);
+
+        var value = $scope._getValueFromArea(code); 
+        if (!_.isUndefined(value)){
+          style.fillColor = $scope._colors[$scope._colorScale(value)];
+        } else {
+          // Show grey for NaN
+          style.fillColor = '#aaaaaa';
+        }
+
         return style;
       };
 

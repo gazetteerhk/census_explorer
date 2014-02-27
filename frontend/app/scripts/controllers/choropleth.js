@@ -101,7 +101,9 @@ angular.module('frontendApp')
 
     var _pctParserFactory = function(rowsToAggregate) {
       return function(data) {
+        console.log(data);
         var d = CensusAPI.asPercentage(CensusAPI.joinData(data.data), 'area');
+        console.log(d);
         var areaHash = {};
         var rows = rowsToAggregate;
         _.forEach(d, function(datum) {
@@ -300,6 +302,25 @@ angular.module('frontendApp')
         params: Indicators.queries.migration,
         config: _valueConfig,
         parser: _pctParserFactory(['a191_moved', 'a192_remained'])
+      },
+      // Public facility 
+      {
+        name: '# of Government Wifi Premises)',
+        params: {"table":"100","column":"n_facilities","row":"f39_govwifi","return":"data","projector": "area,row,value"},
+        config: {
+          colors: colorbrewer.Reds[5],
+          valueVar: "value"
+        },
+        parser: function(response){
+          console.log(response);
+          var d = CensusAPI.joinData(response.data);
+          console.log(d);
+          // _.map(d, function(value, key){
+          //   console.log('value');
+          //   console.log(value);
+          // });
+          return d;
+        } // identity
       },
     ];
 
