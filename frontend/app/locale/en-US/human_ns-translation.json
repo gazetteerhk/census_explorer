@@ -1,8 +1,14 @@
 {
-    "menu":{
-        "sample":"Sample",
-        "data":"Data",
-        "about":"About"
-    }
+  "menu":{
+    "sample":"Sample",
+    "data":"Data",
+    "about":"About"
+  },
+  "table": {
+    "100": "Public Facilities"
+  },
+  "column": {
+    "n_facilities": "No. of Facilities"
+  }
 }
 
