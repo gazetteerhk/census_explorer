@@ -180,3 +180,11 @@ body {
 #profile-charts .chart-row {
   height: 300px;
 }
+
+.social-row {
+  margin-top: 30px;
+}
+
+.fb-like {
+  overflow: hidden;
+}

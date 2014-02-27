@@ -18,14 +18,21 @@
   <link rel="stylesheet" href="bower_components/angular-busy/dist/angular-busy.css" />
   <!-- endbower -->
   <!-- endbuild -->
+  <meta property="og:url" content="http://gazetteer.hk">
+  <meta property="og:site_name" content="Gazetteer HK">
+  <meta property="og:description" content="Explore Hong Kong through data">
+  <meta property="og:image" content="https://raw.github.com/gazetteerhk/census_explorer/master/frontend/app/images/mapper.jpg">
+  <meta itemprop="name" content="Gazetteer HK">
+  <meta itemprop="description" content="Gazetteer HK is a geographical visualization and API platform for data about Hong Kong&#39;s neighborhoods">
+  <meta itemprop="image" content="https://raw.github.com/gazetteerhk/census_explorer/master/frontend/app/images/mapper.jpg">
   <!-- build:css({.tmp,app}) styles/main.css -->
   <link rel="stylesheet" href="styles/main.css" />
   <!-- endbuild -->
 </head>
 <body ng-app="frontendApp">
-    <!--[if lt IE 7]>
-      <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
-      <![endif]-->
+<!--[if lt IE 7]>
+<p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+<![endif]-->
 
       <div class="navbar navbar-static-top navbar-default">
         <div class="container">
@@ -52,21 +59,33 @@
       </div>
     </div>
 
-    <div class="footer">
-      <div class="container">
+<div class="footer">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-4">
         <p>
           (c) <a href="mailto:contact@gazetteer.hk">Gazetteer HK, 2014</a>
         </p>
       </div>
+      <div class="col-md-4 col-md-offset-4 text-right">
+        <div class="fb-like" data-href="http://gazetteer.hk" data-layout="button_count" data-action="like" data-show-faces="true" data-share="true"></div>
+        <a href="https://twitter.com/share" class="twitter-share-button" data-url="http://gazetteer.hk" data-text="Check out these cool visualizations about Hong Kong's neighborhoods at Gazetteer HK">Tweet</a>
+        <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+        <div class="g-plus" data-action="share" data-href="http://gazetteer.hk" data-annotation="bubble"></div>
+      </div>
     </div>
-    <script>
-      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-      ga('create', 'UA-47542275-2', 'gazetteer.hk');
-//      ga('send', 'pageview');
-    </script>
+  </div>
+</div>
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-47542275-2', 'gazetteer.hk');
+  //      ga('send', 'pageview');
+</script>
+
+    <div id="fb-root"></div>
     <!--[if lt IE 9]>
     <script src="bower_components/es5-shim/es5-shim.js"></script>
     <script src="bower_components/json3/lib/json3.min.js"></script>
@@ -124,5 +143,20 @@
     <script src="scripts/controllers/browser.js"></script>
     <!-- endbuild -->
 
-  </body>
-  </html>
+    <script>(function(d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s); js.id = id;
+      js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=626544927417839";
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));</script>
+
+    <script type="text/javascript">
+      (function() {
+        var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+        po.src = 'https://apis.google.com/js/platform.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+      })();
+    </script>
+</body>
+</html>
