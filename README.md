@@ -39,6 +39,8 @@ Run:
 
 `cd` into the `frontend` folder. Prepare environment:
 
+   - `[sudo] npm install -g grunt-cli`
+   - `[sudo] npm install -g bower`
    - `npm install`
    - `bower install`
 
