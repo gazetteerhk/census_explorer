@@ -112,12 +112,52 @@
         </ul>
     </script>
 
-<h2>For Developers</h2>
-
-A typical App may look like this:
-
+<div class="row">
+  <div class="col-md-12">
+    <h2>For Developers</h2>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-12">
+    <h3>Sample response</h3>
 <pre>
-angular.module('frontendApp').controller('MyAppCtrl', ['$scope', 'CensusAPI', function($scope, CensusAPI){
+{
+  "data": {
+    // These are the individual "columns" in the data.  The full data table is the column-wise concatenation
+    // of each array.
+    "area": [...],
+    "column": [...],
+    "district": [...],
+    "region": [...],
+    "row": [...],
+    "table": [...],
+    "value": [...]
+  },
+  "meta": {"length": 1,
+    "request": {"count": 5, "skip": 0},
+    "response": {"count": 1,"skip": 0},
+    "success": true},
+  "options": {
+    // These arrays are the set (i.e. no duplicates) of values found in data.  They essentially tell you
+    // what additional values You can filter on within your current query.
+    "area": [...],
+    "column": [...],
+    "district": [...],
+    "region": [...],
+    "row": [...],
+    "table": [...]
+  }
+}
+</pre>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-12">
+    <h3>Using our framework</h3>
+    If you're developing an app within our framework, you can use the CensusAPI service to query the API (the below
+    sample will update based on the filters you select above):
+<pre>
+  angular.module('myApp').controller('MyAppCtrl', ['$scope', 'CensusAPI', function($scope, CensusAPI){
 
     var q = new CensusAPI.Query({{model}});
     q.addParam('return', 'data');
@@ -128,15 +168,102 @@ angular.module('frontendApp').controller('MyAppCtrl', ['$scope', 'CensusAPI', fu
     }
     ...
 </pre>
+    </div>
+  </div>
+<div class="row">
+  <div class="col-md-12">
+    <h3>API Parameters</h3>
+    <p>
+      API parameters should be passed by query string.  Multiple values can be specified by comma separating the values:
+      <code>?table=1,2,3</code>, not <code>?table=1&table=2&table=3</code>.
+    </p>
+    <p>Here is the full list of available parameters:</p>
+    <p>
+      <strong>Return options:</strong>
+    </p>
 
-<h2>Debug section</h2>
-Model:
+    <dl class="dl-horizontal">
+      <dt><code>return</code></dt>
+      <dd>
+        Specifies what to return.  Valid values are <code>data</code><code>groups</code> or <code>options</code>.
+        Default value is None.  <code>data</code> returns the data in tabular format.  <code>groups</code> is only valid
+        when using <code>aggregate</code> and <code>groupby</code>, and it returns the data grouped by the <code>groupby</code> value.
+        <code>options</code> returns the set of all remaining values for fields that can be filtered.
+      </dd>
+      <dt><code>projector</code></dt>
+      <dd>
+        Specifies which fields to return in the data array.  Valid values are any filterable field.  Default value is
+        <code>value</code> only.
+      </dd>
+      <dt><code>count</code></dt>
+      <dd>Specifies how many records to return.  Should be an integer.</dd>
+      <dt><code>skip</code></dt>
+      <dd>Specifies how many records to skip.  Should be an integer and less than the count.  Used for paging.</dd>
+    </dl>
+
+    <p>
+      <strong>Filters:</strong>
+    </p>
+    <p>For valid values, use the API Browser and check "show codes instead of humanized values."</p>
+    <dl class="dl-horizontal">
+      <dt><code>table</code></dt>
+      <dd>Tables are topical groupings of indicators.  Table codes are numeric.</dd>
+      <dt><code>row</code></dt>
+      <dd>
+        Rows roughly correspond to a category within a table.  These codes were generated based on their
+        original position within the raw data tables.  You should use the API Browser to find the relevant codes you want.
+      </dd>
+      <dt><code>column</code></dt>
+      <dd>Columns roughly correspond to a unit of measure (e.g. number of males, number of females, number of households).</dd>
+      <dt><code>region</code></dt>
+      <dd>
+        Regions are the largest geographical grouping for Hong Kong.  There are only three regions:
+        Hong Kong Island <code>hk</code>, Kowloon <code>kl</code>, and New Territories <code>nt</code>.
+      </dd>
+      <dt><code>district</code></dt>
+      <dd>
+        District councils (DCs) are a smaller geopolitical grouping than regions, but larger than areas.  There are 18
+        district councils.  Codes for the district councils are single letters.
+      </dd>
+      <dt><code>area</code></dt>
+      <dd>
+        Constituency areas (CAs) are the smallest geopolitical unit.  There are 412 areas as of the 2011 Census.  From time
+        to time, areas may be split into new areas, so these boundaries will change over time.  Codes for CAs consist
+        of the district council letter, followed by a two digit numeric value.  For example, <code>a01</code> is an area
+        that belongs to the Central and Western district council (<code>a</code>).
+      </dd>
+    </dl>
+
+    <p>
+      <strong>Aggregation:</strong>
+    </p>
+    <dl class="dl-horizontal">
+      <dt><code>groupby</code></dt>
+      <dd>The field on which the data should be grouped and aggregated.  Valid values are any filterable field.
+        Only groups one level, so if multiple values are provided, all values after the first are ignored.</dd>
+      <dt><code>aggregate</code></dt>
+      <dd>
+        The aggregation function.  Valid values are <code>sum</code>, <code>median</code>, <code>min</code>,
+        <code>max</code>, <code>first</code>.  The aggregation is then performed on each group.  The results of the
+        data are provided in the <code>groups</code> return value.  Note: if you as for <code>data</code>,
+        it will still contain all of the raw, unaggrgated data.
+      </dd>
+    </dl>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <h2>Debug section</h2>
+    Query parameters:
 <pre>
   {{ model }}
 </pre>
-Meta:
+    Returned metadata:
 <pre>
   {{ meta }}
 </pre>
 
+  </div>
+</div>
 </div>
