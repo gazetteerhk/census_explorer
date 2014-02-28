@@ -189,7 +189,7 @@ body {
   overflow: hidden;
 }
 
-#footer-odhk {
+.footer-odhk {
   width: 75px;
 }
 
@@ -203,6 +203,16 @@ body {
   color: #ddd;
 }
 
-#copyright {
+.copyright {
   color: #ddd;
+}
+
+.noscript-container {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  z-index: 3000;
+  height: 100%;
+  width: 100%;
+  background-color: #fff;
 }
