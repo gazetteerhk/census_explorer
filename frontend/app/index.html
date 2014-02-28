@@ -43,7 +43,7 @@
           <div class="navbar-header">
             <a ng-href="#/" class="navbar-brand">Gazetteer HK</a>
           </div>
-          <ul class="nav navbar-nav navbar-right navbar-collapse">
+          <ul class="nav navbar-nav navbar-right">
             <li><a ng-href="#/profiles">Area profiles</a></li>
             <li><a ng-href="#/choropleth">Mapper</a></li>
             <li><a ng-href="#/browser">API browser</a></li>
@@ -66,12 +66,26 @@
 <div class="footer">
   <div class="container">
     <div class="row">
-      <div class="col-md-4">
+      <div class="col-md-2">
         <p>
-          (c) <a href="mailto:contact@gazetteer.hk">Gazetteer HK, 2014</a>
+          <a href="http://opendatahk.com" target="_blank"><img id="footer-odhk" src="images/odhk-logo-co-black.png" /></a>
+        </p>
+        <p id="copyright">
+          © Gazetteer HK, 2014
         </p>
       </div>
-      <div class="col-md-4 col-md-offset-4 text-right">
+      <div class="col-md-3">
+        <ul class="footer-nav">
+          <li><a ng-href="#/"><strong>Gazetteer HK</strong></a></li>
+          <li><a ng-href="#/profiles">Area profiles</a></li>
+          <li><a ng-href="#/choropleth">Mapper</a></li>
+          <li><a ng-href="#/browser">API browser</a></li>
+          <li><a ng-href="#/about">{{'menu.about' | translate}}</a></li>
+          <li><a href="https://github.com/gazetteerhk/census_explorer">Github</a></li>
+          <li><a href="mailto:contact@gazetteer.hk">Contact</a></li>
+        </ul>
+      </div>
+      <div class="col-md-4 col-md-offset-3 text-right">
         <div class="fb-like" data-href="http://gazetteer.hk" data-layout="button_count" data-action="like" data-show-faces="true" data-share="true"></div>
         <a href="https://twitter.com/share" class="twitter-share-button" data-url="http://gazetteer.hk" data-text="Check out these cool visualizations about Hong Kong's neighborhoods at Gazetteer HK">Tweet</a>
         <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
