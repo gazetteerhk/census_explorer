@@ -3,6 +3,6 @@ make sure you have run `/scripts/data_preparation.py`.
 
 Usage: 
 
-   * `python main.py` directly to fire up the backend API server.
+   * `uwsgi uwsgi.ini` for production server.
    * `python debug.py` for the DEBUG version.
 
