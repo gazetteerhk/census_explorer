@@ -2,8 +2,12 @@
 
 import random
 import requests
+import grequests
 import time
-import multiprocessing
+
+NUM_TEST_URLS = 100
+NUM_CONCURRENT_CLIENTS = 10
+MAX_NUM_AREAS = 100
 
 prefix = 'http://localhost:8080/api/?'
 
@@ -22,9 +26,9 @@ def random_areas(areas, num):
 print 'start to gen test URLs'
 
 urls = []
-for i in range(1, 1000):
+for i in range(1, NUM_TEST_URLS):
     url = prefix + '&'.join([
-                'area=' + ','.join(random_areas(areas, random.randint(1,100))), 
+                'area=' + ','.join(random_areas(areas, random.randint(1, MAX_NUM_AREAS))), 
                 'table=' + str(random.choice(tables)),
                 'return=' + 'data,options',
                 ])
@@ -32,12 +36,9 @@ for i in range(1, 1000):
 
 random.shuffle(urls)
 
-def test_url(url):
-    start_time = time.time()
-    requests.get(url)
-    print 'url:', url, 'time:', time.time() - start_time
-
 print 'start to test URLs'
 
-pool = multiprocessing.Pool()
-pool.map(test_url, urls)
+def _report_elapsed(r, *args, **kwargs):
+    print('url={0}, elapsed={1}'.format(r.url, r.elapsed))
+
+grequests.map((grequests.get(u, callback=_report_elapsed) for u in urls), size=NUM_CONCURRENT_CLIENTS)
