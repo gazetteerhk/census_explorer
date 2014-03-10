@@ -8,6 +8,7 @@ import time
 NUM_TEST_URLS = 100
 NUM_CONCURRENT_CLIENTS = 10
 MAX_NUM_AREAS = 100
+MIN_NUM_AREAS = 80
 
 prefix = 'http://localhost:8080/api/?'
 
@@ -25,7 +26,9 @@ def random_areas(areas, num):
 
 print 'start to gen test URLs'
 
+# Generate test URLs
 urls = []
+# Filter by table and area
 for i in range(1, NUM_TEST_URLS):
     url = prefix + '&'.join([
                 'area=' + ','.join(random_areas(areas, random.randint(1, MAX_NUM_AREAS))), 
@@ -33,8 +36,19 @@ for i in range(1, NUM_TEST_URLS):
                 'return=' + 'data,options',
                 ])
     urls.append(url)
-
+# Filter by table, group by area and aggregate
+for i in range(1, NUM_TEST_URLS):
+    url = prefix + '&'.join([
+                'area=' + ','.join(random_areas(areas, random.randint(MIN_NUM_AREAS, MAX_NUM_AREAS))), 
+                'table=' + str(random.choice(tables)),
+                'gropuby=area',
+                'aggregate=', random.choice(['sum', 'median', 'min', 'max']),
+                'return=' + 'groups,options',
+                ])
+    urls.append(url)
+# Shuffle
 random.shuffle(urls)
+print 'generated %s URLs' % len(urls)
 
 print 'start to test URLs'
 

@@ -22,9 +22,17 @@ logger.addHandler(logstream)
 
 
 def _load_dataframe():
+    import copy
     logger.info('Load combined census.csv')
-    return pandas.io.parsers.read_csv('data/combined/census.csv', dtype={'table': 'str'})
-df_census = _load_dataframe()
+    df_census = pandas.io.parsers.read_csv('data/combined/census.csv', dtype={'table': 'str'})
+    df_census_tables = {}
+    for t in df_census['table'].unique():
+        logger.info('gen table %s', t)
+        # pandas do a lazy evaluation of filtering expression
+        # deepcopy is necessary to make this optimization take effect
+        df_census_tables[t] = copy.deepcopy(df_census[df_census['table'] == t])
+    return df_census, df_census_tables
+df_census, df_census_tables = _load_dataframe()
 
 @app.route('/')
 def index():
@@ -172,7 +180,8 @@ def api():
 
     # Parse the arguments
     # Filters:
-    filters = ['region', 'district', 'area', 'table', 'row', 'column']
+    filters = dict((f, parse_argument(get_arg_list(f))) for f in 
+            ['region', 'district', 'area', 'table', 'row', 'column'])
     # Projectors:
     projectors = parse_argument(get_arg_list('projector'))
     if not projectors:
@@ -193,11 +202,19 @@ def api():
     response = {'meta': {}}
     response['meta']['request'] = {'skip': skip, 'count': count}
 
-    # Filters
     df = df_census
+
+    # ==== Optimizations begin
+    if filters['table'] and len(filters['table']) == 1 and filters['table'][0] in df_census_tables:
+        #pass
+        logger.info('optimization table: %s', filters['table'])
+        df = df_census_tables[filters['table'][0]]
+
+    # ==== Optimizations end
+
+    # Filters
     logger.info('start filtering. df len: %d', len(df))
-    for f in filters:
-        fvals = parse_argument(get_arg_list(f))
+    for (f, fvals) in filters.iteritems():
         if fvals:
             df = df[reduce(lambda a, b: a | (df[f] == b), fvals, 
                 pandas.Series([False] * len(df), index=df.index))]
@@ -208,7 +225,7 @@ def api():
 
     # Options
     options = {}
-    for f in filters:
+    for f in filters.keys():
         options[f] = list(df[f].unique())
 
     # Projectors
