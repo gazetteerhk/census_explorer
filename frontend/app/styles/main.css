@@ -188,3 +188,31 @@ body {
 .fb-like {
   overflow: hidden;
 }
+
+.footer-odhk {
+  width: 75px;
+}
+
+.footer-nav {
+  color: #ddd;
+  list-style: none;
+  line-height: 1.7;
+}
+
+.footer-nav * a, .footer-nav * a:hover {
+  color: #ddd;
+}
+
+.copyright {
+  color: #ddd;
+}
+
+.noscript-container {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  z-index: 3000;
+  height: 100%;
+  width: 100%;
+  background-color: #fff;
+}
