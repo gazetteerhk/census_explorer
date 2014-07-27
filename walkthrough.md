@@ -30,7 +30,7 @@ CensusAPI.js
 The first thing that we have to do is build an abstraction of the API in the frontend.  Queries to the API are
 basically requests to urls like this:
 
-`http://gazetteer.hk/api/?area=a01,a02&table=1
+`http://gazetteer.hk/api/?area=a01,a02&table=1`
 
 Everything before the `?` is the base URL of the endpoint, and everything after it is a query string that specifies
 the filters.  In plain text, this query says that I want all of the data for areas a01 and a02 from table 1.
@@ -43,7 +43,7 @@ executed until you call `fetch()`.
 
 Filters are represented as a JavaScript object, so the filter from the request above would be something like this:
 
-```
+```javascript
 {
   area: {a01: true, a02: true},
   table: {1: true},
@@ -54,7 +54,7 @@ Filters are represented as a JavaScript object, so the filter from the request a
 If I had a Query object with these filters, and then I called `myQuery.addParam('area', 'a03')`, then my filter object
 would look like this:
 
-```
+```javascript
 {
   area: {a01: true, a02: true, a03: true},
   table: {1: true},
@@ -92,7 +92,7 @@ The interaction starts here, where a watcher listens for any changes in the data
 of which area was clicked.  The below code includes Angular conventions, since that was
 the frontend library that we used.
 
-```
+```javascript
 $scope.$watch('selection', function() {
   if($scope.selection.selectedAreas().length == 0) {
     return;
@@ -104,7 +104,7 @@ $scope.$watch('selection', function() {
 
 There is a bit of code here to get the display name of the clicked area from the translation map
 
-```
+```javascript
   // Get the name of the area to display
   if (areas.length > 1) {
     // Selected a district
@@ -120,7 +120,7 @@ Then we build the query, fetch it, and save it to the `$scope._queryData` object
 chart drawing code.  All of that is delayed a bit to get the animations to work correctly.  The last timeout
 is also purely an animation.
 
-```
+```javascript
   // Add the selected area to the filter
   query.addParam('area', areas);
 
@@ -144,7 +144,7 @@ is also purely an animation.
 The `redrawCharts()` function loops through each chart that needs to be drawn and does basically the same thing, so
 I'll just go over one of the charts drawn by the function `_drawAge()`.
 
-```
+```javascript
 $scope._drawAge = function() {
   // Get the element to draw the chart in, and clear it if anything is already in it
   var elemSelector = "#profile-age";
@@ -155,7 +155,7 @@ The below does a bit of pivoting of the data to get it into the shape necessary 
 bother with understanding the details, since it's specific to this dataset.  After the data is pivoted and cleaned,
 it gets added to the final data array.
 
-```
+```javascript
   var filters = ['l6_male', 'm6_female'];
   var filtered = _.filter($scope._queryData, function(val) {return (filters.indexOf(val.column) > -1);});
   var grouped = CensusAPI.sumBy(filtered, ['row', 'column']);  //  Need this to handle district aggregates
@@ -173,7 +173,7 @@ Here we use Dimple to draw the chart.  Dimple is just a slightly higher level li
 have to mess with all of the things like manually drawing the axes and calculating the scales.  Finally
 we store the chart in a cache on the page, so that we can refer to it later to clear it away.
 
-```
+```javascript
   // Make the chart
   var svg = dimple.newSvg(elemSelector, undefined, 300);
   var chart = new dimple.chart(svg, data);
