@@ -78,7 +78,7 @@ charts.  Basically pivot table like functionality.
 The Area Profile Visualization
 ------------------------------
 
-The area profile visualization allows the user to click on a single area, then shows a handful of charts that
+The [area profile visualization](http://gazetteer.hk/#/profiles) allows the user to click on a single area, then shows a handful of charts that
 show the demographics of that area.  In pseudocode, the interaction typically goes like this:
 
   - User clicks an area on the map
