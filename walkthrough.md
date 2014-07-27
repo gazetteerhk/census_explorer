@@ -16,9 +16,9 @@ Data
 ----
 
 The data is census data for neighborhoods in Hong Kong.  Our preprocessing script takes the data from spreadsheets
-like this one, and smushes it all into a single table.  The resulting "cleaned" dataset looks something like this:
-
-
+like [this one](http://www.census2011.gov.hk/en/district-profiles/ca/sham-shui-po/f08.html), and 
+smushes it all into a single table.  The resulting "cleaned" dataset is basically the table
+that is shown on the [API browser](http://gazetteer.hk/#/browser) page.
 
 So in other words, each row in the table represents a single cell in the original spreadsheets.
 
