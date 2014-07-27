@@ -36,10 +36,10 @@ Everything before the `?` is the base URL of the endpoint, and everything after 
 the filters.  In plain text, this query says that I want all of the data for areas a01 and a02 from table 1.
 
 It is tedious to have to construct this full URL every time we want to get data from the API, so we want something
-that creates and executes these queries consistently.  This is the `Query` object that is defined here.
+that creates and executes these queries consistently.  This is the `Query` object that is [defined here](https://github.com/gazetteerhk/census_explorer/blob/master/frontend/app/scripts/services/CensusAPI.js#L158).
 
-You can instantiate a Query object with filters, or you can add filters as you go with `addParam()`.  The actual request is not
-executed until you call `fetch()`.
+You can instantiate a Query object with filters, or you can add filters as you go with [`addParam()`](https://github.com/gazetteerhk/census_explorer/blob/master/frontend/app/scripts/services/CensusAPI.js#L195).
+The actual request is not executed until you call [`fetch()`](https://github.com/gazetteerhk/census_explorer/blob/master/frontend/app/scripts/services/CensusAPI.js#L217).
 
 Filters are represented as a JavaScript object, so the filter from the request above would be something like this:
 
@@ -88,7 +88,8 @@ show the demographics of that area.  In pseudocode, the interaction typically go
     - Pivot/aggregate the data to the format needed for the chart
     - Draw the chart
     
-The interaction starts here, where a watcher listens for any changes in the data structure that keeps track
+The interaction starts [here](https://github.com/gazetteerhk/census_explorer/blob/master/frontend/app/scripts/controllers/profiles.js#L37),
+where a watcher listens for any changes in the data structure that keeps track
 of which area was clicked.  The below code includes Angular conventions, since that was
 the frontend library that we used.
 
@@ -102,7 +103,8 @@ $scope.$watch('selection', function() {
   var areas = $scope.selection.selectedAreas();
 ```
 
-There is a bit of code here to get the display name of the clicked area from the translation map
+There is a bit of code here to get the display name of the clicked area from the translation map.  A district is a
+larger geographical unit and contains many areas.  You can think of districts as states, and areas as counties.
 
 ```javascript
   // Get the name of the area to display
@@ -169,9 +171,9 @@ it gets added to the final data array.
   });
 ```
 
-Here we use Dimple to draw the chart.  Dimple is just a slightly higher level library on top of d3, so we don't
-have to mess with all of the things like manually drawing the axes and calculating the scales.  Finally
-we store the chart in a cache on the page, so that we can refer to it later to clear it away.
+Here we use [Dimple](http://dimplejs.org/) to draw the chart.  Dimple is just a slightly higher level library
+ on top of d3, so we don't have to mess with all of the things like manually drawing the axes and calculating
+  the scales.  Finally we store the chart in a cache on the page, so that we can refer to it later to clear it away.
 
 ```javascript
   // Make the chart
