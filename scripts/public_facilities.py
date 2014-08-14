@@ -5,7 +5,7 @@
 # file name "pub_facility_cacode.geo.json" to exist in the data folder.
 # This file should contain all the public facility points, with the CA Code
 # as a property of each object.
-
+import urllib
 
 import config
 import json
@@ -16,8 +16,17 @@ import pandas as pd
 from combine_json import translate_datapoints
 
 
+FACILITY_FILE_URL = 'https://docs.google.com/uc?authuser=0&id=0B9xH-vwbR_tCU3drcG8xUHBESFE&export=download'
+
+
 def get_geojson_objects():
-    with open(os.path.join(config.DIR_DATA_PREFIX, 'pub_facility_cacode.geo.json'), 'rb') as f:
+    facility_file = os.path.join(config.DIR_DATA_PREFIX, 'pub_facility_cacode.geo.json')
+    if not os.path.exists(facility_file):
+        # Get it from the Google Drive
+        logger.info("Facilities geojson file does not exist.  Downloading")
+        urllib.urlretrieve(FACILITY_FILE_URL, facility_file)
+
+    with open(facility_file, 'rb') as f:
         a = json.loads(f.read())
     return a['features']
 
