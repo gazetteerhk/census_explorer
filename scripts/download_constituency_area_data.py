@@ -31,16 +31,22 @@ def main():
         raise RuntimeError("{} is not a folder".format(base_path))
 
     files_to_download = []
+    skipped = []
     # A list of tuples, first element is remote url, second element is local file
 
     for code in ALL_AREA_CODES:
         filename = code + ".xlsx"
         url = base_remote_path + filename
         local_file_path = os.path.join(base_path, filename)
-        files_to_download.append((url, local_file_path))
+        if os.path.exists(local_file_path):
+            skipped.append(local_file_path)
+        else:
+            files_to_download.append((url, local_file_path))
 
-    pool = multiprocessing.Pool()
-    pool.map(download_file, files_to_download)
+    logger.info('Downloading {} files, {} already exist (skipped)'.format(len(files_to_download), len(skipped)))
+    if len(files_to_download) > 0:
+        pool = multiprocessing.Pool()
+        pool.map(download_file, files_to_download)
 
     # Check that all the files were downloaded
     files_in_folder = set(os.listdir(base_path))

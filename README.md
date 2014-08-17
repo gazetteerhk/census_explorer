@@ -66,3 +66,9 @@ For code contributions, please fork, modify and send Pull Request.
 ## License
 
 See `LICENSE`
+
+## Todo
+
+ - Data preparation scripts dump the data into scripts/data, but the backend assumes
+ the data will be in backend/data
+ - Backend requires symlink of backend to /srv/hk_census_explorer/backend

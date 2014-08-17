@@ -4,6 +4,7 @@ import os
 import xlrd
 import json
 import sh
+import re
 import itertools
 import pprint
 import multiprocessing
@@ -11,6 +12,8 @@ import multiprocessing
 from log import logger
 import config
 from constituency_areas import ALL_FILES
+from translation_fix import ERRATA
+from table_meta_data import TABLE_META_DATA
 
 base_path = os.path.abspath(config.DIR_DATA_DOWNLOAD)
 
@@ -115,7 +118,6 @@ def check_for_differences():
     logger.info(u"Rows that had errors, and their frequency:")
     logger.info(frequency)
 
-from table_meta_data import TABLE_META_DATA
 # Sample:
 #TABLE_META_DATA = [
 #        {
@@ -191,7 +193,6 @@ def extract_book(filename):
     #    sheets['sheet' + str(i)] = tables
     #return sheets
 
-from constituency_areas import MAPPING_AREA_CODE_TO_ENGLISH, MAPPING_AREA_CODE_TO_SIMPLIFIED, MAPPING_AREA_CODE_TO_TRADITIONAL
 
 #def add_meta_info(table_data, area, sheet_name):
 #    mapping = {'sheet0': MAPPING_AREA_CODE_TO_TRADITIONAL,
@@ -217,7 +218,6 @@ def process_one_file(fn):
         json.dump(td, open(output_path, 'w'))
     logger.info('process one xls done:' + fn)
 
-import re
 _IDENTIFIER_CLEANER = re.compile(ur'[\(\)\$#&,/]')
 #_IDENTIFIER_BLANKS = re.compile(r'\s')
 def get_identifier(sheet, table, row, col):
@@ -321,7 +321,6 @@ def _merge_translation_dict(dest, src, new_keys=True):
 
 def gen_translation_for_one_group(wb, names_from):
     translate_dict = translate_sheet(wb, names_from)
-    from translation_fix import ERRATA
     #print translate_dict
     #print _merge_translation_dict(translate_dict, ERRATA)
     return _merge_translation_dict(translate_dict, ERRATA, False)
