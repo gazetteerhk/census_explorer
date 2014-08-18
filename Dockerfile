@@ -15,4 +15,6 @@ RUN pip install -r /tmp/requirements.txt
 COPY backend /srv/hk_census_explorer/backend
 
 WORKDIR /srv/hk_census_explorer/backend
-RUN ["uwsgi", "uwsgi.ini"]
+EXPOSE 8080
+ENTRYPOINT ["uwsgi"]
+CMD ["uwsgi.ini"]
