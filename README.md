@@ -8,13 +8,13 @@ Explore Hong Kong's neighborhoods through data
 
 ### Data Preparation
 
-Go to `/scripts` dir and run `python data_preparation.py`.
-This script will download original xlsx files, extract cleaned data to JSON, generate translation mappping, and generate combined CSV files.
+Go to `scripts` dir and run `python data_preparation.py`.
+This script will download original xlsx files, extract cleaned data to JSON, generate translation mapping, and generate combined CSV files.
 
 You can also generate translation files with this script by uncommenting a few lines, but this should not be necessary, as
-the files are included in the repo under `/frontend/locale`
+the files are included in the repo under `/rontend/locale`
 
-All the data files are under `/scripts/data` dir.
+All the data files are under `backend/data` dir.
 
 ### Backend
 
@@ -25,8 +25,19 @@ Make sure to install the necessary libraries by doing `pip install -r requiremen
 
 Run:
 
-   * `python main.py` directly to start the backend API server.
+   * soft link the `backend/` dir to `/srv/hk_census_explorer/backend`.
+   * `uwsgi uwsgi.ini` for production server.
+
+The production server runs at port `8080` by default.
+   
    * `python debug.py` for the DEBUG version.
+
+The development server runs at port `8081` by default.
+
+### Dockerized Backend
+
+You can run the backend as a Docker container.  Simply do `sudo docker build .` in the project root, and it will build
+the container for you.  You must still do the data preparation step first.
 
 ### Frontend
 
