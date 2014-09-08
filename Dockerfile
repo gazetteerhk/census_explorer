@@ -14,6 +14,11 @@ RUN pip install -r /tmp/requirements.txt
 # Program files and data files
 COPY backend /srv/hk_census_explorer/backend
 
+# Copy scripts for running data prep
+COPY scripts /srv/hk_census_explorer/scripts
+
+RUN python /srv/hk_census_explorer/scripts/data_preparation.py
+
 WORKDIR /srv/hk_census_explorer/backend
 EXPOSE 8080
 ENTRYPOINT ["uwsgi"]
