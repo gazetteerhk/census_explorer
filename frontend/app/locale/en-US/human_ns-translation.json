@@ -1,16 +1,48 @@
 {
-  "menu":{
-    "sample":"Sample",
-    "data":"Data",
-    "about":"About",
-    "profiles":"Neighborhood Profiles",
-      "mapper":"Data Mapper",
-      "api":"API Browser2"  
+  "menu": {
+    "title": "Gazetteer HK",
+    "sample": "Sample",
+    "data": "Data",
+    "about": "About",
+    "profiles": "Neighborhood Profiles",
+    "mapper": "Data Mapper",
+    "api": "API Browser"
   },
-  "main":{
-      "description":"Gazetteer makes geographical data about Hong Kong's diverse neighborhoods accessible and easy to use.",
-      "details":"We're collecting and standardizing numerous datasets, such as Hong Kong Census data, and making them available to everyone \n -- journalists, researchers, developers, and anyone curious about the city around us."    
-    },
+  "main": {
+    "description": "Gazetteer makes geographical data about Hong Kong's diverse neighborhoods accessible and easy to use.",
+    "details": "We're collecting and standardizing numerous datasets, such as Hong Kong Census data, and making them available to everyone \n -- journalists, researchers, developers, and anyone curious about the city around us."
+  },
+  "mapper": {
+    "title": "Map the Census Data",
+    "instruction": "To begin, select a feature to overlay on the map",
+    "options":{
+      "male_to_female_ratio":"Male to female ratio (1000s)",
+      "median_age":"Median age of the population",
+      "percent_population_under_15":"% of population under 15",
+      "percent_population_over_65":"% of population over 65",
+      "percent_population_non_chinese":"% of population that is non-Chinese",
+      "percent_population_indo_filipino":"% of population that is Indonesian or Filipino",
+      "population_divorced_separated":"% of population that is divorced or separated",
+      "median_household":"Median household size",
+      "percent_households_public_rental":"% of households in public rental housing",
+      "percent_households_own":"% of households that own their home",
+      "percent_households_rent":"% of households renting their home",
+      "median_monthly_rent":"Median monthly household rent payment",
+      "median_monthly_mortgage":"Median monthly household mortgage payment",
+      "most_common_edu":"Most common level of education",
+      "percent_population_edu_post_sec":"% of population with a post-secondary education",
+      "percent_population_edu_students_travel":"% of students that travel to another district for school",
+      "median_monthly_household_income":"Median monthly household income",
+      "percent_household_lower_income":"% of households making less than HK$25,000 per month (HK median is $23,000)",
+      "most_common_monthly_income":"Most common monthly income",
+      "most_common_occupation_men":"Most common occupation for men",
+      "most_common_occupation_women":"Most common occupation for women",
+      "most_common_industry_men":"Most common industry for men",
+      "most_common_industry_women":"Most common industry for women",
+      "percent_workers_travel":"% of workers that travel to another district for work",
+      "residence_stability":"Residence stability (% of population that lived in the same area 5 years ago)" 
+    }
+  },
   "table": {
     "100": "Public Facilities"
   },
@@ -18,4 +50,3 @@
     "n_facilities": "No. of Facilities"
   }
 }
-
