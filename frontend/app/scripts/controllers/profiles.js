@@ -185,7 +185,7 @@ angular.module('frontendApp')
         data.push({Occupation: i18n.t('row.' + split[0]), 'Gender': i18n.t('column.' + split[1]), Population: val});
       });
 
-      var svg = dimple.newSvg(elemSelector, undefined, 150);
+      var svg = dimple.newSvg(elemSelector, angular.element(elemSelector).width()-20, 150);
       var chart = new dimple.chart(svg, data);
       chart.setBounds(65, 10, 490, 90);
       chart.addCategoryAxis('y', 'Gender');
