@@ -108,7 +108,7 @@ angular.module('frontendApp')
       });
 
       // Make the chart
-      var svg = dimple.newSvg(elemSelector, undefined, 300);
+      var svg = dimple.newSvg(elemSelector, angular.element(elemSelector).width()+10, 300);
       var chart = new dimple.chart(svg, data);
       chart.setBounds("13%", 0, "85%", "85%");
       chart.addMeasureAxis('x', 'Population');
@@ -185,7 +185,7 @@ angular.module('frontendApp')
         data.push({Occupation: i18n.t('row.' + split[0]), 'Gender': i18n.t('column.' + split[1]), Population: val});
       });
 
-      var svg = dimple.newSvg(elemSelector, angular.element(elemSelector).width()-20, 150);
+      var svg = dimple.newSvg(elemSelector, angular.element(elemSelector).width()+10, 150);
       var chart = new dimple.chart(svg, data);
       chart.setBounds(65, 10, 490, 90);
       chart.addCategoryAxis('y', 'Gender');
@@ -212,7 +212,7 @@ angular.module('frontendApp')
         data.push({Industry: i18n.t('row.' + split[0]), 'Gender': i18n.t('column.' + split[1]), Population: val});
       });
 
-      var svg = dimple.newSvg(elemSelector, undefined, 150);
+      var svg = dimple.newSvg(elemSelector, angular.element(elemSelector).width()+10, 150);
       var chart = new dimple.chart(svg, data);
       chart.setBounds(65, 10, 490, 90);
       chart.addCategoryAxis('y', 'Gender');
@@ -243,7 +243,7 @@ angular.module('frontendApp')
       });
 
       // Make the chart
-      var svg = dimple.newSvg(elemSelector, undefined, 350);
+      var svg = dimple.newSvg(elemSelector, angular.element(elemSelector).width()+10, 350);
       var chart = new dimple.chart(svg, data);
       chart.setBounds(120, 0, 400, "85%");
       chart.addMeasureAxis('x', 'Population');
