@@ -65,17 +65,21 @@ angular.module('frontendApp', [
   }]);
 
 angular.module('frontendApp').filter('translate', function(){
-  return function(input, prefix, translate){
+  return function(input, expression, translate){
     if (_.isUndefined(input)) {
       return;
     }
+
+    var prefix = (expression||{}).prefix;
+    //else it is variable
+    //TODO refactor the prefix design
 
     // if the translate toggle is not provided, then we should translate by default
     if (translate === false) {
       return input;
     } else {
       if (_.isUndefined(prefix) || _.isNull(prefix)) {
-        return i18n.t(input);
+        return i18n.t(input,expression);
       } else {
         return i18n.t(prefix  + '.' + input);
       }

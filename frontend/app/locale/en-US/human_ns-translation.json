@@ -12,6 +12,16 @@
     "description": "Gazetteer makes geographical data about Hong Kong's diverse neighborhoods accessible and easy to use.",
     "details": "We're collecting and standardizing numerous datasets, such as Hong Kong Census data, and making them available to everyone \n -- journalists, researchers, developers, and anyone curious about the city around us."
   },
+  "profiles":{
+      "description":"",
+      "instruction":"Choose an area above to get started.  Zoom in for more granular areas.",
+      "age_groups":"Age groups",
+      "ethnicity":"Ethnicity",
+      "language":"Language",
+      "occupation":"Occupation",
+      "industry":"Industry",
+      "title": "Profile for __selectionName__"
+    },
   "mapper": {
     "title": "Map the Census Data",
     "instruction": "To begin, select a feature to overlay on the map",
