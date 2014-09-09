@@ -7,7 +7,8 @@ angular.module('frontendApp').factory('CensusAPI', ['$log', '$http', '$q', funct
   //TODO:
   //    An application scope configuration entry to store the server_prefix
   //    Expose this to a config block or something
-  svc.endpointURL = 'http://137.189.97.90:5901/api/';
+  svc.endpointURL = 'http://128.199.138.207:8080/';
+//  svc.endpointURL = 'http://137.189.97.90:5901/api/';
   //svc.endpointURL = 'http://192.168.222.3:8080/api/';
 
   // All possible parameter keys
