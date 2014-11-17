@@ -42,11 +42,10 @@
   <div class="container noscript-container">
     <div class="row">
       <div class="col-md-12 text-center">
-        <h2><strong>Gazetteer makes geographical data about Hong Kong's diverse neighborhoods accessible and easy to use.</strong></h2>
+        <h2><strong>{{'main.description' | translate}}</strong></h2>
         <h3>
           <p>
-            We're collecting and standardizing numerous datasets, such as Hong Kong Census data, and making them available to everyone
-            -- journalists, researchers, developers, and anyone curious about the city around us.
+          {{'main.details' | translate}}
           </p>
         </h3>
         <div class="alert alert-danger">This site requires Javascript.  Please enable it and refresh the page.</div>
@@ -76,9 +75,9 @@
       <a ng-href="#/" class="navbar-brand">Gazetteer HK</a>
     </div>
     <ul class="nav navbar-nav navbar-right">
-      <li><a ng-href="#/profiles">Area profiles</a></li>
-      <li><a ng-href="#/choropleth">Mapper</a></li>
-      <li><a ng-href="#/browser">API browser</a></li>
+      <li><a ng-href="#/profiles">{{'menu.profiles' | translate}}</a></li>
+      <li><a ng-href="#/choropleth">{{'menu.mapper' | translate}}</a></li>
+      <li><a ng-href="#/browser">{{'menu.api' | translate}}</a></li>
       <li><a ng-href="#/about">{{'menu.about' | translate}}</a></li>
       <li><a href="https://github.com/gazetteerhk/census_explorer">Github</a></li>
     </ul>
@@ -101,10 +100,10 @@
       </div>
       <div class="col-md-3">
         <ul class="footer-nav">
-          <li><a ng-href="#/"><strong>Gazetteer HK</strong></a></li>
-          <li><a ng-href="#/profiles">Area profiles</a></li>
-          <li><a ng-href="#/choropleth">Mapper</a></li>
-          <li><a ng-href="#/browser">API browser</a></li>
+          <li><a ng-href="#/"><strong>{{'menu.title' | translate}}</strong></a></li>
+          <li><a ng-href="#/profiles">{{'menu.profiles' | translate}}</a></li>
+          <li><a ng-href="#/choropleth">{{'menu.mapper' | translate}}</a></li>
+          <li><a ng-href="#/browser">{{'menu.api' | translate}}</a></li>
           <li><a ng-href="#/about">{{'menu.about' | translate}}</a></li>
           <li><a href="https://github.com/gazetteerhk/census_explorer">Github</a></li>
           <li><a href="mailto:contact@gazetteer.hk">Contact</a></li>

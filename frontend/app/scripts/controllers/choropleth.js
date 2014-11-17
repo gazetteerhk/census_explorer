@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('frontendApp')
-  .controller('ChoroplethCtrl', ['$scope', 'CensusAPI', 'Indicators', function ($scope, CensusAPI, Indicators) {
+  .controller('ChoroplethCtrl', ['$scope', 'CensusAPI', 'Indicators', '$filter',function ($scope, CensusAPI, Indicators,$filter) {
 
 
     $scope.refresh = function(){
@@ -121,37 +121,39 @@ angular.module('frontendApp')
       };
     };
 
+
+
     $scope.indicators = [
       // Gender / Age
       {
-        name: 'Male to female ratio (1000s)',
+        name: 'mapper.options.male_to_female_ratio',
         params: _genderRatioParams,
         config: _valueConfig,
         parser: _genderRatioParser
       },
       // Not very interesting
       {
-        name: 'Median age of the population',
+        name: 'mapper.options.median_age',
         params: _.extend(_.clone(Indicators.queries.age, true), Indicators.queries.areaMedianModifier),
         config: _medianAgeConfig,
         parser: _medianParserFactory(_medianAgeConfig)
       },
       {
-        name: '% of population under 15',
+        name: 'mapper.options.percent_population_under_15',
         params: Indicators.queries.age,
         config: _valueConfig,
         parser: _pctParserFactory(['h7_0', 'h8_5', 'h9_10'])
 
       },
       {
-        name: '% of population over 65',
+        name: 'mapper.options.percent_population_over_65',
         params: Indicators.queries.age,
         config: _valueConfig,
         parser: _pctParserFactory(['h20_65', 'h21_70', 'h22_75', 'h23_80', 'h24_85'])
       },
       // Ethnicity
       {
-        name: '% of population that is non-Chinese',
+        name: 'mapper.options.percent_population_non_chinese',
         params: Indicators.queries.ethnicity,
         config: _valueConfig,
         parser: _pctParserFactory([
@@ -171,82 +173,82 @@ angular.module('frontendApp')
         ])
       },
       {
-        name: '% of population that is Indonesian or Filipino',
+        name: 'mapper.options.percent_population_indo_filipino',
         params: Indicators.queries.ethnicity,
         config: _valueConfig,
         parser: _pctParserFactory(['tab0_filipino', 'tab0_indonesian'])
       },
       // Family and housing
       {
-        name: '% of population that is divorced or separated',
+        name: 'mapper.options.population_divorced_separated',
         params: Indicators.queries.maritalStatus,
         config: _valueConfig,
         parser: _pctParserFactory(['a32_divorced', 'a33_separated'])
       },
       {
-        name: 'Median household size',
+        name: 'mapper.options.median_household',
         params: _.extend(_.clone(Indicators.queries.householdSize, true), Indicators.queries.areaMedianModifier),
         config: _medianHouseholdSizeConfig,
         parser: _medianParserFactory(_medianHouseholdSizeConfig)
       },
       {
-        name: '% of households in public rental housing',
+        name: 'mapper.options.percent_households_public_rental',
         params: _.clone(Indicators.queries.householdHousingType),
         config: _valueConfig,
         parser: _pctParserFactory(['a147_public'])
       },
       {
-        name: '% of households that own their home',
+        name: 'mapper.options.percent_households_own',
         params: Indicators.queries.housingTenure,
         config: _valueConfig,
         parser: _pctParserFactory(['a156_with', 'a157_without'])
       },
       {
-        name: '% of households renting their home',
+        name: 'mapper.options.percent_households_rent',
         params: Indicators.queries.housingTenure,
         config: _valueConfig,
         parser: _pctParserFactory(['a158_sole', 'a159_co-tenantmain'])
       },
       {
-        name: 'Median monthly household rent payment',
+        name: 'mapper.options.median_monthly_rent',
         params: _.extend(_.clone(Indicators.queries.householdRent, true), Indicators.queries.areaMedianModifier),
         config: _medianMonthlyIncomeConfig,
         parser: _medianParserFactory(_medianMonthlyIncomeConfig)
       },
       {
-        name: 'Median monthly household mortgage payment',
+        name: 'mapper.options.median_monthly_mortgage',
         params: _.extend(_.clone(Indicators.queries.householdMortgage, true), Indicators.queries.areaMedianModifier),
         config: _medianMonthlyIncomeConfig,
         parser: _medianParserFactory(_medianMonthlyIncomeConfig)
       },
       // Education
       {
-        name: 'Most common level of education',
+        name: 'mapper.options.most_common_edu',
         params: _.extend(_.clone(Indicators.queries.educationalAttainment, true), Indicators.queries.areaModeModifier),
         config: _modeEduAttainmentConfig,
         parser: _medianParserFactory(_modeEduAttainmentConfig)
       },
       {
-        name: '% of population with a post-secondary education',
+        name: 'mapper.options.percent_population_edu_post_sec',
         params: Indicators.queries.educationalAttainment,
         config: _valueConfig,
         parser: _pctParserFactory(['a51_diplomacertificate', 'a52_sub-degree', 'a53_degree'])
       },
       {
-        name: '% of students that travel to another district for school',
+        name: 'mapper.options.percent_population_edu_students_travel',
         params: Indicators.queries.placeOfStudy,
         config: _valueConfig,
         parser: _pctParserFactory(['h44_hong', 'h45_kowloon', 'h46_new', 'h47_other'])
       },
       // Income and work
       {
-        name: 'Median monthly household income',
+        name: 'mapper.options.median_monthly_household_income',
         params: _.extend(_.clone(Indicators.queries.householdIncome, true), Indicators.queries.areaMedianModifier),
         config: _medianMonthlyIncomeConfig,
         parser: _medianParserFactory(_medianMonthlyIncomeConfig)
       },
       {
-        name: '% of households making less than HK$25,000 per month (HK median is $23,000)',
+        name: 'mapper.options.percent_household_lower_income',
         params: Indicators.queries.householdIncome,
         config: _valueConfig,
         parser: _pctParserFactory(['h119_<',
@@ -259,49 +261,57 @@ angular.module('frontendApp')
                                    'h126_20000'])
       },
       {
-        name: 'Most common monthly income',
+        name: 'mapper.options.most_common_monthly_income',
         params: _.extend(_.clone(Indicators.queries.householdIncome, true), Indicators.queries.areaModeModifier),
         config: _medianMonthlyIncomeConfig,
         parser: _medianParserFactory(_medianMonthlyIncomeConfig)
       },
       {
-        name: 'Most common occupation for men',
+        name: 'mapper.options.most_common_occupation_men',
         params: _.extend(_.clone(Indicators.queries.occupationMale, true), Indicators.queries.areaModeModifier),
         config: _modeOccupationConfig,
         parser: _medianParserFactory(_modeOccupationConfig)
       },
       {
-        name: 'Most common occupation for women',
+        name: 'mapper.options.most_common_occupation_women',
         params: _.extend(_.clone(Indicators.queries.occupationFemale, true), Indicators.queries.areaModeModifier),
         config: _modeOccupationConfig,
         parser: _medianParserFactory(_modeOccupationConfig)
       },
       {
-        name: 'Most common industry for men',
+        name: 'mapper.options.most_common_industry_men',
         params: _.extend(_.clone(Indicators.queries.industryMale, true), Indicators.queries.areaModeModifier),
         config: _modeIndustryConfig,
         parser: _medianParserFactory(_modeIndustryConfig)
       },
       {
-        name: 'Most common industry for women',
+        name: 'mapper.options.most_common_industry_women',
         params: _.extend(_.clone(Indicators.queries.industryFemale, true), Indicators.queries.areaModeModifier),
         config: _modeIndustryConfig,
         parser: _medianParserFactory(_modeIndustryConfig)
       },
       {
-        name: '% of workers that travel to another district for work',
+        name: 'mapper.options.percent_workers_travel',
         params: Indicators.queries.placeOfWork,
         config: _valueConfig,
         parser: _pctParserFactory(['h64_hong', 'h65_kowloon', 'h66_new', 'h67_other', 'h68_no', 'h70_places'])
       },
       // Misc
       {
-        name: 'Residence stability (% of population that lived in the same area 5 years ago)',
+        name: 'mapper.options.residence_stability',
         params: Indicators.queries.migration,
         config: _valueConfig,
         parser: _pctParserFactory(['a191_moved', 'a192_remained'])
       },
     ];
+
+    var tFilter = $filter('translate')
+
+    angular.forEach($scope.indicators, function(indicator) {
+      indicator.displayedName =  tFilter(indicator.name); 
+      console.log(indicator.displayedName);
+    })
+
 
     $scope.mapLevel = 'ca';
     $scope.theData = $scope.areaData;
