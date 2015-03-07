@@ -39,7 +39,13 @@ angular.module('frontendApp', [
       .otherwise({
         redirectTo: '/'
       })
-  }]).run([function() {
+  }])
+  .config(function($analyticsProvider) {
+    $analyticsProvider.settings.ga.additionalAccountNames = [
+      'gazetteer.hk', 'census.code4.hk'
+    ];
+  })
+  .run([function() {
     // We'll manually load the translation namespaces, because the config block
     // Appears to have some bugs in how it requests namespace files.
     // Specifically, having both the ns key and the fallbackNS key causes files to be requested
@@ -60,17 +66,54 @@ angular.module('frontendApp', [
       fallbackNS: ['human_ns', 'generated_ns'],
       load: 'current',
       resGetPath: 'locale/__lng__/__ns__-translation.json',
-      getAsync: false  // We'll block, since the translation files are pretty critical
+      getAsync: false // We'll block, since the translation files are pretty critical
     });
+
+
+    BOOMR.init({
+      beacon_url: "/images/beacon.gif",
+      BW: {
+        enabled: false
+      }
+    });
+
+    BOOMR.subscribe('before_beacon', trackInAnalytics);
+    var pageType = "homepage"; // customize this
+    var pageTitle = "Measuring pageSpeed in GA"; // customize this
+    function trackInAnalytics(beacon) {
+      try {
+        if (!beacon.t_done || beacon.t_done < 0) return;
+        var timeTaken = beacon.t_done;
+        _gaq.push(['_trackEvent', pageType + 'PageLoad', getBucket(
+          timeTaken), pageTitle, timeTaken]);
+      } catch (e) {}
+    }
+
+    function getBucket(timeTaken) {
+      var bucketString;
+      var bucket = [1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000,
+        5500, 6000, 6500, 7000, 7500, 8000, 9000, 10000, 15000, 20000,
+        30000, 45000, 60000
+      ];
+      for (var b = 0; b < bucket.length; b++) {
+        if (timeTaken < bucket[b]) {
+          bucketString = '< ' + bucket[b] / 1000 + 's';
+          break;
+        }
+      }
+      if (!bucketString) bucketString = '> ' + bucket[bucket.length - 1] /
+        1000 + 's';
+      return bucketString;
+    }
   }]);
 
-angular.module('frontendApp').filter('translate', function(){
-  return function(input, expression, translate){
+angular.module('frontendApp').filter('translate', function() {
+  return function(input, expression, translate) {
     if (_.isUndefined(input)) {
       return;
     }
 
-    var prefix = (expression||{}).prefix;
+    var prefix = (expression || {}).prefix;
     //else it is variable
     //TODO refactor the prefix design
 
@@ -79,9 +122,9 @@ angular.module('frontendApp').filter('translate', function(){
       return input;
     } else {
       if (_.isUndefined(prefix) || _.isNull(prefix)) {
-        return i18n.t(input,expression);
+        return i18n.t(input, expression);
       } else {
-        return i18n.t(prefix  + '.' + input);
+        return i18n.t(prefix + '.' + input);
       }
     }
   }
