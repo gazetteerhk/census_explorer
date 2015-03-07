@@ -2,11 +2,13 @@
 
 angular.module('frontendApp')
   .controller('ChoroplethCtrl', ['$scope', 'CensusAPI', 'Indicators', '$filter',
-    function($scope, CensusAPI, Indicators, $filter) {
+    '$analytics',
+    function($scope, CensusAPI, Indicators, $filter, $analytics) {
 
 
       $scope.refresh = function() {
         BOOMR.plugins.RT.startTimer("t_done");
+        var startTime = new Date().getTime();
         var query = new CensusAPI.Query($scope.selectedIndicator.params);
 
         var promise = query.fetch().then(function(response) {
@@ -14,6 +16,12 @@ angular.module('frontendApp')
           $scope.mapConfig = $scope.selectedIndicator.config;
           $scope.areaData = d;
           BOOMR.plugins.RT.done();
+          $analytics.eventTrack('loadChoropleth', {
+            timing: true,
+            category: 'interactionSpeed',
+            value: new Date().getTime() - startTime,
+            label: $scope.selectedIndicator.displayedName
+          });
         });
       };
 

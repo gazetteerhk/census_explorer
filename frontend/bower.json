@@ -25,7 +25,7 @@
     "colorbrewer": "~1.0.0",
     "ng-table": "0.3.1",
     "angular-busy": "~2.2.0",
-    "angulartics": "0.8.7",
+    "angulartics": "https://github.com/vincentlaucy/angulartics.git",
     "leaflet-plugins": "~1.0.1",
     "boomerang": "*"
   },
