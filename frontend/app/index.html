@@ -43,39 +43,6 @@
         s.parentNode.insertBefore(p, s);
     })();
     </script>
-    <script type="text/javascript">
-    BOOMR.init({
-            beacon_url: "/boomerang.gif",
-            BW: {
-                enabled: false
-            }
-        });
-
-        BOOMR.subscribe('before_beacon', trackInAnalytics);
-        var pageType = "homepage"; // customize this
-        var pageTitle = "Measuring pageSpeed in GA"; // customize this
-        function trackInAnalytics(beacon) {
-            try {
-                if (!beacon.t_done || beacon.t_done < 0) return;
-                var timeTaken = beacon.t_done;
-                _gaq.push(['_trackEvent', pageType + 'PageLoad', getBucket(timeTaken), pageTitle, timeTaken]);
-            } catch (e) {}
-        }
-
-        function getBucket(timeTaken) {
-            var bucketString;
-            var bucket = [1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000, 5500, 6000, 6500, 7000, 7500, 8000, 9000, 10000, 15000, 20000, 30000, 45000, 60000];
-            for (var b = 0; b < bucket.length; b++) {
-                if (timeTaken < bucket[b]) {
-                    bucketString = '< ' + bucket[b] / 1000 + 's';
-                    break;
-                }
-            }
-            if (!bucketString) bucketString = '> ' + bucket[bucket.length - 1] / 1000 + 's';
-            return bucketString;
-        }
-
-</script>
 </head>
 <body ng-app="frontendApp">
 <!--[if lt IE 7]>
@@ -212,6 +179,7 @@
     <script src="bower_components/topojson/topojson.js"></script>
     <script src="bower_components/colorbrewer/colorbrewer.js"></script>
     <script src="bower_components/ng-table/ng-table.js"></script>
+    <script src="bower_components/boomerang/boomerang.js"></script>
 
     <!-- endbower -->
     <!-- endbuild -->
