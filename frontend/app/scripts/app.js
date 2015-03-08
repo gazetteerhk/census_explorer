@@ -40,11 +40,11 @@ angular.module('frontendApp', [
         redirectTo: '/'
       })
   }])
-  .config(function($analyticsProvider) {
+  .config(['$analyticsProvider', function($analyticsProvider) {
     $analyticsProvider.settings.ga.additionalAccountNames = [
       'gazetteer.hk', 'census.code4.hk'
     ];
-  })
+  }])
   .run([function() {
     // We'll manually load the translation namespaces, because the config block
     // Appears to have some bugs in how it requests namespace files.
@@ -71,7 +71,7 @@ angular.module('frontendApp', [
 
 
     BOOMR.init({
-      beacon_url: "/images/beacon.gif",
+      beacon_url: "images/beacon.gif",
       BW: {
         enabled: false
       }
