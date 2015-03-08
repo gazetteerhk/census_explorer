@@ -42,7 +42,7 @@ angular.module('frontendApp', [
   }])
   .config(['$analyticsProvider', function($analyticsProvider) {
     $analyticsProvider.settings.ga.additionalAccountNames = [
-      'gazetteer.hk', 'census.code4.hk'
+      'code4hk'
     ];
   }])
   .run([function() {
