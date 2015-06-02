@@ -9,6 +9,7 @@ import combine_json
 import public_facilities
 import translation_for_i18next
 
+print(config.DIR_DATA_PREFIX)
 sh.mkdir('-p', config.DIR_DATA_PREFIX)
 
 logger.info('Start data preparation')

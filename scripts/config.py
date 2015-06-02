@@ -1,5 +1,9 @@
 from os import path
-DIR_DATA_PREFIX = '../backend/data'
+
+# The data folder is already soft linked to the 'backend'
+# So here the prefix is under current dir, i.e. 'script'
+DIR_DATA_PREFIX = 'data'
+
 DIR_DATA_DOWNLOAD = path.join(DIR_DATA_PREFIX, 'download')
 DIR_DATA_CLEAN_JSON = path.join(DIR_DATA_PREFIX, 'clean')
 DIR_DATA_GEO_NAME = path.join(DIR_DATA_PREFIX, 'geo')
