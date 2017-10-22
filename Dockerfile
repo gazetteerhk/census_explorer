@@ -47,9 +47,11 @@ RUN npm install -g yarn
 # The command line given by bower-away
 RUN yarn --ignore-engines --ignore-scripts && yarn postinstall
 
-WORKDIR /srv/hk_census_explorer/backend
+WORKDIR /srv/hk_census_explorer/
 
-EXPOSE 8080
+ADD nginx.conf /etc/nginx/conf.d/nginx.conf 
+
+EXPOSE 8888
 # ENTRYPOINT ["uwsgi"]
 
-CMD ["python", "main.py"]
+CMD ["./census.sh"]
