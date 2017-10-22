@@ -12,6 +12,11 @@ Pick your favourite way:
 * Resolve old dependencies that do not work today
 * Start to commit in data and dependencies -- a **400MB** repo that works directly is better than a slim repo that takes **5 hours** to recover every time.
 
+## Useful commands for developers
+
+* Mount the latest Git repository and serve in the container: `docker run -it -p8888:8888 -v $PWD:/srv/hk_census_explorer hupili/hkcensus`
+* Build the frontend via container: `docker run -it -p8888:8888 -v $PWD:/srv/hk_census_explorer hupili/hkcensus bash -c 'cd frontend; grunt build'`
+
 --------
 
 (Following are previous README.md)
