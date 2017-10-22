@@ -1,3 +1,21 @@
+## Usage
+
+Pick your favourite way:
+
+1. Visited the hosted container on AWS/ECS: http://hkcensus11.hupili.net/
+2. Pull the pre-configured all-in-one docker image: https://hub.docker.com/r/hupili/hkcensus/ . All dependencies and data are included in this image. Both Frontend and Backend are integrated using `nginx`, which exposes to port `8888`.
+3. Build your own from `Dockerfile`. Enter the container, `python data_preparation.py`, and `grunt build`. 
+
+## Purpose of This Fork
+
+* Dockerise everything to make one-box-for-all solution
+* Resolve old dependencies that do not work today
+* Start to commit in data and dependencies -- a **400MB** repo that works directly is better than a slim repo that takes **5 hours** to recover every time.
+
+--------
+
+(Following are previous README.md)
+
 # Hong Kong Gazetteer
 
 Explore Hong Kong's neighborhoods through data
