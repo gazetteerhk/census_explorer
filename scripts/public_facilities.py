@@ -16,16 +16,17 @@ import pandas as pd
 from combine_json import translate_datapoints
 
 
-FACILITY_FILE_URL = 'https://docs.google.com/uc?authuser=0&id=0B9xH-vwbR_tCU3drcG8xUHBESFE&export=download'
+FACILITY_FILE_URL = 'all_pub_facility_with_CACODE.json'
 
 
 def get_geojson_objects():
-    facility_file = os.path.join(config.DIR_DATA_PREFIX, 'pub_facility_cacode.geo.json')
-    if not os.path.exists(facility_file):
-        # Get it from the Google Drive
-        logger.info("Facilities geojson file does not exist.  Downloading")
-        urllib.urlretrieve(FACILITY_FILE_URL, facility_file)
+    # facility_file = os.path.join(config.DIR_DATA_PREFIX, 'pub_facility_cacode.geo.json')
+    # if not os.path.exists(facility_file):
+    #     # Get it from the Google Drive
+    #     logger.info("Facilities geojson file does not exist.  Downloading")
+    #     urllib.urlretrieve(FACILITY_FILE_URL, facility_file)
 
+    facility_file = FACILITY_FILE_URL
     with open(facility_file, 'rb') as f:
         a = json.loads(f.read())
     return a['features']
