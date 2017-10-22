@@ -2,7 +2,7 @@
 
 Pick your favourite way:
 
-1. Visited the hosted container on AWS/ECS: http://hkcensus11.hupili.net/
+1. Visit the hosted container on AWS/ECS: http://hkcensus11.hupili.net/
 2. Pull the pre-configured all-in-one docker image: https://hub.docker.com/r/hupili/hkcensus/ . All dependencies and data are included in this image. Both Frontend and Backend are integrated using `nginx`, which exposes to port `8888`.
 3. Build your own from `Dockerfile`. Enter the container, `python data_preparation.py`, and `grunt build`. 
 
