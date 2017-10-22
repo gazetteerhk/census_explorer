@@ -19,3 +19,5 @@ backend/lib/*
 backend/index.yaml
 
 .grunt
+
+*~

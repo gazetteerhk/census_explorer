@@ -1,6 +1,6 @@
 # Dockerfile for the backend of Gazetteer
 
-FROM ubuntu:12.04
+FROM ubuntu:16.04
 MAINTAINER Han Xu <han@hxu.io>
 
 # Basic packages
@@ -21,7 +21,9 @@ RUN apt-get -y install \
     curl \
     python-software-properties \
     software-properties-common \
-    python-numpy
+    python-numpy \
+    nginx
+
 
 ADD . /srv/hk_census_explorer/
 WORKDIR /srv/hk_census_explorer/
@@ -29,14 +31,25 @@ WORKDIR /srv/hk_census_explorer/
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
-## Project requirements file
-#COPY requirements.txt /tmp/requirements.txt
-#RUN pip install -r /tmp/requirements.txt
-#
-## Program files and data files
-#COPY backend /srv/hk_census_explorer/backend
-#
-#WORKDIR /srv/hk_census_explorer/backend
-#EXPOSE 8080
-#ENTRYPOINT ["uwsgi"]
-#CMD ["uwsgi.ini"]
+RUN curl -sL https://deb.nodesource.com/setup_8.x | bash -
+RUN apt-get install -y nodejs
+
+# RUN apt-get install -y phantomjs
+# RUN apt-get install -y x11-xserver-utils
+# To solve a problem with phantomjs
+# ENV QT_QPA_PLATFORM offscreen
+# ENV DISPLAY :0
+# RUN npm install -g bower
+
+WORKDIR /srv/hk_census_explorer/frontend
+RUN npm install -g grunt-cli
+RUN npm install -g yarn
+# The command line given by bower-away
+RUN yarn --ignore-engines --ignore-scripts && yarn postinstall
+
+WORKDIR /srv/hk_census_explorer/backend
+
+EXPOSE 8080
+# ENTRYPOINT ["uwsgi"]
+
+CMD ["python", "main.py"]
