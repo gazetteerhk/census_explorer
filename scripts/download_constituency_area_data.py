@@ -45,7 +45,7 @@ def main():
 
     logger.info('Downloading {} files, {} already exist (skipped)'.format(len(files_to_download), len(skipped)))
     if len(files_to_download) > 0:
-        pool = multiprocessing.Pool()
+        pool = multiprocessing.Pool(1)
         pool.map(download_file, files_to_download)
 
     # Check that all the files were downloaded
