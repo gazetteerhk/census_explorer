@@ -43,7 +43,11 @@ def main():
         else:
             files_to_download.append((url, local_file_path))
 
-    logger.info('Downloading {} files, {} already exist (skipped)'.format(len(files_to_download), len(skipped)))
+    logger.info('Total {} files: {} files to download; {} already exist (will skip)'.format(
+        len(files_to_download) + len(skipped),
+        len(files_to_download), 
+        len(skipped))
+        )
     if len(files_to_download) > 0:
         pool = multiprocessing.Pool(1)
         pool.map(download_file, files_to_download)
