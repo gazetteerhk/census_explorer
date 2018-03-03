@@ -15,7 +15,7 @@ Pick your favourite way:
 ## Useful commands for developers
 
 * Mount the latest Git repository and serve in the container: `docker run -it -p8888:8888 -v $PWD:/srv/hk_census_explorer hupili/hkcensus`
-* Build the frontend via container: `docker run -it -p8888:8888 -v $PWD:/srv/hk_census_explorer hupili/hkcensus bash -c 'cd frontend; grunt build'`
+* Build the frontend via container: `docker run -it -p8888:8888 -v $PWD:/srv/hk_census_explorer hupili/hkcensus bash -c 'cd frontend; npm install; grunt build'`
 
 ## Issues
 
