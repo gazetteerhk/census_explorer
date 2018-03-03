@@ -1,8 +1,6 @@
 .idea
 *.swp
 
-scripts/data
-
 *.pyc
 
 # pip install
