@@ -1,3 +1,35 @@
+## Usage
+
+Pick your favourite way:
+
+1. Visit the hosted container on AWS/ECS: http://hkcensus11.hupili.net/
+2. Pull the pre-configured all-in-one docker image: https://hub.docker.com/r/hupili/hkcensus/ . All dependencies and data are included in this image. Both Frontend and Backend are integrated using `nginx`, which exposes to port `8888`.
+3. Build your own from `Dockerfile`. Enter the container, `python data_preparation.py`, and `grunt build`. 
+
+## Purpose of This Fork
+
+* Dockerise everything to make one-box-for-all solution
+* Resolve old dependencies that do not work today
+* Start to commit in data and dependencies -- a **400MB** repo that works directly is better than a slim repo that takes **5 hours** to recover every time.
+
+## Useful commands for developers
+
+* Mount the latest Git repository and serve in the container: `docker run -it -p8888:8888 -v $PWD:/srv/hk_census_explorer hupili/hkcensus`
+* Build the frontend via container: `docker run -it -p8888:8888 -v $PWD:/srv/hk_census_explorer hupili/hkcensus bash -c 'cd frontend; npm install; grunt build'`
+
+## Issues
+
+```
+remote: warning: File frontend/node_modules.tgz is 50.93 MB; this is larger than GitHub's recommended maximum file size of 50.00 MB
+remote: warning: File scripts/data.tgz is 50.97 MB; this is larger than GitHub's recommended maximum file size of 50.00 MB
+```
+
+GitHub's LFS has many known issues. I would stick to normal Git instead of using LFS. Those 50MB tar balls will save our time in the future.
+
+--------
+
+(Following are previous README.md)
+
 # Hong Kong Gazetteer
 
 Explore Hong Kong's neighborhoods through data

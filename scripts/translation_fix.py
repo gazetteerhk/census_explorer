@@ -57,7 +57,8 @@ ERRATA.update({
 logger.info('len of ERRATA: %d', len(ERRATA))
 
 import pandas
-df = pandas.io.parsers.read_csv('https://docs.google.com/spreadsheet/pub?key=0Asi0lKkzNhjsdENOYnVKaXE0RFR2VC1BOVcwM1lMZkE&output=csv')
+# df = pandas.io.parsers.read_csv('https://docs.google.com/spreadsheet/pub?key=0Asi0lKkzNhjsdENOYnVKaXE0RFR2VC1BOVcwM1lMZkE&output=csv')
+df = pandas.io.parsers.read_csv('canonical_name - Sheet 1.csv')
 
 for i, row in df.iterrows():
     identifier = row['identifier']

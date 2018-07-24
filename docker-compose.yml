@@ -1,0 +1,13 @@
+version: '2'
+services:
+  hkcensus:
+    image: hupili/hkcensus
+    build:  
+      context: .
+      dockerfile: Dockerfile
+  hkcensus-base:
+    image: hupili/hkcensus-base
+    build:  
+      context: .
+      dockerfile: Dockerfile.base
+

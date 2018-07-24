@@ -1,13 +1,8 @@
 .idea
 *.swp
 
-scripts/data
-scripts/data-clean
-
 *.pyc
 
-# bower install
-bower_components
 # pip install
 build
 # grunt build
@@ -18,4 +13,8 @@ backend/lib/*
 
 backend/index.yaml
 
+node_modules
+
 .grunt
+
+*~

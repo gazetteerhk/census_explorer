@@ -88,7 +88,7 @@ def _agg_first(df):
 
 def _agg_sorted_group(func):
     def wrapped(df):
-        return func(df.sort(columns=['row', 'column']))
+        return func(df.sort_values(by=['row', 'column']))
     return wrapped
 
 #@_agg_sorted_group
